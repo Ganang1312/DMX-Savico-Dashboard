@@ -3,35 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Tổng hợp - v218.25 (Cập nhật giao diện)</title>
+    <title>Dashboard Tổng hợp - v218.28 (Giao diện 3D)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
+        /*
+         * BẢNG MÀU MỚI DỰA TRÊN YÊU CẦU CỦA BẠN
+         * --primary-accent: #108AB1 (Xanh dương)
+         * --success-color: #06D7A0 (Xanh lá)
+         * --warning-color: #FFD167 (Vàng)
+         * --danger-color: #F04770 (Hồng/Đỏ)
+         * --secondary-accent: #F78C6A (Cam)
+         * --text-primary: #073A4B (Xanh đen - cho văn bản chính)
+         * --text-on-dark: #FFFFFF (Trắng - cho văn bản trên nền tối)
+         * --text-muted: #5A7A84 (Xám xanh - cho văn bản phụ)
+         * --bg-main: #F4F7F9 (Nền chính - xám rất nhạt)
+         * --border-main: #DDE3E7 (Màu viền)
+         * --shadow-main: 0 4px 12px rgba(7, 58, 75, 0.08) (Đổ bóng)
+        */
         :root {
-            --dmx-blue: #0088ff;
-            --dmx-green: #28a745;
-            --dmx-yellow: #ffc107;
-            --dmx-red: #dc3545;
-            --dmx-orange: #fd7e14;
-            --dmx-pink: #EC4899;
-            --text-dark: #333;
-            --text-light: #f8f9fa;
-            --text-muted: #6c757d;
-            --bg-color: #eef2f7; 
-            --border-color: #dee2e6;
-            --card-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
+            --primary-accent: #108AB1;
+            --success-color: #06D7A0;
+            --warning-color: #FFD167;
+            --danger-color: #F04770;
+            --secondary-accent: #F78C6A;
+            --text-primary: #073A4B;
+            --text-on-dark: #FFFFFF;
+            --text-muted: #5A7A84;
+            --bg-main: #F4F7F9; 
+            --border-main: #DDE3E7;
+            /* CẬP NHẬT: Hiệu ứng shadow 3D nổi khối */
+            --shadow-main: 
+                0px 2.8px 2.2px rgba(7, 58, 75, 0.02),
+                0px 6.7px 5.3px rgba(7, 58, 75, 0.028),
+                0px 12.5px 10px rgba(7, 58, 75, 0.035),
+                0px 22.3px 17.9px rgba(7, 58, 75, 0.042),
+                0px 41.8px 33.4px rgba(7, 58, 75, 0.05),
+                0px 100px 80px rgba(7, 58, 75, 0.07);
+        }
+        /* CSS DÀNH RIÊNG CHO CHẾ ĐỘ CHỤP ẢNH */
+        .capture-mode .card,
+        .capture-mode .input-section,
+        .capture-mode .action-btn {
+            box-shadow: none !important;
+            transform: none !important;
+            transition: none !important;
         }
         html, body {
             width: 100%;
             margin: 0;
             padding: 0;
             overflow-x: hidden;
-            background-color: var(--bg-color); 
+            background-color: var(--bg-main); 
         }
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
-            color: var(--text-dark); 
+            color: var(--text-primary); 
         }
         .container { 
             width: 100%;
@@ -44,187 +72,205 @@
             gap: 25px; 
         }
         header { text-align: center; margin-bottom: 10px; }
-        header h1 { color: var(--text-dark); margin: 0; font-size: 2.5em; font-weight: 700; }
+        header h1 { color: var(--text-primary); margin: 0; font-size: 2.5em; font-weight: 700; }
         
-        .tab-buttons { display: flex; gap: 10px; border-bottom: 2px solid var(--border-color); margin-bottom: 25px; flex-wrap: wrap; }
+        .tab-buttons { display: flex; gap: 10px; border-bottom: 2px solid var(--border-main); margin-bottom: 25px; flex-wrap: wrap; }
         .tab-button { padding: 10px 20px; cursor: pointer; border: none; background-color: transparent; font-size: 1.1em; font-weight: 600; color: var(--text-muted); border-bottom: 3px solid transparent; transition: all 0.2s ease-in-out; }
-        .tab-button.active { color: var(--dmx-blue); border-bottom-color: var(--dmx-blue); }
+        .tab-button.active { color: var(--primary-accent); border-bottom-color: var(--primary-accent); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
         .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; }
-        .input-section, .card { background: #ffffff; padding: 20px; border-radius: 15px; border: 1px solid var(--border-color); box-shadow: var(--card-shadow); }
+        /* CẬP NHẬT: Thêm transition cho shadow để hiệu ứng mượt hơn */
+        .input-section, .card { 
+            background: #ffffff; 
+            padding: 20px; 
+            border-radius: 15px; 
+            border: 1px solid var(--border-main); 
+            box-shadow: var(--shadow-main);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
         .input-section h4 { margin-top: 0; color: var(--text-muted); }
         .input-section h4 a { color: inherit; text-decoration: none; transition: color 0.2s; }
-        .input-section h4 a:hover { color: var(--dmx-blue); }
-        textarea { width: 100%; padding: 10px; border: 1px solid var(--border-color); background: #f8f9fa; border-radius: 8px; font-size: 14px; box-sizing: border-box; resize: vertical; }
+        .input-section h4 a:hover { color: var(--primary-accent); }
+        textarea { width: 100%; padding: 10px; border: 1px solid var(--border-main); background: #f8f9fa; border-radius: 8px; font-size: 14px; box-sizing: border-box; resize: vertical; }
         .mainDataInput, .contestDataInput { height: 120px; }
-        .button-container { display: flex; justify-content: center; align-items: center; gap: 20px; grid-column: 1 / -1; }
+        .button-container { display: flex; justify-content: center; align-items: center; gap: 20px; width: 100%; margin-top: 25px; }
         .analyzeBtn, .captureBtn { flex: 1; max-width: 400px; }
         
-        .input-wrapper {
-            display: flex;
-            flex-direction: column;
-        }
-        .paste-btn-container {
-            display: flex;
-            justify-content: flex-end;
-            padding-top: 8px;
-        }
+        .input-wrapper { display: flex; flex-direction: column; }
+        .paste-btn-container { display: flex; justify-content: flex-end; padding-top: 8px; }
         .paste-btn {
             padding: 6px 12px;
             font-size: 13px;
             font-weight: 600;
-            background-color: var(--dmx-blue);
+            background-color: var(--primary-accent);
             color: white;
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            opacity: 0.85;
+            opacity: 0.9;
             transition: all 0.2s;
         }
         .paste-btn:hover {
             opacity: 1;
             transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(0, 136, 255, 0.3);
+            box-shadow: 0 2px 8px rgba(16, 138, 177, 0.4);
         }
 
-        .input-header-flex {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .input-header-flex h4 {
-            margin: 0;
-        }
+        .input-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .input-header-flex h4 { margin: 0; }
         
-        .interactive-table-wrapper { height: 200px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px; }
+        .interactive-table-wrapper { height: 200px; overflow-y: auto; border: 1px solid var(--border-main); border-radius: 8px; }
         .interactive-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        .interactive-table thead th { position: sticky; top: 0; background-color: #f8f9fa; color: var(--text-dark); font-weight: 600; padding: 5px; text-align: center; border-bottom: 1px solid var(--border-color); z-index: 1; vertical-align: top; }
+        .interactive-table thead th { position: sticky; top: 0; background-color: #f8f9fa; color: var(--text-primary); font-weight: 600; padding: 5px; text-align: center; border-bottom: 1px solid var(--border-main); z-index: 1; vertical-align: top; }
         .interactive-table tbody td { padding: 8px 10px; border-bottom: 1px solid #f1f1f1; text-align: right; }
         .interactive-table tbody td:first-child { text-align: center; font-weight: 500; background-color: #f8f9fa; }
         .interactive-table tbody td[contenteditable="true"] { background-color: #fff; transition: background-color 0.2s; }
-        .interactive-table tbody td[contenteditable="true"]:focus { background-color: #e6f0ff; outline: 2px solid var(--dmx-blue); outline-offset: -2px; }
+        .interactive-table tbody td[contenteditable="true"]:focus { background-color: #e6f7ff; outline: 2px solid var(--primary-accent); outline-offset: -2px; }
         .interactive-table tbody tr:last-child td { border-bottom: none; }
 
         .th-content { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding-top: 5px; }
         .col-actions { display: flex; gap: 8px; }
         .col-action-btn { background: none; border: none; cursor: pointer; padding: 2px; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; transition: background-color 0.2s; }
         .col-action-btn:hover { background-color: #ddd; }
-        .col-action-btn svg { width: 18px; height: 18px; }
-        .col-action-btn.copy svg { color: var(--dmx-green); }
-        .col-action-btn.paste svg { color: var(--dmx-blue); }
+        .col-action-btn.copy svg { color: var(--success-color); }
+        .col-action-btn.paste svg { color: var(--primary-accent); }
 
-        .action-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 15px; font-size: 18px; font-weight: 600; color: var(--text-light); border: none; border-radius: 10px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); }
-        .action-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); }
+        /* CẬP NHẬT: Hiệu ứng shadow 3D cho nút */
+        .action-btn { 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+            padding: 15px; 
+            font-size: 18px; 
+            font-weight: 600; 
+            color: var(--text-on-dark); 
+            border: none; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1), inset 0 -2px 0 rgba(0,0,0,0.2);
+        }
+        .action-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 10px rgba(0,0,0,0.15), inset 0 -2px 0 rgba(0,0,0,0.2);
+        }
+        .action-btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 3px rgba(0,0,0,0.15), inset 0 1px 0 rgba(0,0,0,0.2);
+        }
         .action-btn svg { width: 20px; height: 20px; }
-        .analyzeBtn { background: var(--dmx-blue); }
-        .captureBtn { background: linear-gradient(45deg, #28a745, #218838); }
-        .copySummaryBtn { background: linear-gradient(45deg, #007bff, #0069d9); margin-top: 15px; }
+        .analyzeBtn { background: var(--primary-accent); }
+        .captureBtn { background: linear-gradient(45deg, var(--success-color), #05B386); }
+        .copySummaryBtn { background: linear-gradient(45deg, var(--primary-accent), #0d6c8b); margin-top: 15px; }
 
         .dashboard-body { display: none; margin-top: 15px; }
-        .report-title { text-align: center; font-size: 1.8em; font-weight: 700; margin: 10px 0 0 0; color: var(--text-dark); }
+        .report-title { text-align: center; font-size: 1.8em; font-weight: 700; margin: 10px 0 0 0; color: var(--text-primary); }
         #capture-area-luyke > * + *, #capture-area-rt > * + * { margin-top: 25px; }
         #capture-content-luyke > * + *, #capture-content-rt > * + * { margin-top: 25px; }
 
         .progress-bar-container { padding: 15px 25px; }
         .progress-labels { display: flex; justify-content: space-between; font-size: 1em; font-weight: 700; margin-bottom: 8px; color: var(--text-muted); }
         .progress-track { width: 100%; height: 18px; background-color: #e9ecef; border-radius: 9px; overflow: hidden; position: relative; border: 1px solid #ddd; }
-        .progress-fill { height: 100%; background: var(--dmx-blue); border-radius: 9px; transition: width 0.8s ease-out; }
-        .progress-text { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); color: black; font-size: 0.9em; font-weight: bold; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; }
+        .progress-fill { height: 100%; background: var(--primary-accent); border-radius: 9px; transition: width 0.8s ease-out; }
+        .progress-text { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); color: var(--text-primary); font-size: 0.9em; font-weight: bold; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; }
         
         .kpi-group-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; }
-        .kpi-group-card { background-color: #fff; border-radius: 15px; box-shadow: var(--card-shadow); overflow: hidden; border: 1px solid var(--border-color); }
+        .kpi-group-card { background-color: #fff; border-radius: 15px; box-shadow: var(--shadow-main); overflow: hidden; border: 1px solid var(--border-main); }
         .kpi-group-header { color: white; padding: 12px 20px; font-size: 1.2em; font-weight: 700; text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .kpi-group-header svg { width: 24px; height: 24px; }
-        .kpi-group-header.blue { background-color: #3B82F6; }
-        .kpi-group-header.orange { background-color: #F97316; }
-        .kpi-group-header.red { background-color: #ef4444; }
+        .kpi-group-header.blue { background-color: var(--primary-accent); }
+        .kpi-group-header.orange { background-color: var(--secondary-accent); }
+        .kpi-group-header.red { background-color: var(--danger-color); }
         .kpi-group-body { padding: 15px 20px; display: flex; flex-direction: column; gap: 12px; }
         .kpi-item { display: flex; justify-content: space-between; align-items: center; font-size: 1.1em; padding: 5px 0; border-bottom: 1px solid #f0f0f0; }
         .kpi-item:last-child { border-bottom: none; }
-        .kpi-label { display: flex; align-items: center; gap: 10px; color: #343a40; font-weight: 600; }
+        .kpi-label { display: flex; align-items: center; gap: 10px; color: var(--text-primary); font-weight: 600; }
         .kpi-label svg { width: 20px; height: 20px; flex-shrink: 0; }
-        .kpi-value { font-weight: 700; color: var(--text-dark); font-size: 1.15em; }
+        .kpi-value { font-weight: 700; color: var(--text-primary); font-size: 1.15em; }
         .kpi-panel { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
         .sub-kpi-card { text-align: center; display: flex; flex-direction: column; justify-content: space-between; padding: 15px 10px; min-height: 160px; }
-        .sub-kpi-card h4 { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 1.2em; margin: 0; color: var(--text-dark); font-weight: 700; }
+        .sub-kpi-card h4 { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 1.2em; margin: 0; color: var(--text-primary); font-weight: 700; }
         .sub-kpi-card h4 svg { width: 24px; height: 24px; flex-shrink: 0; }
-        .sub-kpi-card .value { font-size: 4em; font-weight: 700; margin: 0; color: var(--dmx-blue); line-height: 1; }
+        .sub-kpi-card .value { font-size: 4em; font-weight: 700; margin: 0; color: var(--primary-accent); line-height: 1; }
         .sub-kpi-card .sub-text { font-size: 1em; color: var(--text-muted); margin: 0; }
         .kpi-installment-card { justify-content: center; gap: 10px; }
         .kpi-installment-card .text-content { text-align: center; }
         .kpi-installment-card .chart-content { width: 100px; height: 100px; position: relative; margin: 0 auto; }
-        .kpi-installment-card .chart-content .chart-inner-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.8em; font-weight: 700; color: var(--text-dark); }
+        .kpi-installment-card .chart-content .chart-inner-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.8em; font-weight: 700; color: var(--text-primary); }
 
         .dashboard-layout-grid { display: grid; gap: 25px; align-items: flex-start; }
         .charts-column { display: flex; flex-direction: column; gap: 25px; }
         .chart-wrapper, .report-section { padding: 25px; min-width: 0; } 
-        .report-section h2, .chart-wrapper h2 { font-size: 1.8em; color: var(--dmx-blue); text-align: center; margin-top:0; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .report-section h2, .chart-wrapper h2 { font-size: 1.8em; color: var(--primary-accent); text-align: center; margin-top:0; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .chart-wrapper h2 svg, .report-section h2 svg { width: 24px !important; height: 24px !important; flex-shrink: 0; }
         .chart-container { position: relative; width: 100%; }
         
         .contest-results-container .card-content { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
-        .contest-column-visual { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px; border: 1px solid var(--border-color); border-radius: 15px; }
+        .contest-column-visual { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px; border: 1px solid var(--border-main); border-radius: 15px; }
         .status-icon-wrapper { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; }
-        .status-icon-wrapper.green { background-color: #d4edda; border: 3px solid var(--dmx-green); }
-        .status-icon-wrapper.red { background-color: #f8d7da; border: 3px solid var(--dmx-red); }
+        .status-icon-wrapper.green { background-color: #d4edda; border: 3px solid var(--success-color); }
+        .status-icon-wrapper.red { background-color: #f8d7da; border: 3px solid var(--danger-color); }
         .status-icon-wrapper svg { width: 50%; height: 50%; }
-        .status-icon-wrapper.green svg { color: var(--dmx-green); }
-        .status-icon-wrapper.red svg { color: var(--dmx-red); }
+        .status-icon-wrapper.green svg { color: var(--success-color); }
+        .status-icon-wrapper.red svg { color: var(--danger-color); }
         .contest-column-visual h4 { font-size: 1.3em; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
-        .contest-column-visual h4.on-track { color: var(--dmx-green); }
-        .contest-column-visual h4.behind { color: var(--dmx-red); }
+        .contest-column-visual h4.on-track { color: var(--success-color); }
+        .contest-column-visual h4.behind { color: var(--danger-color); }
         .contest-list-new { width: 100%; }
-        .contest-item-new { padding: 12px 0; border-bottom: 1px solid var(--border-color); }
+        .contest-item-new { padding: 12px 0; border-bottom: 1px solid var(--border-main); }
         .contest-item-new:last-child { border-bottom: none; }
         .contest-main-info { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
         .contest-main-info .name-rank { font-weight: 700; font-size: 1.1em; flex-grow: 1; text-align: left; }
         .contest-main-info .stats { font-size: 0.9em; color: var(--text-muted); text-align: right; white-space: normal; flex-shrink: 1; }
-        .contest-main-info .stats strong { color: var(--text-dark); font-weight: 700; }
+        .contest-main-info .stats strong { color: var(--text-primary); font-weight: 700; }
         .contest-progress-track { width: 100%; height: 10px; background-color: #e9ecef; border-radius: 5px; overflow: hidden; margin-top: 8px; }
         .contest-progress-fill { height: 100%; border-radius: 5px; transition: width 0.8s ease-out; }
         
-        .summary-textarea { height: 500px; background-color: #f8f9fa; border: 1px solid var(--border-color); }
+        .summary-textarea { height: 500px; background-color: #f8f9fa; border: 1px solid var(--border-main); }
         
-        .toast-notification { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background-color: var(--dmx-green); color: white; padding: 16px 30px; border-radius: 8px; z-index: 1001; font-size: 1.1em; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: bottom 0.5s ease-in-out; }
+        .toast-notification { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background-color: var(--success-color); color: white; padding: 16px 30px; border-radius: 8px; z-index: 1001; font-size: 1.1em; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: bottom 0.5s ease-in-out; }
         .toast-notification.show { bottom: 30px; }
-        .toast-notification.error { background-color: var(--dmx-red); }
+        .toast-notification.error { background-color: var(--danger-color); }
 
         .details-toggle { text-align: center; margin-top: 25px; }
-        .details-toggle button { font-size: 0.9em; font-weight: 600; background: #6c757d; color: var(--text-light); padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; transition: background-color 0.3s, box-shadow 0.3s; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
+        .details-toggle button { font-size: 0.9em; font-weight: 600; background: #6c757d; color: var(--text-on-dark); padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; transition: background-color 0.3s, box-shadow 0.3s; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
         .details-toggle button:hover { background-color: #5a6268; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
         .tables-container { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out; }
         .tables-container.show { max-height: 5000px; margin-top: 25px; }
         #specificTablesContainer.show, #specificTablesContainer-rt.show { max-height: 5000px; margin-top: 25px; }
         .table-container { margin-bottom:25px; overflow-x: auto; } 
-        .table-container h2 { margin-top: 0; font-size: 1.5em; color: var(--dmx-blue); }
+        .table-container h2 { margin-top: 0; font-size: 1.5em; color: var(--primary-accent); }
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-color); }
-        thead th { background-color: var(--dmx-blue); color: var(--text-light); text-transform: uppercase; font-size: 0.9em; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-main); }
+        thead th { background-color: var(--primary-accent); color: var(--text-on-dark); text-transform: uppercase; font-size: 0.9em; }
         tbody tr:nth-child(even) { background-color: #f8f9fa; }
         tbody tr:hover { background-color: #e9ecef; }
         
         #contest-table-luyke-wrapper { padding: 25px; }
         #contest-table-luyke-wrapper h2 { text-align: center; font-size: 2em; margin-bottom: 25px; }
         .contest-split-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; align-items: flex-start; }
-        .contest-group { background: #fff; border-radius: 15px; padding: 20px; border: 1px solid var(--border-color); box-shadow: var(--card-shadow); }
+        .contest-group { background: #fff; border-radius: 15px; padding: 20px; border: 1px solid var(--border-main); box-shadow: var(--shadow-main); }
         .contest-group-title { font-size: 1.5em; font-weight: 700; margin: 0 0 15px 0; text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .contest-group-title.top-performers { color: var(--dmx-green); }
-        .contest-group-title.needs-improvement { color: var(--dmx-red); }
+        .contest-group-title.top-performers { color: var(--success-color); }
+        .contest-group-title.needs-improvement { color: var(--danger-color); }
 
         .contest-detail-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        .contest-detail-table th, .contest-detail-table td { padding: 12px 8px; text-align: left; border-bottom: 1px solid var(--border-color); border-right: 1px solid var(--border-color); vertical-align: middle; }
+        .contest-detail-table th, .contest-detail-table td { padding: 12px 8px; text-align: left; border-bottom: 1px solid var(--border-main); border-right: 1px solid var(--border-main); vertical-align: middle; }
         .contest-detail-table th:last-child, .contest-detail-table td:last-child { border-right: none; }
-        .contest-detail-table thead th { background-color: #f8f9fa; color: var(--text-dark); font-weight: 600; text-align: center; font-size: 0.9em; text-transform: uppercase; }
+        .contest-detail-table thead th { background-color: #f8f9fa; color: var(--text-primary); font-weight: 600; text-align: center; font-size: 0.9em; text-transform: uppercase; }
         .contest-detail-table tbody tr:last-child td { border-bottom: none; }
         .contest-detail-table tbody tr:hover { background-color: #e9ecef; }
         .contest-detail-table td { font-weight: 500; }
         .contest-detail-table th:not(:nth-child(2)), .contest-detail-table td:not(:nth-child(2)) { text-align: center; }
         .contest-detail-table .col-category { text-align: left; font-weight: 700; width: 30%; }
         .contest-detail-table .col-rank { width: 40px; }
-        .col-negative { color: var(--dmx-red); font-weight: bold; }
+        .col-negative { color: var(--danger-color); font-weight: bold; }
 
         .progress-bar-cell { min-width: 100px; }
         .bar-wrapper { display: flex; align-items: center; gap: 8px; }
@@ -244,7 +290,7 @@
             text-align: center !important;
             vertical-align: middle;
             padding: 10px 8px;
-            border-right: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-main);
         }
         .rt-styled-table th:last-child, .rt-styled-table td:last-child {
             border-right: none;
@@ -254,7 +300,7 @@
         }
         .rt-styled-table thead th {
             background-color: #f8f9fa;
-            color: var(--text-dark);
+            color: var(--text-primary);
             font-weight: 600;
         }
 
@@ -623,19 +669,19 @@
     /****************************************************************************
     * SHARED UTILITY & SETUP FUNCTIONS
     ****************************************************************************/
-    var VIBRANT_PALETTE = window.VIBRANT_PALETTE || ['#0088ff', '#28a745', '#ffc107', '#fd7e14', '#6f42c1', '#dc3545', '#20c997', '#6610f2', '#d63384'];
-    var formatNumber = window.formatNumber || ((num, decimals = 0) => {
+    var VIBRANT_PALETTE = ['#108AB1', '#06D7A0', '#FFD167', '#F78C6A', '#F04770', '#073A4B'];
+    var formatNumber = (num, decimals = 0) => {
         const number = parseFloat(num);
         if (isNaN(number)) {
             return ''; 
         }
         return number.toLocaleString('vi-VN', { maximumFractionDigits: decimals });
-    });
+    };
     var formatShortK = (num) => {
         if (isNaN(num) || num === 0) return '0';
         return (num / 1000).toLocaleString('vi-VN', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
     };
-    var getColor = window.getColor || ((value, threshold1 = 50, threshold2 = 100) => value < threshold1 ? 'var(--dmx-red)' : value < threshold2 ? 'var(--dmx-orange)' : 'var(--dmx-green)');
+    var getColor = (value, threshold1 = 50, threshold2 = 100) => value < threshold1 ? '#F04770' : value < threshold2 ? '#F78C6A' : '#06D7A0';
     
     function showToast(message, isError = false) {
         const toast = document.createElement('div');
@@ -682,6 +728,7 @@
         return `<div class="contest-item-new"><div class="contest-main-info"><span class="name-rank">#${rank} ${item.name}</span><span class="stats">${statsHtml}</span></div><div class="contest-progress-track"><div class="contest-progress-fill" style="width: ${item.percentProjected > 100 ? 100 : item.percentProjected}%; background-color: ${getColor(item.percentProjected)};"></div></div></div>`;
     }
 
+    // CẬP NHẬT: Thay đổi logic phân loại thi đua dựa trên %HT thực tế
     function processFullContestData(allContests, daysRemaining) {
         let processedItems = [];
         if (!allContests || allContests.length === 0) return { all: [], veDich:[], canCoGang:[], canTapTrung:[], baoDong:[], onTrack:[], behind:[] };
@@ -708,14 +755,18 @@
             });
         });
         const sortedItems = processedItems.sort((a,b) => b.percentProjected - a.percentProjected);
+        
+        // Phân loại dựa trên %HT thực tế cho phần nhận xét
         return {
             all: sortedItems,
-            veDich: sortedItems.filter(p => p.percentActual >= 100),
-            canCoGang: sortedItems.filter(p => p.percentProjected >= 100 && p.percentActual < 100),
-            canTapTrung: sortedItems.filter(p => p.percentProjected >= 80 && p.percentProjected < 100),
-            baoDong: sortedItems.filter(p => p.percentProjected < 80),
+            // Phân loại cũ dựa trên % dự kiến cho hiển thị trực quan
             onTrack: sortedItems.filter(p => p.percentProjected >= 100),
-            behind: sortedItems.filter(p => p.percentProjected < 100)
+            behind: sortedItems.filter(p => p.percentProjected < 100),
+            // Phân loại mới dựa trên %HT thực tế cho phần nhận xét
+            veDich_actual: sortedItems.filter(p => p.percentActual >= 100),
+            canCoGang_actual: sortedItems.filter(p => p.percentActual >= 80 && p.percentActual < 100),
+            canTapTrung_actual: sortedItems.filter(p => p.percentActual >= 50 && p.percentActual < 80),
+            baoDong_actual: sortedItems.filter(p => p.percentActual < 50)
         };
     }
 
@@ -732,7 +783,7 @@
         `;
         
         document.getElementById('luyKeTab').innerHTML = `
-            <div class="input-grid">
+            <div id="luyKeInputGrid" class="input-grid">
                 <div class="input-section">
                     <div class="input-header-flex">
                          <h4><a href="https://bi.thegioididong.com/sieu-thi-con?id=16753&tab=bcdtnh&rt=2&dm=1" target="_blank" rel="noopener noreferrer">Dữ liệu Báo cáo Kinh doanh</a></h4>
@@ -767,13 +818,14 @@
                     </div>
                     <div id="dailyComparisonInputContainer"></div>
                 </div>
-                <div class="button-container">
-                     <button id="analyzeBtn" class="action-btn analyzeBtn">TẠO DASHBOARD LUỸ KẾ</button>
-                     <button id="captureBtnLuyKe" class="action-btn captureBtn">
-                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9Z" /></svg>
-                        Chụp ảnh Báo cáo
-                    </button>
-                </div>
+            </div>
+            <div class="button-container">
+                 <button id="analyzeBtn" class="action-btn analyzeBtn">TẠO DASHBOARD LUỸ KẾ</button>
+                 <button id="showInputsBtnLuyKe" class="action-btn" style="display: none; background: #6c757d; max-width: 250px;">Chỉnh sửa Dữ liệu</button>
+                 <button id="captureBtnLuyKe" class="action-btn captureBtn">
+                    <svg fill="currentColor" viewBox="0 0 24 24"><path d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9Z" /></svg>
+                    Chụp ảnh Báo cáo
+                </button>
             </div>
             <div id="dashboard-body-luyke" class="dashboard-body">
                 <div id="capture-area-luyke">
@@ -783,8 +835,7 @@
                         <div class="progress-bar-container card"><div class="progress-labels"><span>Tiến độ Target</span><span id="progress-summary-target"></span></div><div class="progress-track"><div class="progress-fill" id="progress-fill-target"><span class="progress-text" id="progress-text-target"></span></div></div></div>
                         
                         <div id="kpi-group-container" class="kpi-group-container">
-                            <!-- KPI Groups will be rendered here -->
-                        </div>
+                            </div>
                         
                         <div class="dashboard-layout-grid" style="grid-template-columns: 2fr 1fr;">
                             <div class="charts-column">
@@ -820,7 +871,7 @@
             </div>`;
         
         document.getElementById('realtimeTab').innerHTML = `
-            <div class="input-grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
+            <div id="realtimeInputGrid" class="input-grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
                 <div class="input-section">
                     <h4><a href="https://bi.thegioididong.com/sieu-thi-con?id=16753&tab=bcdtnh&rt=1&dm=1" target="_blank" rel="noopener noreferrer">Dữ liệu Realtime Ngành hàng</a></h4>
                     <div class="input-wrapper">
@@ -848,9 +899,10 @@
                         </div>
                     </div>
                 </div>
-            </div>
+             </div>
              <div class="button-container">
                 <button id="analyzeBtn-rt" class="action-btn analyzeBtn">TẠO DASHBOARD REAL-TIME</button>
+                <button id="showInputsBtnRt" class="action-btn" style="display: none; background: #6c757d; max-width: 250px;">Chỉnh sửa Dữ liệu</button>
                 <button id="captureBtnRt" class="action-btn captureBtn">
                    <svg fill="currentColor" viewBox="0 0 24 24"><path d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9Z" /></svg>
                    Chụp ảnh Báo cáo
@@ -970,11 +1022,23 @@
             try { 
                 const mainParsedData = parseLuyKeData(mainDataFromTextarea); 
                 const contestParsedData = contestDataFromTextarea.trim() ? parseAllContestData(contestDataFromTextarea) : []; 
+                
+                // Ẩn form nhập liệu và hiện nút chỉnh sửa
+                document.getElementById('luyKeInputGrid').style.display = 'none';
+                document.getElementById('showInputsBtnLuyKe').style.display = 'inline-flex';
+
                 displayLuyKeDashboard(mainParsedData, contestParsedData, yearlyDataFromTable, dailyDataFromTable); 
             } catch (error) { 
                 showToast("Lỗi xử lý dữ liệu Luỹ kế: " + error.message, true); 
                 console.error(error); 
             } 
+        });
+
+        document.getElementById('showInputsBtnLuyKe').addEventListener('click', function() {
+            const inputGrid = document.getElementById('luyKeInputGrid');
+            const isHidden = inputGrid.style.display === 'none';
+            inputGrid.style.display = isHidden ? 'grid' : 'none';
+            this.textContent = isHidden ? 'Ẩn Mục Nhập Liệu' : 'Chỉnh sửa Dữ liệu';
         });
         
         document.getElementById('toggleSpecificTablesBtn').addEventListener('click', () => {
@@ -997,15 +1061,27 @@
                 ? document.getElementById('capture-area-luyke') 
                 : document.getElementById('capture-content-luyke');
 
-            html2canvas(captureElement, { useCORS: true, backgroundColor: '#eef2f7', scale: 2.5 }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `báo cáo luỹ kế ngày ${new Date().toLocaleDateString('vi-VN')}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-            }).catch(err => {
-                showToast('Lỗi khi chụp ảnh.', true);
-                console.error(err);
-            });
+            const mainContainer = document.querySelector('body');
+            mainContainer.classList.add('capture-mode'); // Thêm class để "làm phẳng" giao diện
+
+            // Dùng setTimeout để đảm bảo trình duyệt đã render lại CSS trước khi chụp
+            setTimeout(() => {
+                html2canvas(captureElement, { 
+                    useCORS: true, 
+                    backgroundColor: '#F4F7F9', // Dùng mã màu trực tiếp
+                    scale: 2.5 
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `báo cáo luỹ kế ngày ${new Date().toLocaleDateString('vi-VN')}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                }).catch(err => {
+                    showToast('Lỗi khi chụp ảnh. Hãy thử lại.', true);
+                    console.error(err);
+                }).finally(() => {
+                    mainContainer.classList.remove('capture-mode'); // Xóa class để giao diện trở lại bình thường
+                });
+            }, 100); // Chờ 100ms
         });
 
         function parseLuyKeData(text) { 
@@ -1108,9 +1184,9 @@
                     <div class="kpi-group-header orange"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M11 2v9h9a9 9 0 00-9-9zm2 1.08a7 7 0 016.92 6.92H13V3.08zM4 12a8 8 0 018-8v8H4zm9 8a8 8 0 01-8-8h8v8z"/></svg>PHÂN TÍCH CHI TIẾT</div>
                     <div class="kpi-group-body">
                         <div class="kpi-item"><span class="kpi-label"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,9L8,13H11V17H13V13H16L12,9Z"/></svg>Mục tiêu ngày</span><span class="kpi-value">${formatNumber(kpis.mucTieuNgay, 0)} Triệu</span></div>
-                        <div class="kpi-item"><span class="kpi-label"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>% Tăng trưởng</span><span class="kpi-value" style="color: ${kpis.growthRate >= 0 ? 'var(--dmx-green)' : 'var(--dmx-red)'}">${kpis.growthRate >= 0 ? '▲' : '▼'} ${formatNumber(Math.abs(kpis.growthRate), 2)}%</span></div>
-                        <div class="kpi-item"><span class="kpi-label"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>± DT cùng kỳ</span><span class="kpi-value" style="color: ${kpis.chenhLech >= 0 ? 'var(--dmx-green)' : 'var(--dmx-red)'}">${kpis.chenhLech >= 0 ? '▲' : '▼'} ${formatNumber(Math.abs(kpis.chenhLech), 0)}</span></div>
-                        <div class="kpi-item"><span class="kpi-label"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M21,11H12.42A3,3 0 0,1 12,11.58V13.42A3,3 0 0,1 12.42,14H21V16H12.42A3,3 0 0,1 10,18.42V20H8V18.42A3,3 0 0,1 5.58,16H3V14H5.58A3,3 0 0,1 8,11.58V10H10V11.58A3,3 0 0,1 12.42,14H15V12H12.42A3,3 0 0,1 10,9.58V8H8V9.58A3,3 0 0,1 5.58,12H3V10H5.58A3,3 0 0,1 8,7.58V6H10V7.58A3,3 0 0,1 12.42,10H21V11Z"/></svg>Tỷ trọng trả góp</span><span class="kpi-value" style="color: ${kpis.tyTrongTraGop < 20 ? 'var(--dmx-red)' : 'var(--dmx-green)'}">${formatNumber(kpis.tyTrongTraGop, 1)}%</span></div>
+                        <div class="kpi-item"><span class="kpi-label"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>% Tăng trưởng</span><span class="kpi-value" style="color: ${kpis.growthRate >= 0 ? '#06D7A0' : '#F04770'}">${kpis.growthRate >= 0 ? '▲' : '▼'} ${formatNumber(Math.abs(kpis.growthRate), 2)}%</span></div>
+                        <div class="kpi-item"><span class="kpi-label"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>± DT cùng kỳ</span><span class="kpi-value" style="color: ${kpis.chenhLech >= 0 ? '#06D7A0' : '#F04770'}">${kpis.chenhLech >= 0 ? '▲' : '▼'} ${formatNumber(Math.abs(kpis.chenhLech), 0)}</span></div>
+                        <div class="kpi-item"><span class="kpi-label"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M21,11H12.42A3,3 0 0,1 12,11.58V13.42A3,3 0 0,1 12.42,14H21V16H12.42A3,3 0 0,1 10,18.42V20H8V18.42A3,3 0 0,1 5.58,16H3V14H5.58A3,3 0 0,1 8,11.58V10H10V11.58A3,3 0 0,1 12.42,14H15V12H12.42A3,3 0 0,1 10,9.58V8H8V9.58A3,3 0 0,1 5.58,12H3V10H5.58A3,3 0 0,1 8,7.58V6H10V7.58A3,3 0 0,1 12.42,10H21V11Z"/></svg>Tỷ trọng trả góp</span><span class="kpi-value" style="color: ${kpis.tyTrongTraGop < 20 ? '#F04770' : '#06D7A0'}">${formatNumber(kpis.tyTrongTraGop, 1)}%</span></div>
                     </div>
                 </div>
                 <div class="kpi-group-card">
@@ -1189,7 +1265,7 @@
                     const tooltipText = item.percentProjected < 50 ? "Cần tập trung cao độ!" : item.percentProjected < 70 ? "Cần cải thiện thêm!" : "Duy trì phong độ tốt!";
                     
                     const remainingCell = item.remaining <= 0
-                        ? `<td style="color: var(--dmx-green); font-weight: bold;">Hoàn thành</td>`
+                        ? `<td style="color: var(--success-color); font-weight: bold;">Hoàn thành</td>`
                         : `<td class="col-negative">${formatNumber(item.remaining, 1)}</td>`;
 
                     return `
@@ -1323,8 +1399,8 @@
                         {
                             label: 'Target tháng',
                             data: targets,
-                            backgroundColor: VIBRANT_PALETTE[5] + '99',
-                            borderColor: VIBRANT_PALETTE[5],
+                            backgroundColor: VIBRANT_PALETTE[4] + '99',
+                            borderColor: VIBRANT_PALETTE[4],
                             borderWidth: 1,
                             datalabels: {
                                 color: 'var(--text-muted)',
@@ -1340,7 +1416,7 @@
                             borderColor: VIBRANT_PALETTE[0],
                             borderWidth: 1,
                             datalabels: {
-                                color: 'var(--text-dark)',
+                                color: 'var(--text-primary)',
                                 anchor: 'end',
                                 align: 'top',
                                 offset: -5,
@@ -1412,11 +1488,12 @@
                 }
             });
 
+            // CẬP NHẬT: Sửa lỗi mất màu biểu đồ bằng cách gán mã màu trực tiếp
             const weekendColorCallback = (context) => {
                 const day = context.dataIndex + 1;
                 const date = new Date(reportDate.getFullYear(), reportDate.getMonth(), day);
                 const dayOfWeek = date.getDay();
-                return dayOfWeek === 0 || dayOfWeek === 6 ? '#dc3545' : '#0088ff';
+                return dayOfWeek === 0 || dayOfWeek === 6 ? '#F04770' : '#108AB1'; // Sử dụng mã hex trực tiếp
             };
 
             const dailyChart = new Chart('dailyComparisonChart', {
@@ -1443,14 +1520,14 @@
                             type: 'line',
                             label: 'Tháng trước',
                             data: lastMonthRevenue,
-                            borderColor: '#5f6368', 
-                            backgroundColor: '#5f6368',
+                            borderColor: '#5A7A84', 
+                            backgroundColor: '#5A7A84',
                             pointBackgroundColor: (context) => {
-                                if (context.dataIndex === null || context.dataIndex >= daysInMonth) return '#5f6368';
+                                if (context.dataIndex === null || context.dataIndex >= daysInMonth) return '#5A7A84';
                                 const day = context.dataIndex + 1;
                                 const prevMonthDate = new Date(reportDate.getFullYear(), reportDate.getMonth() - 1, day);
                                 const dayOfWeek = prevMonthDate.getDay();
-                                return dayOfWeek === 0 || dayOfWeek === 6 ? 'var(--dmx-pink)' : '#5f6368';
+                                return dayOfWeek === 0 || dayOfWeek === 6 ? '#F04770' : '#5A7A84';
                             },
                             borderDash: [5, 5],
                             pointRadius: 4,
@@ -1461,7 +1538,7 @@
                             datalabels: {
                                 display: (ctx) => ctx.dataset.data[ctx.dataIndex] !== null,
                                 formatter: (value) => formatNumber(value, 0),
-                                color: '#5f6368',
+                                color: '#5A7A84',
                                 align: 'bottom',
                                 font: { size: 10 }
                             }
@@ -1470,8 +1547,8 @@
                             type: 'line',
                             label: 'Target',
                             data: Array(daysInMonth).fill(dailyTarget),
-                            borderColor: '#ffc107', 
-                            backgroundColor: '#ffc107',
+                            borderColor: '#FFD167', 
+                            backgroundColor: '#FFD167',
                             borderDash: [10, 5], 
                             borderWidth: 2,
                             pointRadius: 0,
@@ -1479,7 +1556,7 @@
                             order: 0,
                             datalabels: {
                                 display: true,
-                                color: '#ffc107',
+                                color: '#FFD167',
                                 align: 'end',
                                 anchor: 'end',
                                 formatter: (value, context) => context.dataIndex === Math.floor(daysInMonth / 2) ? formatNumber(value, 0) : '',
@@ -1610,6 +1687,7 @@
             container.appendChild(contentGrid);
         }
         
+        // CẬP NHẬT: Thay đổi logic render nhận xét để dùng %HT thực tế
         function renderLuyKeSummary(kpis, contest, reportDate) {
             const container = document.getElementById('summary-report-wrapper-luyke');
             container.style.display = 'block';
@@ -1619,10 +1697,10 @@
             const dateString = `ngày ${dateToUse.getDate()}/${dateToUse.getMonth() + 1}/${dateToUse.getFullYear()}`;
             const growthText = kpis.chenhLech >= 0 ? 'Tăng' : 'Giảm';
 
-            const createSubListWithProjected = (items, showDailyTarget = false) => {
+            const createSubListWithActual = (items, showDailyTarget = false) => {
                 if (!items || items.length === 0) return '';
                 return items.map(item =>
-                    `  - ${item.name} (${formatNumber(item.percentProjected, 1)}%)` +
+                    `  - ${item.name} (${formatNumber(item.percentActual, 1)}%)` +
                     (showDailyTarget && item.dailyTarget > 0 ? `: cần ${formatNumber(item.dailyTarget, 1)}/ngày` : '')
                 ).join('\n');
             };
@@ -1631,18 +1709,18 @@
             const totalCount = contest.all.length;
             
             let contestSummarySections = [];
-            if (contest.veDich.length > 0) {
-                contestSummarySections.push(`✅ ĐÃ VỀ ĐÍCH (${contest.veDich.length} nhóm):\n${createSubListWithProjected(contest.veDich)}`);
+            if (contest.veDich_actual.length > 0) {
+                contestSummarySections.push(`✅ ĐÃ VỀ ĐÍCH (${contest.veDich_actual.length} nhóm):\n${createSubListWithActual(contest.veDich_actual)}`);
             }
-            if (contest.canCoGang.length > 0) {
-                contestSummarySections.push(`💪 CẦN CỐ GẮNG (${contest.canCoGang.length} nhóm):\n${createSubListWithProjected(contest.canCoGang, true)}`);
+            if (contest.canCoGang_actual.length > 0) {
+                contestSummarySections.push(`💪 CẦN CỐ GẮNG (${contest.canCoGang_actual.length} nhóm - HT >80%):\n${createSubListWithActual(contest.canCoGang_actual, true)}`);
             }
-            if (contest.canTapTrung.length > 0) {
-                contestSummarySections.push(`🎯 CẦN TẬP TRUNG (${contest.canTapTrung.length} nhóm):\n${createSubListWithProjected(contest.canTapTrung, true)}`);
+            if (contest.canTapTrung_actual.length > 0) {
+                contestSummarySections.push(`🎯 CẦN TẬP TRUNG (${contest.canTapTrung_actual.length} nhóm - HT >50%):\n${createSubListWithActual(contest.canTapTrung_actual, true)}`);
             }
-            if (contest.baoDong.length > 0) {
-                const baoDongList = contest.baoDong.map(item => item.name).join(', ');
-                contestSummarySections.push(`🚨 BÁO ĐỘNG (${contest.baoDong.length} nhóm): ${baoDongList}`);
+            if (contest.baoDong_actual.length > 0) {
+                const baoDongList = contest.baoDong_actual.map(item => `${item.name} (${formatNumber(item.percentActual, 1)}%)`).join(', ');
+                contestSummarySections.push(`🚨 BÁO ĐỘNG (${contest.baoDong_actual.length} nhóm - HT <50%): ${baoDongList}`);
             }
 
             const summaryText = `📊 BÁO CÁO SỨC KHOẺ SIÊU THỊ - ${dateString} 📊
@@ -1655,7 +1733,7 @@
 - 💳 Tỷ trọng trả góp: ${formatNumber(kpis.tyTrongTraGop, 2)}%
 - 💵 Doanh thu trả góp: ${formatNumber(kpis.doanhThuTraGop)}
 - 💰 Mục tiêu ngày: ${formatNumber(kpis.mucTieuNgay > 0 ? kpis.mucTieuNgay : 0)}
-- 🏆 Số ngành hàng thi đua đạt: ${onTrackCount}/${totalCount}
+- 🏆 Số ngành hàng thi đua dự kiến đạt: ${onTrackCount}/${totalCount}
 -------------------
 ${contestSummarySections.join('\n\n')}`.trim();
 
@@ -1726,6 +1804,11 @@ ${contestSummarySections.join('\n\n')}`.trim();
                 const mainParsedData = parseRealtimeData(mainDataRaw); 
                 const contestParsedData = contestDataRaw.trim() ? parseRealtimeData(contestDataRaw) : []; 
                 const employeeParsedData = employeeDataRaw.trim() ? parseEmployeeSalesData(employeeDataRaw) : [];
+
+                // Ẩn form nhập liệu và hiện nút chỉnh sửa
+                document.getElementById('realtimeInputGrid').style.display = 'none';
+                document.getElementById('showInputsBtnRt').style.display = 'inline-flex';
+
                 displayRealtimeDashboard(mainParsedData, contestParsedData, employeeParsedData); 
             } catch (error) { 
                 showToast("Lỗi xử lý dữ liệu Realtime: " + error.message, true); 
@@ -1733,7 +1816,15 @@ ${contestSummarySections.join('\n\n')}`.trim();
             } 
         });
 
+        document.getElementById('showInputsBtnRt').addEventListener('click', function() {
+            const inputGrid = document.getElementById('realtimeInputGrid');
+            const isHidden = inputGrid.style.display === 'none';
+            inputGrid.style.display = isHidden ? 'grid' : 'none';
+            this.textContent = isHidden ? 'Ẩn Mục Nhập Liệu' : 'Chỉnh sửa Dữ liệu';
+        });
+
         document.getElementById('toggleTablesBtn-rt').addEventListener('click', () => document.getElementById('tablesContainer-rt').classList.toggle('show'));
+        
         document.getElementById('toggleSpecificTablesBtn-rt').addEventListener('click', () => {
             document.getElementById('specificTablesContainer-rt').classList.toggle('show');
         });
@@ -1750,12 +1841,27 @@ ${contestSummarySections.join('\n\n')}`.trim();
                 ? document.getElementById('capture-area-rt') 
                 : document.getElementById('capture-content-rt');
 
-            html2canvas(captureElement, { useCORS: true, backgroundColor: '#eef2f7', scale: 2.5 }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `báo cáo realtime ${new Date().toLocaleTimeString('vi-VN')}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-            }).catch(err => { showToast('Lỗi khi chụp ảnh.', true); });
+            const mainContainer = document.querySelector('body');
+            mainContainer.classList.add('capture-mode'); // Thêm class để "làm phẳng" giao diện
+
+            // Dùng setTimeout để đảm bảo trình duyệt đã render lại CSS trước khi chụp
+            setTimeout(() => {
+                html2canvas(captureElement, { 
+                    useCORS: true, 
+                    backgroundColor: '#F4F7F9', // Dùng mã màu trực tiếp
+                    scale: 2.5 
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `báo cáo realtime ${new Date().toLocaleTimeString('vi-VN')}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                }).catch(err => { 
+                    showToast('Lỗi khi chụp ảnh. Hãy thử lại.', true);
+                    console.error(err);
+                }).finally(() => {
+                    mainContainer.classList.remove('capture-mode'); // Xóa class để giao diện trở lại bình thường
+                });
+            }, 100); // Chờ 100ms
         });
 
         function parseRealtimeData(text) {
@@ -1860,8 +1966,9 @@ ${contestSummarySections.join('\n\n')}`.trim();
             return elapsedMinutes / totalMinutes;
         }
 
+        // CẬP NHẬT: Thay đổi logic phân loại thi đua realtime
         function processRealtimeContestData(contestData) {
-            if (!contestData || contestData.length === 0) return { all: [], onTrack: [], behind: [], canCoGang: [], canTapTrung: [] };
+            if (!contestData || contestData.length === 0) return { all: [], onTrack: [], behind: [], veDich_actual: [], canCoGang_actual: [], canTapTrung_actual: [] };
             const timeFraction = getTimePassedFraction();
             
             const items = contestData
@@ -1886,8 +1993,10 @@ ${contestSummarySections.join('\n\n')}`.trim();
                 all: items,
                 onTrack: items.filter(p => p.percentProjected >= 100),
                 behind: items.filter(p => p.percentProjected < 100),
-                canCoGang: items.filter(p => p.percentProjected >= 80 && p.percentProjected < 100),
-                canTapTrung: items.filter(p => p.percentProjected < 80)
+                // Phân loại mới dựa trên %HT thực tế cho phần nhận xét
+                veDich_actual: items.filter(p => p.percentActual >= 100),
+                canCoGang_actual: items.filter(p => p.percentActual >= 80 && p.percentActual < 100),
+                canTapTrung_actual: items.filter(p => p.percentActual < 80)
             };
         }
 
@@ -1920,15 +2029,15 @@ ${contestSummarySections.join('\n\n')}`.trim();
             const installmentPercent = totalRow['Tỷ trọng trả góp'];
 
             const getInstallmentColor = (percent) => {
-                if (percent < 20) return '#dc3545';
-                if (percent < 30) return '#fd7e14';
-                return '#28a745';
+                if (percent < 20) return '#F04770';
+                if (percent < 30) return '#F78C6A';
+                return '#06D7A0';
             };
 
             const kpis = [
                 { id: 'kpi-target', title: 'Target Ngày', value: formatNumber(totalRow['Target Ngày (QĐ)']), subtext: 'Mục tiêu hôm nay', icon: '<path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6Z"/>' },
                 { id: 'kpi-realtime', title: 'DT Realtime', value: formatNumber(totalRow['DT Realtime (QĐ)']), subtext: `${formatNumber(ht,1)}% HT`, color: getColor(ht), icon: '<path fill="currentColor" d="M9 14.5A2.5 2.5 0 0 1 6.5 12A2.5 2.5 0 0 1 9 9.5V14.5M9 16.5A4.5 4.5 0 0 0 13.5 12A4.5 4.5 0 0 0 9 7.5V16.5M22 12l-4-4v3H3v2h15v3l4-4Z"/>' },
-                { id: 'kpi-remaining', title: 'DT Còn lại', value: remainingRevenue <= 0 ? '🏆' : formatNumber(remainingRevenue), subtext: remainingRevenue <= 0 ? 'Đã hoàn thành!' : 'Cần đạt thêm', color: remainingRevenue <= 0 ? 'var(--dmx-green)' : 'var(--dmx-red)', icon: '<path fill="currentColor" d="M12,6A6,6 0 0,1 18,12C18,14.21 16.84,16.21 15,17.2V19A1,1 0 0,1 14,20H10A1,1 0 0,1 9,19V17.2C7.16,16.21 6,14.21 6,12A6,6 0 0,1 12,6M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z"/>' },
+                { id: 'kpi-remaining', title: 'DT Còn lại', value: remainingRevenue <= 0 ? '🏆' : formatNumber(remainingRevenue), subtext: remainingRevenue <= 0 ? 'Đã hoàn thành!' : 'Cần đạt thêm', color: remainingRevenue <= 0 ? '#06D7A0' : '#F04770', icon: '<path fill="currentColor" d="M12,6A6,6 0 0,1 18,12C18,14.21 16.84,16.21 15,17.2V19A1,1 0 0,1 14,20H10A1,1 0 0,1 9,19V17.2C7.16,16.21 6,14.21 6,12A6,6 0 0,1 12,6M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z"/>' },
                 { id: 'kpi-projected', title: 'Dự kiến đạt', value: formatNumber(projectedSales), subtext: `${formatNumber(projectedHt, 1)}%`, color: getColor(projectedHt), icon: '<path fill="currentColor" d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6h-6z"/>' },
                 { id: 'kpi-contest', title: 'Thi đua đạt', value: `${onTrackCount}/${totalCount}`, subtext: 'Chương trình Về Đích', icon: '<path fill="currentColor" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>' },
                 { id: 'kpi-installment', title: 'Tỷ trọng Trả góp', value: `${formatNumber(installmentPercent, 2)}%`, subtext: "DT: " + formatNumber(totalRow['DT Trả Góp']), icon: '<path fill="currentColor" d="M21,11H12.42A3,3 0 0,1 12,11.58V13.42A3,3 0 0,1 12.42,14H21V16H12.42A3,3 0 0,1 10,18.42V20H8V18.42A3,3 0 0,1 5.58,16H3V14H5.58A3,3 0 0,1 8,11.58V10H10V11.58A3,3 0 0,1 12.42,14H15V12H12.42A3,3 0 0,1 10,9.58V8H8V9.58A3,3 0 0,1 5.58,12H3V10H5.58A3,3 0 0,1 8,7.58V6H10V7.58A3,3 0 0,1 12.42,10H21V11Z"/>' },
@@ -1948,7 +2057,7 @@ ${contestSummarySections.join('\n\n')}`.trim();
                 }
                 return `<div class="sub-kpi-card card">
                             <h4><svg class="title-icon" viewBox="0 0 24 24">${kpi.icon}</svg>${kpi.title}</h4>
-                            <p class="value" style="color: ${kpi.color || 'var(--dmx-blue)'}">${kpi.value}</p>
+                            <p class="value" style="color: ${kpi.color || 'var(--primary-accent)'}">${kpi.value}</p>
                             <p class="sub-text">${kpi.subtext}</p>
                         </div>`;
             }).join('');
@@ -1979,6 +2088,12 @@ ${contestSummarySections.join('\n\n')}`.trim();
             });
         }
         
+        /**
+         * UPDATE: This function is updated to render a 3D-style bar chart.
+         * - Uses a linear gradient for the bar colors.
+         * - Configures borderWidth and borderRadius to simulate depth.
+         * - Enhances datalabels for better readability on the new background.
+         */
         function renderEmployeeSalesChart(data) {
             const wrapper = document.getElementById('employee-sales-chart-wrapper');
             if (!data || data.length === 0) {
@@ -1988,7 +2103,8 @@ ${contestSummarySections.join('\n\n')}`.trim();
             wrapper.style.display = 'block';
             wrapper.innerHTML = `<h2><svg class="title-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" /></svg>Xếp hạng Doanh thu Nhân viên</h2><div class="chart-container" style="min-height: 300px; height: ${data.length * 45}px;"><canvas id="employeeSalesChart"></canvas></div>`;
 
-            const ctx = document.getElementById('employeeSalesChart').getContext('2d');
+            const canvas = document.getElementById('employeeSalesChart');
+            const ctx = canvas.getContext('2d');
             
             const sortedData = data.sort((a, b) => b.revenue - a.revenue);
 
@@ -2008,6 +2124,16 @@ ${contestSummarySections.join('\n\n')}`.trim();
             });
             const revenues = sortedData.map(d => d.revenue);
 
+            // Create a gradient for the bars
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+            gradient.addColorStop(0, 'rgba(6, 215, 160, 0.9)'); // --success-color
+            gradient.addColorStop(0.5, 'rgba(16, 185, 129, 0.9)'); // Mid-point green
+            gradient.addColorStop(1, 'rgba(16, 138, 177, 0.9)'); // --primary-accent
+
+            const negativeGradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+            negativeGradient.addColorStop(0, 'rgba(240, 71, 112, 0.9)'); // --danger-color
+            negativeGradient.addColorStop(1, 'rgba(247, 140, 106, 0.9)'); // --secondary-accent
+
             employeeChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -2015,26 +2141,33 @@ ${contestSummarySections.join('\n\n')}`.trim();
                     datasets: [{
                         label: 'Doanh thu',
                         data: revenues,
-                        backgroundColor: (context) => context.raw >= 0 ? 'rgba(0, 136, 255, 0.8)' : 'rgba(220, 53, 69, 0.8)',
-                        borderColor: (context) => context.raw >= 0 ? 'rgba(0, 136, 255, 1)' : 'rgba(220, 53, 69, 1)',
-                        borderWidth: 1,
-                        borderRadius: 5,
-                        borderSkipped: false,
+                        backgroundColor: (context) => context.raw >= 0 ? gradient : negativeGradient,
+                        borderColor: (context) => context.raw >= 0 ? 'rgba(7, 58, 75, 0.7)' : 'rgba(150, 30, 60, 0.7)', // Darker border for depth
+                        borderWidth: 2,
+                        borderRadius: { topRight: 8, bottomRight: 8, topLeft: 0, bottomLeft: 0 },
+                        borderSkipped: 'start',
                     }]
                 },
                 options: {
                     indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
+                    // CẬP NHẬT: Thêm padding bên phải để số không bị cắt
+                    layout: {
+                        padding: {
+                            right: 35 
+                        }
+                    },
                     scales: {
                         x: {
                             grid: {
-                                color: '#e0e0e0',
+                                color: 'rgba(0, 0, 0, 0.05)',
                                 borderDash: [2, 4],
                             },
                             ticks: {
-                                callback: (value) => formatNumber(value / 1000000, 1) + 'tr'
-                            }
+                                callback: (value) => formatNumber(value / 1000000, 2) + 'tr'
+                            },
+                            position: 'top'
                         },
                         y: {
                             grid: {
@@ -2049,7 +2182,7 @@ ${contestSummarySections.join('\n\n')}`.trim();
                         legend: { display: false },
                         tooltip: {
                              enabled: true,
-                             backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                             backgroundColor: 'rgba(7, 58, 75, 0.9)', // Dark blue tooltip
                              titleFont: { size: 14, weight: 'bold' },
                              bodyFont: { size: 12 },
                              callbacks: {
@@ -2058,18 +2191,17 @@ ${contestSummarySections.join('\n\n')}`.trim();
                                  }
                              }
                         },
+                        // CẬP NHẬT: Đổi màu chữ số liệu sang màu đen (biến --text-primary)
                         datalabels: {
                             anchor: 'end',
-                            align: (context) => context.dataset.data[context.dataIndex] >= 0 ? 'right' : 'left',
-                            offset: 8,
-                            color: (context) => context.dataset.data[context.dataIndex] >= 0 ? '#1e3a8a' : 'var(--dmx-red)',
+                            align: 'end',
+                            offset: 4,
+                            color: 'var(--text-primary)',
                             font: { weight: 'bold', size: 13 },
                             formatter: (value) => {
                                 if (value === 0) return 'Chưa có DT';
                                 return formatNumber(value / 1000000, 2) + 'tr';
                             },
-                            textShadowColor: 'white',
-                            textShadowBlur: 4
                         }
                     }
                 }
@@ -2122,8 +2254,8 @@ ${contestSummarySections.join('\n\n')}`.trim();
 
             const createRowHtml = (item, index, isHidden = false) => {
                 const remainingCell = item.remaining <= 0
-                    ? `<td style="color: var(--dmx-green); font-weight: bold; font-size: 1.5em;">🏆</td>`
-                    : `<td style="color: var(--dmx-red); font-weight: bold;">${formatNumber(item.remaining, 1)}</td>`;
+                    ? `<td style="color: var(--success-color); font-weight: bold; font-size: 1.5em;">🏆</td>`
+                    : `<td style="color: var(--danger-color); font-weight: bold;">${formatNumber(item.remaining, 1)}</td>`;
 
                 const icon = item.percentProjected >= 100 ? ' <span title="Dự kiến hoàn thành xuất sắc!">🚀</span>' : '';
                 const progressBar = `
@@ -2330,6 +2462,7 @@ ${contestSummarySections.join('\n\n')}`.trim();
             container.appendChild(contentGrid);
         }
         
+        // CẬP NHẬT: Thay đổi logic render nhận xét realtime để dùng %HT thực tế
         function renderRealtimeSummary(totalRow, contestData) {
             const container = document.getElementById('summary-report-wrapper-rt');
             container.style.display = 'block';
@@ -2339,21 +2472,21 @@ ${contestSummarySections.join('\n\n')}`.trim();
             const onTrackCount = contestData.onTrack.length;
             const totalCount = contestData.all.length;
 
-            const createSubListWithProjected = (items) => {
+            const createSubListWithActual = (items) => {
                 if (!items || items.length === 0) return '';
-                return items.map(item => `  - ${item.name} (${formatNumber(item.percentProjected, 1)}%)`).join('\n');
+                return items.map(item => `  - ${item.name} (${formatNumber(item.percentActual, 1)}%)`).join('\n');
             };
 
             let contestSummarySections = [];
-            if (contestData.onTrack.length > 0) {
-                contestSummarySections.push(`✅ DỰ KIẾN VỀ ĐÍCH (${contestData.onTrack.length} nhóm):\n${createSubListWithProjected(contestData.onTrack)}`);
+            if (contestData.veDich_actual.length > 0) {
+                contestSummarySections.push(`✅ ĐÃ VỀ ĐÍCH (${contestData.veDich_actual.length} nhóm):\n${createSubListWithActual(contestData.veDich_actual)}`);
             }
-            if (contestData.canCoGang.length > 0) {
-                contestSummarySections.push(`💪 CẦN CỐ GẮNG (${contestData.canCoGang.length} nhóm):\n${createSubListWithProjected(contestData.canCoGang)}`);
+            if (contestData.canCoGang_actual.length > 0) {
+                contestSummarySections.push(`💪 CẦN CỐ GẮNG (${contestData.canCoGang_actual.length} nhóm - HT >80%):\n${createSubListWithActual(contestData.canCoGang_actual)}`);
             }
-            if (contestData.canTapTrung.length > 0) {
-                const canTapTrungList = contestData.canTapTrung.map(item => item.name).join(', ');
-                contestSummarySections.push(`🚨 CẦN TẬP TRUNG (${contestData.canTapTrung.length} nhóm): ${canTapTrungList}`);
+            if (contestData.canTapTrung_actual.length > 0) {
+                const canTapTrungList = contestData.canTapTrung_actual.map(item => `${item.name} (${formatNumber(item.percentActual, 1)}%)`).join(', ');
+                contestSummarySections.push(`🚨 CẦN TẬP TRUNG (${contestData.canTapTrung_actual.length} nhóm - HT <80%): ${canTapTrungList}`);
             }
 
             const summaryText = `📊 BÁO CÁO SỨC KHOẺ SIÊU THỊ đến ${now.toLocaleTimeString('vi-VN')}
@@ -2364,7 +2497,7 @@ ${contestSummarySections.join('\n\n')}`.trim();
 - 🚀 Dự kiến đạt: ${formatNumber(projectedSales)} (${formatNumber(projectedSales/totalRow['Target Ngày (QĐ)']*100, 1)}%)
 - 💳 Tỷ trọng trả góp: ${formatNumber(totalRow['Tỷ trọng trả góp'], 2)}%
 - 💵 Doanh thu trả góp: ${formatNumber(totalRow['DT Trả Góp'])}
-- 🏆 Số ngành hàng thi đua đạt: ${onTrackCount}/${totalCount}
+- 🏆 Số ngành hàng thi đua dự kiến đạt: ${onTrackCount}/${totalCount}
 -------------------
 ${contestSummarySections.join('\n-------------------\n')}`.trim();
 

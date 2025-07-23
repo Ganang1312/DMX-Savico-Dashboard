@@ -4,37 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Phân Tích KPI Hoàn Thiện</title>
-    <!-- External Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
-            --primary-color: #0d6efd; --secondary-color: #6c757d; --success-color: #198754;
-            --danger-color: #dc3545; --light-bg-color: #f8f9fa; --border-color: #dee2e6; --shadow-color: rgba(0, 0, 0, 0.06);
-            --card-bg: #fff; --text-dark: #212529; --text-light: #fff; --warning-color: #ffc107;
-            /* Department Colors */
-            --dept-color-1: #20c997; /* Teal for Group 1 */
-            --dept-color-2: #fd7e14; /* Orange for Group 2 */
-            --kpi-pink: #e83e8c;
+            /* New Color Palette */
+            --primary-color: #108AB1;   /* Blue */
+            --secondary-color: #073A4B; /* Dark Blue */
+            --success-color: #06D7A0;   /* Green/Teal */
+            --danger-color: #F04770;    /* Pink/Red */
+            --warning-color: #FFD167;   /* Yellow */
+            --accent-color: #F78C6A;    /* Orange */
+
+            /* Layout Colors */
+            --light-bg-color: #f0f7fa; /* Very Light Blue */
+            --border-color: #dee2e6;
+            --shadow-color: rgba(0, 0, 0, 0.06);
+            --card-bg: #fff;
+
+            /* Text Colors */
+            --text-dark: #073A4B;      /* Dark Blue for text */
+            --text-light: #fff;
+
+            /* Department/Group Colors from Palette */
+            --dept-color-1: var(--success-color); /* Green for Group 1 */
+            --dept-color-2: var(--accent-color);  /* Orange for Group 2 */
+            --kpi-pink: var(--danger-color);
+
             /* Industry Group Colors */
-            --group-bg-tech: #e0f2ff; /* Light Blue for Tech */
-            --group-bg-appliance: #fff4e6; /* Light Orange for Appliances */
-            --group-bg-service: #e6f4ea; /* Light Green for Services */
-            --group-bg-default: #f8f9fa; /* Default Grey */
+            --group-bg-tech: #e0f2ff;
+            --group-bg-appliance: #fff4e6;
+            --group-bg-service: #e6f4ea;
+            --group-bg-default: #f8f9fa;
         }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; padding: 20px; background-color: var(--light-bg-color); color: var(--text-dark); }
         .container { max-width: 100%; padding: 15px; box-sizing: border-box; }
         .inner-container{ max-width: 100%; width: 100%; margin: 0; padding: 0; margin: auto; }
-        h1, h2, h3 { color: #333; }
+        h1, h2, h3 { color: var(--text-dark); }
         h1 { text-align: center; margin-bottom: 25px; }
         h2 { font-size: 1.6em; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
-        .card { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 6px 20px var(--shadow-color); margin-bottom: 25px; }
+        .card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid #E7EAF3;
+            box-shadow: 0 10px 30px -5px rgba(16, 138, 177, 0.15);
+            position: relative;
+        }
+        
         .grid-container { display: grid; gap: 25px; }
         .grid-2-col { grid-template-columns: 1fr 1fr; }
         .grid-3-col { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));}
         
-        /* --- NEW STYLES FOR PASTE BUTTON --- */
         .input-group { display: flex; flex-direction: column; gap: 8px; }
         .input-group textarea { width: 100%; }
         .btn-paste {
@@ -46,11 +69,10 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.2s;
-            align-self: flex-start; /* Align button to the left */
+            transition: filter 0.2s;
+            align-self: flex-start;
         }
-        .btn-paste:hover { background-color: #0b5ed7; }
-        /* --- END NEW STYLES --- */
+        .btn-paste:hover { filter: brightness(90%); }
 
         input[type="text"], input[type="number"], textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; box-sizing: border-box; }
         textarea { height: 120px; font-family: 'Courier New', Courier, monospace; }
@@ -71,7 +93,24 @@
         .data-table thead { background-color: #f2f3f7; font-weight: 600; }
         .data-table tbody td:nth-child(2), .data-table tbody td:first-child { text-align: left; font-weight: 500; }
         #rawDataWrapper { display: none; }
-        
+
+        /* Progress bar in table */
+        .table-progress-bar-bg {
+            background-color: #e9ecef; border-radius: 4px; height: 18px;
+            overflow: hidden; position: relative; display: flex;
+            align-items: center; justify-content: center; margin-top: 5px;
+        }
+        .table-progress-bar-fill {
+            background-color: var(--primary-color); height: 100%; border-radius: 4px;
+            transition: width 0.5s ease-in-out; position: absolute; top: 0; left: 0;
+        }
+        .table-progress-bar-fill.success { background-color: var(--success-color); }
+        .table-progress-bar-text {
+            font-weight: bold; color: var(--text-dark); font-size: 11px;
+            position: relative; z-index: 1;
+            text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
+        }
+
         #allCardsContainer { 
             display: grid; 
             grid-template-columns: repeat(3, 1fr);
@@ -80,7 +119,18 @@
         @media (max-width: 1400px) { #allCardsContainer { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 992px) { #allCardsContainer { grid-template-columns: 1fr; } }
 
-        .perf-card { border-radius: 10px; overflow: hidden; background: white; border: 1px solid var(--border-color); display: flex; flex-direction: column; height: 100%;}
+        .perf-card {
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+            border: 1px solid #E7EAF3;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            box-shadow: 0 10px 30px -5px rgba(16, 138, 177, 0.15);
+            position: relative;
+        }
+        
         .perf-card .perf-body { font-weight: bold; }
         .perf-header { display: grid; grid-template-columns: 80px 1fr auto; background: var(--text-dark); color: var(--text-light); padding: 15px; align-items: center; gap: 15px;}
         .perf-header .perf-avatar { width: 60px; height: 60px; }
@@ -111,7 +161,7 @@
         }
 
         .progress-bar-group > div:nth-child(1) { background-color: var(--primary-color); }
-        .progress-bar-group > div:nth-child(2) { background-color: var(--dept-color-2); }
+        .progress-bar-group > div:nth-child(2) { background-color: var(--accent-color); }
         .progress-bar-group > div:nth-child(3) { background-color: var(--kpi-pink); }
         .progress-bar-group > div:nth-child(4) { background-color: var(--success-color); }
         .progress-bar-group > div:nth-child(5) { background-color: var(--secondary-color); }
@@ -128,7 +178,7 @@
         
         .progress-bar-text {
              font-weight: bold;
-             color: black;
+             color: var(--text-dark);
              text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
              font-family: inherit;
              position: relative;
@@ -155,7 +205,7 @@
         @media (max-width: 992px) { .grid-2-col { grid-template-columns: 1fr; } }
         
         .contest-table {
-            min-width: 100%; /* Changed from width to min-width to allow expansion */
+            min-width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
         }
@@ -165,11 +215,9 @@
         .contest-table tbody tr:hover { background-color: #f1f1f1; }
         .contest-table .icon-cell { text-align: center; font-size: 1.5em; }
 
-        /* --- FIX FOR KPI CARD TABLE OVERFLOW --- */
         .perf-card .contest-table-container {
             overflow-x: auto;
         }
-        /* --- END FIX --- */
 
         .perf-card .contest-table th,
         .perf-card .contest-table td {
@@ -180,42 +228,56 @@
             border-left: 1px solid var(--border-color);
         }
 
-        #contestSummaryContainer .data-table { table-layout: auto; }
+        /* --- STYLES FOR SUMMARY TABLE --- */
+        #contestSummaryContainer .data-table {
+            border-collapse: collapse;
+            width: 100%;
+            table-layout: auto;
+        }
         #contestSummaryContainer .data-table th,
         #contestSummaryContainer .data-table td {
-            font-size: 10px;
-            padding: 4px;
-            word-wrap: break-word;
-            border-right: 2px solid #adb5bd;
-            border-bottom: 2px solid #adb5bd;
+            font-size: 12px;
+            padding: 10px 8px;
+            border: none;
             text-align: center;
+            vertical-align: middle;
+        }
+        #contestSummaryContainer .data-table thead th {
+            border-bottom: 2px solid var(--secondary-color);
+            font-size: 11px;
+            vertical-align: middle;
+            background-color: transparent;
+            border-right: 1px solid #E7EAF3;
+        }
+        #contestSummaryContainer .data-table thead th:last-child {
+            border-right: none;
+        }
+        #contestSummaryContainer .data-table thead th:has(.th-flex-wrapper) {
+            padding: 0;
+        }
+        #contestSummaryContainer .data-table tbody tr {
+            border-bottom: 1px solid #E7EAF3;
+        }
+        #contestSummaryContainer .data-table tbody tr:last-child {
+            border-bottom: none;
         }
         #contestSummaryContainer .data-table tbody td:nth-child(2) {
             text-align: left;
+            font-weight: 600;
         }
-        
-        #contestSummaryContainer .data-table th:last-child,
-        #contestSummaryContainer .data-table td:last-child {
-            border-right: 1px solid var(--border-color);
+        #contestSummaryContainer .data-table tbody td {
+            font-weight: 600;
         }
-        #contestSummaryContainer .data-table th {
-             vertical-align: middle;
-             font-size: 11px;
-             padding: 0;
-        }
-        
         .th-flex-wrapper {
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: center;
             height: 100%;
-            padding: 5px;
-            min-height: 60px; 
-            transition: background-color 0.3s ease;
+            padding: 8px 4px;
+            min-height: 60px;
         }
-        
         #contestSummaryContainer .data-table th .header-main-text {
-            font-weight: bold;
+            font-weight: bold; /* BOLDED HEADER */
             word-wrap: break-word;
             text-align: center;
             font-size: 10px;
@@ -225,19 +287,21 @@
             align-items: center;
             justify-content: center;
         }
-        
         #contestSummaryContainer .data-table th .header-sub-text {
-            font-weight: bold;
+            font-weight: 700;
+            font-size: 12px;
             text-align: center;
+            margin-top: 4px;
         }
+        /* --- END STYLES --- */
 
         .data-bar-cell {
-            padding: 2px 5px !important;
+            padding: 8px !important;
             vertical-align: middle !important;
         }
         .data-bar-container {
             position: relative;
-            height: 20px;
+            height: 24px;
             background-color: #e9ecef;
             border-radius: 4px;
             display: flex;
@@ -258,8 +322,8 @@
             position: relative;
             z-index: 1;
             font-weight: bold;
-            font-size: 11px;
-            color: #212529;
+            font-size: 12px;
+            color: var(--text-dark);
         }
 
         .rank-cell { text-align: center !important; }
@@ -271,7 +335,7 @@
             font-size: 14px;
             font-weight: bold;
             padding: 10px 20px;
-            background-color: #6f42c1;
+            background-color: var(--primary-color); /* Changed from purple */
             color: white;
             border: none;
             border-radius: 8px;
@@ -280,7 +344,7 @@
             cursor: pointer;
         }
         .section-header .btn:hover {
-            background-color: #5a37a0;
+            filter: brightness(90%);
             transform: translateY(-1px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
@@ -346,20 +410,29 @@
         .contest-details-table thead th:nth-child(-n+4) { z-index: 3; }
 
     
-html, body {
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
-}
+        html, body {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
 
-</style>
+    </style>
 </head>
 <body onload="initDashboard()">
     <div class="container">
         <div class="inner-container">
-            <h1>Dashboard Đánh giá Hiệu suất</h1>
+            
+            <div id="report-header" style="display: none; align-items: center; justify-content: space-between; margin-bottom: 25px;">
+                <h1 style="margin: 0; text-align: left;">Báo cáo Phân tích Hiệu suất</h1>
+                <div>
+                     <button id="editDataBtn" class="btn" style="display: inline-block; width: auto; background-color: var(--secondary-color); margin-right: 10px; font-size: 16px; padding: 12px 20px;">Chỉnh sửa Dữ liệu</button>
+                     <button id="captureReportBtn" class="btn" style="display: inline-block; width: auto; font-size: 16px; padding: 12px 20px;">Chụp Báo cáo</button>
+                </div>
+            </div>
+
             <div class="card" id="data-input-card">
+                 <h1 style="margin-top:0;">Dashboard Đánh giá Hiệu suất</h1>
                 <div class="grid-container grid-3-col">
                     <div>
                         <h3><a href="https://bi.thegioididong.com/thi-dua-st?id=16753&tab=1&rt=2&dm=2&mt=1" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">Bảng 2: Target Thi đua</a></h3>
@@ -398,7 +471,6 @@ html, body {
                 </div>
                 <div class="btn-group">
                     <button id="processBtn" class="btn">Tạo Báo Cáo Phân Tích</button>
-                    <button id="captureReportBtn" class="btn" style="display: none;">Chụp Báo cáo</button>
                 </div>
             </div>
             
@@ -407,22 +479,15 @@ html, body {
                 <div id="month-progress-container" class="card" style="display: none; padding: 15px 25px; margin-bottom: 25px; margin-top: 0;"></div>
 
                 <div id="results-wrapper" style="display: none;">
-                    <div class="grid-container grid-2-col">
+                    <div class="grid-container">
                         <div class="card">
-                            <h2 style="color:#198754; margin-bottom: 20px;">💹 Bảng Doanh thu Nhân viên</h2>
+                            <h2 style="color:var(--success-color); margin-bottom: 20px;">💹 Bảng Xếp hạng Nhân viên</h2>
                             <div id="revenueTableContainer" class="table-container" style="margin-top:0;"></div>
-                        </div>
-                        
-                        <div class="card">
-                            <h2 style="margin-bottom: 20px;">📈 Biểu đồ Xếp hạng & Thi đua</h2>
-                            <div class="chart-container">
-                                <canvas id="comprehensiveRankChart"></canvas>
-                            </div>
                         </div>
                     </div>
                     
                     <div class="card" id="contest-summary-card">
-                        <h2>📊 Bảng Tóm tắt % Hoàn thành Dự kiến</h2>
+                        <h2>📊 Bảng theo dõi thi đua nhân viên</h2>
                         <div id="contestSummaryContainer" class="table-container"></div>
                         
                         <div id="comments-section" style="display: none; margin-top: 25px;">
@@ -457,7 +522,7 @@ html, body {
             <div id="kpi-cards-section" style="display: none;">
                  <div class="card">
                     <div class="section-header">
-                        <h2 style="color:#6f42c1; margin-bottom: 0;">🧑‍💻 Phân tích Chi tiết Hiệu suất Cá nhân</h2>
+                        <h2 style="color:var(--primary-color); margin-bottom: 0;">🧑‍💻 Phân tích Chi tiết Hiệu suất Cá nhân</h2>
                         <div style="display: flex;">
                             <button id="captureCardsBtn" class="btn">Chụp Thẻ KPI</button>
                             <button id="captureAllCardsBtn" class="btn" style="margin-left: 15px; background-color: var(--success-color);">Chụp Tất Cả KPI</button>
@@ -484,11 +549,10 @@ html, body {
     // Register Chart.js plugins
     Chart.register(ChartDataLabels);
     
-    // Global chart instances
-    let comprehensiveRankChart;
+    // JS variables for colors to be used in canvas drawing
     const deptColorsJs = {
-        group1: '#20c997', // Teal for Group 1
-        group2: '#fd7e14'  // Orange for Group 2
+        group1: '#06D7A0', // Green for Group 1
+        group2: '#F78C6A'  // Orange for Group 2
     };
 
     function initDashboard() {
@@ -553,15 +617,29 @@ html, body {
 
 
     function renderRevenueTable(data) {
-        let tableHtml = '<table class="data-table"><thead><tr><th>Hạng</th><th>Nhân viên</th><th>Luỹ kế DTQĐ</th><th>Target Tháng</th><th>Còn lại</th><th>% HT</th><th>% Dự kiến HT</th></tr></thead><tbody>';
+        let tableHtml = '<table class="data-table"><thead><tr><th>Hạng</th><th>Nhân viên</th><th>Điểm</th><th>Số ngành HT (DK)</th><th>Luỹ kế DTQĐ</th><th>Target Tháng</th><th>Còn lại</th><th>% HT</th><th>% Dự kiến HT</th></tr></thead><tbody>';
         const total = data.length;
         data.forEach((e) => {
              const remaining = e.revenueTarget - e.actual_DTQD;
              const remainingCell = remaining <= 0 ? `<td class="icon-cell">✅</td>` : `<td>${formatNumberFull(remaining, 0)}</td>`;
+            
+             const revenueCompletionCapped = Math.min(100, e.revenueCompletion);
+             const revenueCellHtml = `
+                <td>
+                    ${formatNumberFull(e.actual_DTQD, 0)}
+                    <div class="table-progress-bar-bg">
+                        <div class="table-progress-bar-fill ${e.revenueCompletion >= 100 ? 'success' : ''}" style="width: ${revenueCompletionCapped}%;"></div>
+                        <span class="table-progress-bar-text">${e.revenueCompletion.toFixed(1)}%</span>
+                    </div>
+                </td>
+            `;
+
              tableHtml += `<tr style="font-weight: bold;">
                 ${getRankCellHtml(e.rank, total)}
                 <td>${e.name}</td>
-                <td>${formatNumberFull(e.actual_DTQD, 0)}</td>
+                <td style="font-weight:bold;">${e.totalScore.toFixed(1)}</td>
+                <td style="font-weight:bold;">${e.projectedCompletedContests} / ${Object.keys(e.contestTargets).length}</td>
+                ${revenueCellHtml}
                 <td>${formatNumberFull(e.revenueTarget, 0)}</td>
                 ${remainingCell}
                 <td style="color: ${e.revenueCompletion >= 100 ? 'var(--success-color)' : 'var(--danger-color)'}">${e.revenueCompletion.toFixed(1)}%</td>
@@ -622,31 +700,35 @@ html, body {
         return 'var(--group-bg-default)';
     }
 
+    function getHeatmapStyle(percent) {
+        if (percent >= 100) {
+            return 'style="background-color: rgba(6, 215, 160, 0.15); color: #035442;"'; // Light success-color bg, dark success-color text
+        } else if (percent >= 80) {
+            return 'style="background-color: rgba(255, 209, 103, 0.2); color: #665221;"'; // Light warning-color bg, dark warning-color text
+        } else if (percent > 0) {
+            return 'style="background-color: rgba(240, 71, 112, 0.1); color: #9a223f;"'; // Light danger-color bg, dark danger-color text
+        }
+        return 'style="color: #6c757d;"'; // Default grey for 0%
+    }
+
     function renderContestSummaryTables(data, headers, contestProjectedTotals) {
         const container = document.getElementById('contestSummaryContainer');
         container.innerHTML = '';
         
-        const maxRevenue = data.length > 0 ? Math.max(...data.map(e => e.actual_DTQD)) : 0;
-
         let tableHtml = '<table class="data-table"><thead>';
         tableHtml += `<tr>
             <th>Hạng</th>
             <th>Nhân viên</th>
-            <th style="background-color: #fff3cd;">Điểm</th>
-            <th style="background-color: #cfe2ff;">DT Lũy kế</th>
-            <th style="background-color: #d1e7dd;">Số ngành HT (DK)</th>`;
+            <th>Số ngành HT (DK)</th>`;
         
         headers.forEach((h, index) => {
             const projectedPercent = contestProjectedTotals[h] || 0;
             const percentColor = projectedPercent >= 100 ? 'var(--success-color)' : 'var(--danger-color)';
-            const groupColor = getIndustryGroupColor(h);
             
-            tableHtml += `<th title="${h}">
-                <div class="th-flex-wrapper" style="background-color: ${groupColor};">
+            tableHtml += `<th style="background-color: ${getIndustryGroupColor(h)};">
+                <div class="th-flex-wrapper">
                     <span class="header-main-text">${index + 1}. ${h}</span>
-                    <div class="header-sub-text" style="color: ${percentColor};">
-                        ${projectedPercent.toFixed(1)}%
-                    </div>
+                    <div class="header-sub-text" style="color: ${percentColor};">${projectedPercent.toFixed(1)}%</div>
                 </div>
             </th>`; 
         });
@@ -654,27 +736,15 @@ html, body {
 
         const total = data.length;
         data.forEach(e => {
-            const barWidth = maxRevenue > 0 ? (e.actual_DTQD / maxRevenue) * 100 : 0;
-            const revenueBarHtml = `
-                <td class="data-bar-cell">
-                    <div class="data-bar-container">
-                        <div class="data-bar-fill" style="width: ${barWidth}%;"></div>
-                        <span class="data-bar-label">${formatNumberFull(e.actual_DTQD, 0)}</span>
-                    </div>
-                </td>`;
-
-            tableHtml += `<tr style="font-weight: bold;">
+            tableHtml += `<tr>
                 ${getRankCellHtml(e.rank, total)}
-                <td style="text-align:left;">${e.name}</td>
-                <td>${e.totalScore.toFixed(1)}</td>
-                ${revenueBarHtml}
+                <td>${abbreviateNameForSummary(e.name)}</td>
                 <td>${e.projectedCompletedContests}/${Object.keys(e.contestTargets).length}</td>`;
 
             headers.forEach(h => {
                 const item = e.contestCompletion[h] || { projectedPercent: 0 };
-                const bgColor = item.projectedPercent >= 100 ? '#d1e7dd' : (item.projectedPercent >= 80 ? '#fff3cd' : '#f8d7da');
-                const color = item.projectedPercent >= 100 ? '#0f5132' : (item.projectedPercent >= 80 ? '#664d03' : '#842029');
-                tableHtml += `<td style="background-color:${bgColor}; color:${color};">${item.projectedPercent.toFixed(1)}%</td>`;
+                const style = getHeatmapStyle(item.projectedPercent);
+                tableHtml += `<td ${style}>${item.projectedPercent.toFixed(1)}%</td>`;
             });
             tableHtml += '</tr>';
         });
@@ -732,6 +802,17 @@ html, body {
         const lastName = parts.pop(); // Lấy tên chính
         const initials = parts.map(p => p.charAt(0).toUpperCase()).join('');
         return `${initials}. ${lastName}`;
+    }
+
+    function abbreviateNameForSummary(fullName) {
+        if (!fullName || typeof fullName !== 'string') return '';
+        const parts = fullName.trim().split(' ').filter(p => p);
+        if (parts.length <= 1) {
+            return fullName;
+        }
+        const lastName = parts[parts.length - 1];
+        const firstInitial = parts[0].charAt(0).toUpperCase();
+        return `${firstInitial}. ${lastName}`;
     }
 
     function generateAvatarSvg(employee) {
@@ -833,157 +914,6 @@ html, body {
             </div>`;
     }
     
-    function renderComprehensiveRankChart(data) {
-        if (comprehensiveRankChart) comprehensiveRankChart.destroy();
-        const canvas = document.getElementById('comprehensiveRankChart');
-        const ctx = setupCanvas(canvas);
-        
-        const total = data.length;
-        const labels = data.map(e => {
-            let icon = '';
-            if (e.rank === 1) icon = '🥇';
-            else if (e.rank === 2) icon = '🥈';
-            else if (e.rank === 3) icon = ' ';
-            else if (total > 3 && e.rank >= total - 2) icon = '🔴';
-            
-            const rankLabel = `${icon} #${e.rank}`.trim();
-            const nameLabel = abbreviateName(e.name);
-            
-            return [rankLabel, nameLabel];
-        });
-
-        comprehensiveRankChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'Điểm Thi Đua',
-                        data: data.map(e => e.totalScore),
-                        backgroundColor: 'rgba(255, 193, 7, 0.8)',
-                        yAxisID: 'y',
-                        order: 2,
-                    },
-                    {
-                        label: '% HT Doanh thu (Dự kiến)',
-                        data: data.map(e => e.projectedRevenueCompletion),
-                        backgroundColor: 'rgba(13, 110, 253, 0.7)',
-                        yAxisID: 'y',
-                        order: 3,
-                    },
-                    {
-                        label: 'Số ngành HT (Dự kiến)',
-                        data: data.map(e => e.projectedCompletedContests),
-                        borderColor: '#198754',
-                        backgroundColor: 'rgba(25, 135, 84, 0.5)',
-                        type: 'line',
-                        fill: false,
-                        tension: 0.1,
-                        yAxisID: 'y1',
-                        order: 1, 
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                    mode: 'index',
-                    intersect: false,
-                },
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Xếp hạng tổng hợp theo Điểm, Doanh thu và Số ngành hàng hoàn thành'
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) { label += ': '; }
-                                if (context.parsed.y !== null) {
-                                    let value = context.parsed.y;
-                                    if (context.dataset.label.includes('%')) {
-                                        label += value.toFixed(1) + '%';
-                                    } else if (context.dataset.label.includes('Điểm')) {
-                                        label += value.toFixed(1);
-                                    } else {
-                                         label += value;
-                                    }
-                                }
-                                return label;
-                            }
-                        }
-                    },
-                    datalabels: {
-                        display: true,
-                        align: function(context) {
-                           return context.dataset.type === 'line' ? 'top' : 'center';
-                        },
-                        anchor: function(context) {
-                           return context.dataset.type === 'line' ? 'end' : 'center';
-                        },
-                        color: function(context) {
-                            return context.dataset.type === 'line' ? '#198754' : 'black';
-                        },
-                        font: {
-                            weight: 'bold'
-                        },
-                        strokeColor: function(context) {
-                            return context.dataset.type === 'line' ? null : 'white';
-                        },
-                        strokeWidth: function(context) {
-                            return context.dataset.type === 'line' ? 0 : 4;
-                        },
-                        formatter: function(value, context) {
-                            if (context.dataset.label.includes('Số ngành HT')) {
-                                return `⭐ ${value}`;
-                            }
-                            if (context.dataset.label.includes('% HT Doanh thu')) {
-                                return `${value.toFixed(1)}%`;
-                            }
-                            return value.toFixed(0);
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        ticks: {
-                            font: {
-                                weight: 'bold'
-                            }
-                        }
-                    },
-                    y: {
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                        title: {
-                            display: true,
-                            text: 'Điểm / % Hoàn thành'
-                        }
-                    },
-                    y1: {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        title: {
-                            display: true,
-                            text: 'Số ngành HT'
-                        },
-                        grid: {
-                            drawOnChartArea: false,
-                        },
-                        ticks: {
-                            stepSize: 1,
-                            beginAtZero: true
-                        }
-                    }
-                }
-            }
-        });
-    }
-
     function getContestTimeframe(header) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -1051,9 +981,7 @@ html, body {
         return defaultTimeframe;
     }
 
-    // --- NEW FUNCTION TO EXTRACT TABLE DATA ---
     function extractTableData(fullText, filterType) {
-        // Define start markers for each table type. Using regex for flexibility.
         const markers = {
             table2: /^Ngành hàng\s+DTQĐ\s+Target/,
             table6: /^Nhân viên\s+DTLK\s+DTQĐ/,
@@ -1063,26 +991,20 @@ html, body {
 
         const lines = fullText.split('\n');
         
-        // Find the first line that matches the start marker for the given table type.
         const startIndex = lines.findIndex(line => markers[filterType] && markers[filterType].test(line.trim()));
 
-        // If a start marker is found, extract the content until the end marker.
         if (startIndex !== -1) {
-            // Find the end marker starting from the startIndex.
             let endIndex = lines.findIndex(line => line.includes(endMarker), startIndex);
             if (endIndex === -1) {
-                endIndex = lines.length; // If no end marker, go to the end of the text.
+                endIndex = lines.length;
             }
             
             const relevantLines = lines.slice(startIndex, endIndex);
             return relevantLines.join('\n').trim();
         }
 
-        // If no marker is found, it might be because the user pasted already clean data,
-        // or the format is unexpected. Return the original text without filtering.
         return fullText;
     }
-    // --- END NEW FUNCTION ---
 
     document.getElementById('processBtn').addEventListener('click', function() {
         try {
@@ -1117,7 +1039,6 @@ html, body {
                     const nameOnly = nameId.split(' - ')[0].trim();
                     const group = group1Depts.includes(currentDept) ? 'group1' : 'group2';
                     const sales = {};
-                    // ***FIXED***: Changed parseInt to parseFloat to handle decimal values correctly.
                     contestHeaders7.forEach((header, i) => { 
                         sales[header.trim()] = parseFloat(String(cells[i + 1] || '0').replace(/,/g, '')) || 0; 
                     });
@@ -1232,6 +1153,10 @@ html, body {
                 }
             });
 
+            // UI Changes: Hide input, show report view
+            document.getElementById('data-input-card').style.display = 'none';
+            document.getElementById('report-header').style.display = 'flex';
+
             document.getElementById('month-progress-container').innerHTML = `
                 <div class="progress-bar-wrapper" style="margin-top:0;">
                     <div class="progress-bar-label"><span>Tiến độ Tháng</span><span>${(currentMonthTimeframe.passedDays / currentMonthTimeframe.totalDays * 100).toFixed(1)}%</span></div>
@@ -1250,13 +1175,11 @@ html, body {
             renderRevenueTable(finalData);
             renderContestSummaryTables(finalData, sortedContestHeaders, contestProjectedTotals);
             renderAllEmployeeCards(finalData);
-            renderComprehensiveRankChart(finalData);
             renderFullContestTable(finalData, sortedContestHeaders);
             renderCommentsBox(finalData);
             
             document.getElementById('results-wrapper').style.display = 'block';
             document.getElementById('kpi-cards-section').style.display = 'block';
-            document.getElementById('captureReportBtn').style.display = 'block';
             document.getElementById('toggleRawDataBtn').style.display = 'block';
             document.getElementById('show-full-contest-btn-container').style.display = 'block';
             
@@ -1273,8 +1196,23 @@ html, body {
             console.error("Data processing error:", error);
         }
     });
+
+    document.getElementById('editDataBtn').addEventListener('click', function() {
+        // Hide report elements
+        document.getElementById('results-wrapper').style.display = 'none';
+        document.getElementById('kpi-cards-section').style.display = 'none';
+        document.getElementById('report-header').style.display = 'none';
+        document.getElementById('reportTitle').style.display = 'none';
+        document.getElementById('month-progress-container').style.display = 'none';
+        document.getElementById('show-full-contest-btn-container').style.display = 'none';
+        document.getElementById('full-contest-table-card').style.display = 'none';
+        document.getElementById('toggleRawDataBtn').style.display = 'none';
+        document.getElementById('rawDataWrapper').style.display = 'none';
+
+        // Show input card
+        document.getElementById('data-input-card').style.display = 'block';
+    });
     
-    // --- NEW EVENT LISTENER FOR PASTE BUTTONS ---
     document.getElementById('data-input-card').addEventListener('click', async function(event) {
         if (event.target.classList.contains('btn-paste')) {
             const targetId = event.target.dataset.target;
@@ -1284,11 +1222,8 @@ html, body {
             if (!textarea) return;
 
             try {
-                // Use the Clipboard API to read text from the clipboard
                 const text = await navigator.clipboard.readText();
-                // Filter the pasted text
                 const filteredText = extractTableData(text, filterType);
-                // Set the filtered text to the textarea value
                 textarea.value = filteredText;
                 showToast(`Đã dán và lọc dữ liệu cho ${targetId}!`);
             } catch (err) {
@@ -1302,7 +1237,7 @@ html, body {
         html2canvas(element, { 
             useCORS: true, 
             scale: 2,
-            backgroundColor: '#f8f9fa' 
+            backgroundColor: getComputedStyle(document.body).getPropertyValue('--light-bg-color')
         }).then(canvas => {
             const link = document.createElement('a');
             link.download = filename;
@@ -1321,21 +1256,11 @@ html, body {
         
         commentsSection.style.display = 'none';
 
-        html2canvas(reportArea, { 
-            useCORS: true, 
-            scale: 2,
-            backgroundColor: '#f8f9fa' 
-        }).then(canvas => {
-            const link = document.createElement('a');
-            link.download = 'BaoCaoTongQuan.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-        }).catch(err => {
-            console.error("html2canvas error:", err);
-            showToast("Lỗi khi chụp ảnh màn hình.");
-        }).finally(() => {
-            commentsSection.style.display = originalDisplayStyle;
-        });
+        captureAndDownload(reportArea, 'BaoCaoTongQuan.png');
+        
+        setTimeout(() => {
+             commentsSection.style.display = originalDisplayStyle;
+        }, 100);
     });
 
     document.getElementById('captureCardsBtn').addEventListener('click', function() {
