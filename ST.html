@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Tổng hợp - v218.28 (Giao diện 3D)</title>
+    <title>Dashboard Tổng hợp - v218.33 (Cập nhật Realtime)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -137,6 +137,7 @@
         .col-actions { display: flex; gap: 8px; }
         .col-action-btn { background: none; border: none; cursor: pointer; padding: 2px; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; transition: background-color 0.2s; }
         .col-action-btn:hover { background-color: #ddd; }
+        .col-action-btn svg { width: 16px; height: 16px; }
         .col-action-btn.copy svg { color: var(--success-color); }
         .col-action-btn.paste svg { color: var(--primary-accent); }
 
@@ -304,6 +305,35 @@
             font-weight: 600;
         }
 
+        /* NEW STYLES for no-revenue lists */
+        .no-revenue-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px dashed var(--border-main);
+            border-radius: 8px;
+        }
+        .no-revenue-section h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+        .no-revenue-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 5px 15px;
+            font-size: 0.9em;
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+        }
+        .no-revenue-grid li {
+            color: var(--text-primary);
+        }
+
         @media (max-width: 1200px) {
             .kpi-group-container { grid-template-columns: 1fr; }
             .kpi-panel { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
@@ -368,7 +398,8 @@
                     extractedData = extractData(text, /(Ngành hàng\tDT Realtime \(QĐ\)[\s\S]+?)Hỗ trợ BI/);
                     break;
                 case 'employeeSalesDataInput':
-                    extractedData = extractData(text, /((?:\d+\s+-\s+[^\r\n]+[\r\n]?)+)/);
+                    // CHANGE: Updated regex for employee sales data
+                    extractedData = extractData(text, /(Nhân viên SL DT[\s\S]+)/);
                     break;
                 default:
                     extractedData = text;
@@ -483,6 +514,32 @@
         showToast('Đã dán và lưu dữ liệu!');
     }
 
+    // CẬP NHẬT: Thêm hàm xử lý sự kiện nhấn phím Enter trong bảng
+    function handleTableKeyDown(event) {
+        // Chỉ xử lý phím Enter và trong ô có thể chỉnh sửa
+        if (event.key !== 'Enter' || !event.target.isContentEditable) {
+            return;
+        }
+
+        // Chặn hành vi mặc định của phím Enter (tạo dòng mới)
+        event.preventDefault();
+
+        const currentCell = event.target;
+        const currentRow = currentCell.parentElement;
+        const cellIndex = currentCell.cellIndex;
+        
+        // Tìm dòng tiếp theo
+        const nextRow = currentRow.nextElementSibling;
+
+        if (nextRow) {
+            // Tìm ô ở cùng cột của dòng tiếp theo
+            const nextCell = nextRow.cells[cellIndex];
+            if (nextCell && nextCell.isContentEditable) {
+                nextCell.focus();
+            }
+        }
+    }
+
     function saveTableData(tableId) {
         const table = document.getElementById(tableId);
         if (!table) return;
@@ -578,6 +635,7 @@
     
     function createYearlyDataTable(defaultData) {
         const container = document.getElementById('yearlyDataInputContainer');
+        // FIX: Re-added copy/paste buttons to the table header
         let tableHTML = `
             <div class="interactive-table-wrapper">
                 <table id="yearlyDataTable" class="interactive-table">
@@ -618,11 +676,13 @@
         const table = document.getElementById('yearlyDataTable');
         table.addEventListener('input', () => saveTableData('yearlyDataTable'));
         table.addEventListener('paste', (e) => handleTablePaste(e, table));
+        table.addEventListener('keydown', handleTableKeyDown);
         loadTableData('yearlyDataTable', defaultData);
     }
 
     function createDailyComparisonTable(defaultData) {
         const container = document.getElementById('dailyComparisonInputContainer');
+        // FIX: Re-added copy/paste buttons to the table header
         let tableHTML = `
             <div class="interactive-table-wrapper">
                 <table id="dailyComparisonTable" class="interactive-table">
@@ -663,6 +723,7 @@
         const table = document.getElementById('dailyComparisonTable');
         table.addEventListener('input', () => saveTableData('dailyComparisonTable'));
         table.addEventListener('paste', (e) => handleTablePaste(e, table));
+        table.addEventListener('keydown', handleTableKeyDown);
         loadTableData('dailyComparisonTable', defaultData);
     }
 
@@ -1768,24 +1829,6 @@ ${contestSummarySections.join('\n\n')}`.trim();
         let employeeChart = null;
         let installmentChart = null;
 
-        function toggleNoRevenueRows(tableId, button) {
-            const table = document.getElementById(tableId);
-            if (!table) return;
-            
-            const rows = table.querySelectorAll('.no-revenue-row');
-            if (rows.length === 0) return;
-
-            let areRowsHidden = rows[0].style.display === 'none';
-
-            rows.forEach(row => {
-                row.style.display = areRowsHidden ? '' : 'none';
-            });
-            
-            if(button) {
-                button.textContent = areRowsHidden ? `Ẩn ${rows.length} nhóm chưa có DT khỏi bảng` : `Hiện ${rows.length} nhóm chưa có DT trong bảng`;
-            }
-        }
-
         document.getElementById('analyzeBtn-rt').addEventListener('click', () => { 
             const mainDataRaw = document.getElementById('realtimeDataInput').value; 
             const contestDataRaw = document.getElementById('realtimeContestDataInput').value; 
@@ -1905,20 +1948,28 @@ ${contestSummarySections.join('\n\n')}`.trim();
             });
         }
         
+        // CHANGE: Updated employee sales parsing logic
         function parseEmployeeSalesData(text) {
             const lines = text.trim().split('\n');
             const data = [];
             
             lines.forEach(line => {
                 line = line.trim();
-                if (!line || line.toLowerCase().startsWith('nhân viên') || line.toLowerCase().startsWith('tổng')) return;
+                // Skip header, total, online, and empty lines
+                if (!line || 
+                    line.toLowerCase().startsWith('nhân viên') || 
+                    line.toLowerCase().startsWith('tổng') ||
+                    line.toLowerCase().includes('online')) {
+                    return;
+                }
 
-                const regex = /^(\d+)\s*-\s*(.+?)(?:\s+(-?[\d,.]+))?$/;
+                // Regex to capture name and the last number (revenue)
+                const regex = /^\d+\s*-\s*(.+?)\s+[\d-]+\s+(-?[\d,.]+)$/;
                 const match = line.match(regex);
 
                 if (match) {
-                    const name = match[2].trim();
-                    const revenueStr = match[3] || '0'; 
+                    const name = match[1].trim();
+                    const revenueStr = match[2] || '0'; 
                     const revenue = parseFloat(revenueStr.replace(/,/g, '')) || 0;
                     data.push({ name, revenue });
                 }
@@ -2088,12 +2139,6 @@ ${contestSummarySections.join('\n\n')}`.trim();
             });
         }
         
-        /**
-         * UPDATE: This function is updated to render a 3D-style bar chart.
-         * - Uses a linear gradient for the bar colors.
-         * - Configures borderWidth and borderRadius to simulate depth.
-         * - Enhances datalabels for better readability on the new background.
-         */
         function renderEmployeeSalesChart(data) {
             const wrapper = document.getElementById('employee-sales-chart-wrapper');
             if (!data || data.length === 0) {
@@ -2124,15 +2169,14 @@ ${contestSummarySections.join('\n\n')}`.trim();
             });
             const revenues = sortedData.map(d => d.revenue);
 
-            // Create a gradient for the bars
             const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
-            gradient.addColorStop(0, 'rgba(6, 215, 160, 0.9)'); // --success-color
-            gradient.addColorStop(0.5, 'rgba(16, 185, 129, 0.9)'); // Mid-point green
-            gradient.addColorStop(1, 'rgba(16, 138, 177, 0.9)'); // --primary-accent
+            gradient.addColorStop(0, 'rgba(6, 215, 160, 0.9)'); 
+            gradient.addColorStop(0.5, 'rgba(16, 185, 129, 0.9)'); 
+            gradient.addColorStop(1, 'rgba(16, 138, 177, 0.9)'); 
 
             const negativeGradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
-            negativeGradient.addColorStop(0, 'rgba(240, 71, 112, 0.9)'); // --danger-color
-            negativeGradient.addColorStop(1, 'rgba(247, 140, 106, 0.9)'); // --secondary-accent
+            negativeGradient.addColorStop(0, 'rgba(240, 71, 112, 0.9)'); 
+            negativeGradient.addColorStop(1, 'rgba(247, 140, 106, 0.9)');
 
             employeeChart = new Chart(ctx, {
                 type: 'bar',
@@ -2142,7 +2186,7 @@ ${contestSummarySections.join('\n\n')}`.trim();
                         label: 'Doanh thu',
                         data: revenues,
                         backgroundColor: (context) => context.raw >= 0 ? gradient : negativeGradient,
-                        borderColor: (context) => context.raw >= 0 ? 'rgba(7, 58, 75, 0.7)' : 'rgba(150, 30, 60, 0.7)', // Darker border for depth
+                        borderColor: (context) => context.raw >= 0 ? 'rgba(7, 58, 75, 0.7)' : 'rgba(150, 30, 60, 0.7)',
                         borderWidth: 2,
                         borderRadius: { topRight: 8, bottomRight: 8, topLeft: 0, bottomLeft: 0 },
                         borderSkipped: 'start',
@@ -2152,7 +2196,6 @@ ${contestSummarySections.join('\n\n')}`.trim();
                     indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
-                    // CẬP NHẬT: Thêm padding bên phải để số không bị cắt
                     layout: {
                         padding: {
                             right: 35 
@@ -2182,7 +2225,7 @@ ${contestSummarySections.join('\n\n')}`.trim();
                         legend: { display: false },
                         tooltip: {
                              enabled: true,
-                             backgroundColor: 'rgba(7, 58, 75, 0.9)', // Dark blue tooltip
+                             backgroundColor: 'rgba(7, 58, 75, 0.9)',
                              titleFont: { size: 14, weight: 'bold' },
                              bodyFont: { size: 12 },
                              callbacks: {
@@ -2191,7 +2234,6 @@ ${contestSummarySections.join('\n\n')}`.trim();
                                  }
                              }
                         },
-                        // CẬP NHẬT: Đổi màu chữ số liệu sang màu đen (biến --text-primary)
                         datalabels: {
                             anchor: 'end',
                             align: 'end',
@@ -2208,6 +2250,7 @@ ${contestSummarySections.join('\n\n')}`.trim();
             });
         }
         
+        // CHANGE: Re-added toggle button logic for no-revenue items
         function renderRealtimeContestTable(processedContest) {
             const wrapper = document.getElementById('contest-table-rt-wrapper');
             if (!processedContest.all || processedContest.all.length === 0) {
@@ -2216,7 +2259,7 @@ ${contestSummarySections.join('\n\n')}`.trim();
             }
             wrapper.style.display = 'block';
 
-            const itemsWithRevenue = processedContest.all.filter(item => item.actual > 0).sort((a,b) => b.percentProjected - a.percentProjected);
+            const itemsWithRevenue = processedContest.all.filter(item => item.actual > 0);
             const itemsWithoutRevenue = processedContest.all.filter(item => item.actual <= 0);
 
             const completedItems = processedContest.onTrack.length;
@@ -2238,79 +2281,57 @@ ${contestSummarySections.join('\n\n')}`.trim();
             
             let tableHtml = `<h2><svg class="title-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M5,4H19A2,2 0 0,1 21,6V18A2,2 0 0,1 19,20H5A2,2 0 0,1 3,18V6A2,2 0 0,1 5,4M5,8V12H11V8H5M13,8V12H19V8H13M5,14V18H11V14H5M13,14V18H19V14H13Z" /></svg>Bảng chi tiết Thi đua Real-time</h2>
                             ${progressBarHtml}
-                            <table id="contest-rt-table" class="rt-styled-table">
+                            <table class="rt-styled-table">
                                 <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Ngành hàng</th>
-                                        <th>DT Realtime</th>
-                                        <th>Còn lại</th>
-                                        <th>Target Ngày</th>
-                                        <th>% HT</th>
-                                        <th>% HT Dự kiến</th>
-                                    </tr>
+                                    <tr><th>#</th><th>Ngành hàng</th><th>DT Realtime</th><th>Còn lại</th><th>Target Ngày</th><th>% HT</th><th>% HT Dự kiến</th></tr>
                                 </thead>
                                 <tbody>`;
 
-            const createRowHtml = (item, index, isHidden = false) => {
-                const remainingCell = item.remaining <= 0
-                    ? `<td style="color: var(--success-color); font-weight: bold; font-size: 1.5em;">🏆</td>`
-                    : `<td style="color: var(--danger-color); font-weight: bold;">${formatNumber(item.remaining, 1)}</td>`;
-
-                const icon = item.percentProjected >= 100 ? ' <span title="Dự kiến hoàn thành xuất sắc!">🚀</span>' : '';
-                const progressBar = `
-                    <div class="contest-progress-track" style="height: 8px; margin-top: 5px; background-color: #e9ecef; border-radius: 4px; overflow: hidden;">
-                        <div class="progress-fill" style="width: ${Math.min(item.percentActual, 100)}%; background-color: ${getColor(item.percentActual)}; height: 100%;"></div>
-                    </div>
-                `;
-                
-                const rowClass = isHidden ? 'class="no-revenue-row" style="display: none;"' : '';
-
-                return `<tr ${rowClass}>
+            itemsWithRevenue.forEach((item, index) => {
+                const remainingCell = item.remaining <= 0 ? `<td style="color: var(--success-color); font-weight: bold; font-size: 1.5em;">🏆</td>` : `<td style="color: var(--danger-color); font-weight: bold;">${formatNumber(item.remaining, 1)}</td>`;
+                const icon = item.percentProjected >= 100 ? ' <span title="Dự kiến hoàn thành!">🚀</span>' : '';
+                tableHtml += `<tr>
                         <td>${index + 1}${icon}</td>
-                        <td style="text-align: left !important;">
-                            <div>${item.name}</div>
-                            ${progressBar}
-                        </td>
+                        <td style="text-align: left !important;">${item.name}</td>
                         <td>${formatNumber(item.actual)}</td>
                         ${remainingCell}
                         <td>${formatNumber(item.target)}</td>
                         <td style="color: ${getColor(item.percentActual)}; font-weight: bold;">${formatNumber(item.percentActual, 1)}%</td>
                         <td style="color: ${getColor(item.percentProjected)}; font-weight: bold;">${formatNumber(item.percentProjected, 1)}%</td>
                     </tr>`;
-            };
-
-            itemsWithRevenue.forEach((item, index) => {
-                tableHtml += createRowHtml(item, index);
             });
-            itemsWithoutRevenue.forEach((item, index) => {
-                tableHtml += createRowHtml(item, itemsWithRevenue.length + index, true);
-            });
-
             tableHtml += '</tbody></table>';
-
-            if (itemsWithoutRevenue.length > 0) {
-                tableHtml += `
-                    <div class="details-toggle" style="margin-top: 15px;">
-                        <button id="toggle-contest-btn">
-                            Hiện ${itemsWithoutRevenue.length} nhóm chưa có DT trong bảng
-                        </button>
-                    </div>
-                `;
-            }
-
             wrapper.innerHTML = tableHtml;
 
             if (itemsWithoutRevenue.length > 0) {
-                const toggleBtn = document.getElementById('toggle-contest-btn');
-                toggleBtn.addEventListener('click', () => toggleNoRevenueRows('contest-rt-table', toggleBtn));
+                 const noRevenueHtml = `<div id="contest-no-revenue-section" class="no-revenue-section" style="display:none;">
+                                <h4>Nhóm chưa phát sinh doanh thu (${itemsWithoutRevenue.length}):</h4>
+                                <ul class="no-revenue-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+                                    ${itemsWithoutRevenue.map((item, index) => `<li>${index + 1}. ${item.name}</li>`).join('')}
+                                </ul>
+                              </div>`;
+                const buttonHtml = `<div class="details-toggle" style="margin-top: 15px;">
+                        <button id="toggle-contest-no-revenue-btn">
+                            Hiện ${itemsWithoutRevenue.length} nhóm chưa có DT
+                        </button>
+                    </div>`;
+                
+                wrapper.insertAdjacentHTML('beforeend', buttonHtml + noRevenueHtml);
+
+                const toggleBtn = document.getElementById('toggle-contest-no-revenue-btn');
+                const noRevenueSection = document.getElementById('contest-no-revenue-section');
+                toggleBtn.addEventListener('click', () => {
+                    const isHidden = noRevenueSection.style.display === 'none';
+                    noRevenueSection.style.display = isHidden ? 'block' : 'none';
+                    toggleBtn.textContent = isHidden ? `Ẩn ${itemsWithoutRevenue.length} nhóm chưa có DT` : `Hiện ${itemsWithoutRevenue.length} nhóm chưa có DT`;
+                });
             }
         }
         
+        // CHANGE: Added filter for Target > 0 and re-added toggle button logic
         function renderRealtimeCategoryTable(mainData) {
             const wrapper = document.getElementById('category-table-rt-wrapper');
             if (!mainData || mainData.length === 0) {
-                wrapper.innerHTML = '';
                 wrapper.style.display = 'none';
                 return;
             }
@@ -2321,96 +2342,58 @@ ${contestSummarySections.join('\n\n')}`.trim();
                 row["Nhóm ngành hàng"].toLowerCase() !== "tổng" && 
                 row["Target Ngày (QĐ)"] > 0
             );
-
+            
             const categoriesWithRevenue = categoryData.filter(row => row["DT Realtime (QĐ)"] > 0).sort((a,b) => b["DT Realtime (QĐ)"] - a["DT Realtime (QĐ)"]);
             const categoriesWithoutRevenue = categoryData.filter(row => row["DT Realtime (QĐ)"] <= 0);
 
-            if (!totalRow && categoryData.length === 0) {
-                wrapper.innerHTML = '<h2><svg class="title-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M3,4H21V6H3V4M3,7H21V9H3V7M3,10H21V12H3V10M3,13H21V15H3V13M3,16H21V18H3V16Z"/></svg>Bảng chi tiết Ngành hàng</h2><p style="text-align:center; color: var(--text-muted);">Không có dữ liệu ngành hàng để hiển thị.</p>';
-                return;
-            }
-            
             let mainProgressBarHtml = '';
             if (totalRow) {
                 const htThuc = totalRow['% HT Target Ngày (QĐ)'];
-                const htColor = getColor(htThuc);
-                mainProgressBarHtml = `
-                    <div class="progress-bar-container" style="padding: 0 0 20px 0;">
-                        <div class="progress-labels">
-                            <span>Tiến độ Target Ngày (Tổng)</span>
-                            <span>${formatNumber(totalRow['DT Realtime (QĐ)'])} / ${formatNumber(totalRow['Target Ngày (QĐ)'])}</span>
-                        </div>
-                        <div class="progress-track">
-                            <div class="progress-fill" style="width: ${htThuc > 100 ? 100 : htThuc}%; background-color: ${htColor};">
-                                <span class="progress-text">${formatNumber(htThuc, 1)}%</span>
-                            </div>
-                        </div>
+                mainProgressBarHtml = `<div class="progress-bar-container" style="padding: 0 0 20px 0;">
+                        <div class="progress-labels"><span>Tiến độ Target Ngày (Tổng)</span><span>${formatNumber(totalRow['DT Realtime (QĐ)'])} / ${formatNumber(totalRow['Target Ngày (QĐ)'])}</span></div>
+                        <div class="progress-track"><div class="progress-fill" style="width: ${htThuc > 100 ? 100 : htThuc}%; background-color: ${getColor(htThuc)};"><span class="progress-text">${formatNumber(htThuc, 1)}%</span></div></div>
                     </div>`;
             }
-
-            const headers = {
-                "Nhóm ngành hàng": "Ngành hàng", "Số lượng": "SL", "DT Realtime (QĐ)": "DT Realtime", "Target Ngày (QĐ)": "Target Ngày",
-                "% HT Target Ngày (QĐ)": "% HT", "DT Trả Góp": "DT Trả Góp", "Tỷ trọng trả góp": "% Trả Góp"
-            };
-            const headerKeys = Object.keys(headers);
 
             let tableHtml = `<h2><svg class="title-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M3,4H21V6H3V4M3,7H21V9H3V7M3,10H21V12H3V10M3,13H21V15H3V13M3,16H21V18H3V16Z"/></svg>Bảng chi tiết Ngành hàng</h2>
                             ${mainProgressBarHtml}
-                            <table id="category-rt-table" class="rt-styled-table">
-                                <thead>
-                                    <tr>${headerKeys.map(key => `<th>${headers[key]}</th>`).join('')}</tr>
-                                </thead>
+                            <table class="rt-styled-table">
+                                <thead><tr><th>Ngành hàng</th><th>SL</th><th>DT Realtime</th><th>Target Ngày</th><th>% HT</th><th>% Trả Góp</th></tr></thead>
                                 <tbody>`;
-            
-            const createCategoryRowHtml = (row, isHidden = false) => {
-                const htPercent = row["% HT Target Ngày (QĐ)"];
-                const progressBar = `
-                    <div class="contest-progress-track" style="height: 8px; margin-top: 5px; background-color: #e9ecef; border-radius: 4px; overflow: hidden;">
-                        <div class="progress-fill" style="width: ${Math.min(htPercent, 100)}%; background-color: ${getColor(htPercent)}; height: 100%;"></div>
-                    </div>`;
-                const rowClass = isHidden ? 'class="no-revenue-row" style="display: none;"' : '';
-                return `<tr ${rowClass}>
-                            <td style="text-align: left !important;"><div>${row["Nhóm ngành hàng"]}</div>${progressBar}</td>
-                            <td>${formatNumber(row["Số lượng"])}</td>
-                            <td>${formatNumber(row["DT Realtime (QĐ)"])}</td>
-                            <td>${formatNumber(row["Target Ngày (QĐ)"])}</td>
-                            <td style="color: ${getColor(htPercent)}; font-weight: bold;">${formatNumber(htPercent, 1)}%</td>
-                            <td>${formatNumber(row["DT Trả Góp"])}</td>
-                            <td>${formatNumber(row["Tỷ trọng trả góp"], 2)}%</td>
-                        </tr>`;
-            };
-
             if (totalRow) {
                  tableHtml += `<tr style="font-weight:bold; background-color: #e9ecef;">
-                                <td style="text-align: left !important;">${totalRow["Nhóm ngành hàng"]}</td>
-                                <td>${formatNumber(totalRow["Số lượng"])}</td>
-                                <td>${formatNumber(totalRow["DT Realtime (QĐ)"])}</td>
-                                <td>${formatNumber(totalRow["Target Ngày (QĐ)"])}</td>
-                                <td style="color: ${getColor(totalRow["% HT Target Ngày (QĐ)"])};">${formatNumber(totalRow["% HT Target Ngày (QĐ)"], 1)}%</td>
-                                <td>${formatNumber(totalRow["DT Trả Góp"])}</td>
-                                <td>${formatNumber(totalRow["Tỷ trọng trả góp"], 2)}%</td>
+                                <td style="text-align: left !important;">${totalRow["Nhóm ngành hàng"]}</td><td>${formatNumber(totalRow["Số lượng"])}</td><td>${formatNumber(totalRow["DT Realtime (QĐ)"])}</td><td>${formatNumber(totalRow["Target Ngày (QĐ)"])}</td><td style="color: ${getColor(totalRow["% HT Target Ngày (QĐ)"])};">${formatNumber(totalRow["% HT Target Ngày (QĐ)"], 1)}%</td><td>${formatNumber(totalRow["Tỷ trọng trả góp"], 2)}%</td>
                             </tr>`;
             }
-
-            categoriesWithRevenue.forEach(row => { tableHtml += createCategoryRowHtml(row); });
-            categoriesWithoutRevenue.forEach(row => { tableHtml += createCategoryRowHtml(row, true); });
-
+            categoriesWithRevenue.forEach(row => { 
+                tableHtml += `<tr><td style="text-align: left !important;">${row["Nhóm ngành hàng"]}</td><td>${formatNumber(row["Số lượng"])}</td><td>${formatNumber(row["DT Realtime (QĐ)"])}</td><td>${formatNumber(row["Target Ngày (QĐ)"])}</td><td style="color: ${getColor(row["% HT Target Ngày (QĐ)"])}; font-weight: bold;">${formatNumber(row["% HT Target Ngày (QĐ)"], 1)}%</td><td>${formatNumber(row["Tỷ trọng trả góp"], 2)}%</td></tr>`;
+            });
             tableHtml += '</tbody></table>';
-
-            if (categoriesWithoutRevenue.length > 0) {
-                tableHtml += `
-                    <div class="details-toggle" style="margin-top: 15px;">
-                        <button id="toggle-category-btn">
-                            Hiện ${categoriesWithoutRevenue.length} ngành hàng chưa có DT trong bảng
-                        </button>
-                    </div>
-                `;
-            }
-
             wrapper.innerHTML = tableHtml;
+
             if (categoriesWithoutRevenue.length > 0) {
-                const toggleBtn = document.getElementById('toggle-category-btn');
-                toggleBtn.addEventListener('click', () => toggleNoRevenueRows('category-rt-table', toggleBtn));
+                const noRevenueHtml = `<div id="category-no-revenue-section" class="no-revenue-section" style="display:none;">
+                                <h4>Ngành hàng chưa phát sinh doanh thu (${categoriesWithoutRevenue.length}):</h4>
+                                <ul class="no-revenue-grid">
+                                    ${categoriesWithoutRevenue.map((item, index) => `<li>${index + 1}. ${item["Nhóm ngành hàng"]}</li>`).join('')}
+                                </ul>
+                              </div>`;
+
+                const buttonHtml = `<div class="details-toggle" style="margin-top: 15px;">
+                        <button id="toggle-category-no-revenue-btn">
+                            Hiện ${categoriesWithoutRevenue.length} ngành hàng chưa có DT
+                        </button>
+                    </div>`;
+                
+                wrapper.insertAdjacentHTML('beforeend', buttonHtml + noRevenueHtml);
+
+                const toggleBtn = document.getElementById('toggle-category-no-revenue-btn');
+                const noRevenueSection = document.getElementById('category-no-revenue-section');
+                toggleBtn.addEventListener('click', () => {
+                    const isHidden = noRevenueSection.style.display === 'none';
+                    noRevenueSection.style.display = isHidden ? 'block' : 'none';
+                    toggleBtn.textContent = isHidden ? `Ẩn ${categoriesWithoutRevenue.length} ngành hàng chưa có DT` : `Hiện ${categoriesWithoutRevenue.length} ngành hàng chưa có DT`;
+                });
             }
         }
 
