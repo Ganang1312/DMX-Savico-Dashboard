@@ -26,10 +26,10 @@
             border-collapse: collapse;
             table-layout: auto; 
             width: 100%;
-            font-size: 13px; /* THAY ĐỔI: Giảm font chữ cơ bản */
+            font-size: 13px; 
         }
         th, td {
-            padding: 8px 3px; /* THAY ĐỔI: Giảm padding */
+            padding: 8px 3px; 
             border: 1px solid #e5e7eb;
             vertical-align: middle;
             word-wrap: break-word;
@@ -42,8 +42,8 @@
             color: white;
             z-index: 10;
             font-weight: 600;
-            font-size: 12px; /* THAY ĐỔI: Giảm font chữ header */
-            white-space: normal; /* Cho phép chữ trong header xuống dòng */
+            font-size: 12px; 
+            white-space: normal; 
         }
         tfoot td {
             font-weight: 600;
@@ -63,10 +63,10 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 3px 6px; /* THAY ĐỔI: Giảm padding của pill */
+            padding: 3px 6px; 
             border-radius: 9999px;
             font-weight: 500;
-            font-size: 11px; /* THAY ĐỔI: Giảm font chữ của pill */
+            font-size: 11px; 
             white-space: nowrap;
         }
         .shift-sang { background-color: #bae6fd; color: #0c4a6e; border: 1px solid #7dd3fc; }
@@ -86,7 +86,6 @@
             display: none;
         }
 
-        /* THAY ĐỔI: Tinh chỉnh lại min-width */
         .col-stt { min-width: 30px; }
         .col-nganhhang, .col-hang { min-width: 90px; }
         .col-tenpg { min-width: 90px; font-weight: 600; }
@@ -152,13 +151,15 @@
         <div id="summary-card" class="card p-4 md:p-6 print-hide">
             <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
                 <svg class="icon text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" /></svg>
-                Tổng Quan Theo Ngày
+                Phân Tích & Nhận Xét Hôm Nay
             </h2>
             <div class="mb-4">
                 <label for="summary-date" class="font-semibold text-gray-700">Chọn ngày để xem:</label>
                 <input type="date" id="summary-date" class="mt-1 block w-full md:w-auto p-2 border border-gray-300 rounded-lg shadow-sm">
             </div>
-            <div id="daily-summary" class="space-y-4 text-gray-700"></div>
+            <div id="daily-summary" class="space-y-4 text-gray-700">
+                <!-- Nội dung sẽ được render bằng JS -->
+            </div>
         </div>
     </div>
 
@@ -166,7 +167,7 @@
         const initialData = [
             { stt: 1, nganhHang: 'ĐIỆN TỬ', hang: 'SONY', ten: 'YẾN', sdt: '362282223', gt: 'Nữ', veSinh: 'Thứ 3', lich: ['CHIỀU', 'SÁNG', 'OFF', 'HỌP', 'CHIỀU', 'SÁNG', 'CHIỀU'], note: '', diaChi: '447 Lạc Long Quân, Tây Hồ, HN' },
             { stt: 2, nganhHang: 'ĐIỆN TỬ', hang: 'SAMSUNG', ten: 'THẢO', sdt: '0338096094', gt: 'Nữ', veSinh: 'Thứ 2', lich: ['SÁNG', 'CHIỀU', 'SÁNG', 'OFF', 'CHIỀU', 'CHIỀU', 'SÁNG'], note: '', diaChi: 'Vĩnh Hưng , Hoàng Mai .HN' },
-            { stt: 3, nganhHang: 'ĐIỆN TỬ', hang: 'LG', ten: 'HÀ', sdt: '0904808424', gt: 'Nam', veSinh: 'Thứ 5', lich: ['HỌP', 'OFF', 'SÁNG', 'SÁNG', 'SÁNG', 'SÁNG', 'SÁNG'], note: '', diaChi: '390 Nguyễn Văn Cừ' },
+            { stt: 3, nganhHang: 'ĐIỆN LẠNH', hang: 'LG', ten: 'HÀ', sdt: '0904808424', gt: 'Nam', veSinh: 'Thứ 5', lich: ['HỌP', 'OFF', 'SÁNG', 'SÁNG', 'SÁNG', 'SÁNG', 'SÁNG'], note: '', diaChi: '390 Nguyễn Văn Cừ' },
             { stt: 4, nganhHang: 'GIA DỤNG', hang: 'PANASONIC', ten: 'THỦY', sdt: '0987654321', gt: 'Nữ', veSinh: 'Thứ 4', lich: ['SÁNG', 'OFF', 'CHIỀU', 'SÁNG', 'ST KHÁC', 'SÁNG', 'CHIỀU'], note: 'Test', diaChi: 'Hà Nội' },
 
         ];
@@ -194,9 +195,9 @@
         
         const categoryColorMap = new Map();
         const colorPalette = [
-            'bg-sky-50', 'bg-amber-50', 'bg-emerald-50', 'bg-indigo-50',
-            'bg-rose-50', 'bg-fuchsia-50', 'bg-cyan-50', 'bg-lime-50',
-            'bg-red-50', 'bg-blue-50', 'bg-green-50', 'bg-purple-50'
+            'bg-red-100', 'bg-sky-100', 'bg-green-100', 'bg-yellow-100', 
+            'bg-purple-100', 'bg-pink-100', 'bg-orange-100', 'bg-teal-100',
+            'bg-lime-100', 'bg-fuchsia-100', 'bg-cyan-100', 'bg-gray-200'
         ];
 
         function assignCategoryColors(data) {
@@ -214,13 +215,11 @@
             'col-diachi': 'Địa Chỉ'
         };
 
-        // --- START: CẬP NHẬT ICONS BẰNG SVG ---
         const pillSunIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm-.707 9.193a1 1 0 010-1.414l.707-.707a1 1 0 111.414 1.414l-.707.707a1 1 0 01-1.414 0zm12.728 0l-.707-.707a1 1 0 111.414-1.414l.707.707a1 1 0 01-1.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z" clip-rule="evenodd" /></svg>`;
         const pillMoonIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" /></svg>`;
         const pillOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>`;
         const pillHopIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zm-3 2a2 2 0 100-4 2 2 0 000 4zm7 1a1 1 0 011-1h3a1 1 0 110 2h-3a1 1 0 01-1-1zm-2-5a3 3 0 11-6 0 3 3 0 016 0zm-3 2a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M19 14a1 1 0 01-1 1H2a1 1 0 01-1-1v-1a3 3 0 013-3h12a3 3 0 013 3v1zm-3-1a1 1 0 00-1-1H5a1 1 0 00-1 1v1h12v-1z" clip-rule="evenodd" /></svg>`;
         const pillKhacIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" /></svg>`;
-        // --- END: CẬP NHẬT ICONS BẰNG SVG ---
 
         function getShiftClass(shift) {
             const s = (shift || '').toUpperCase();
@@ -257,7 +256,7 @@
             noResultsDiv.classList.toggle('hidden', data.length > 0);
             data.forEach(pg => {
                 const row = document.createElement('tr');
-                const bgColorClass = categoryColorMap.get(pg.nganhHang) || 'bg-gray-50';
+                const bgColorClass = categoryColorMap.get(pg.nganhHang) || 'bg-gray-200';
 
                 row.innerHTML = `
                     <td class="font-medium text-gray-900 ${bgColorClass} col-stt">${pg.stt}</td>
@@ -269,7 +268,6 @@
                     <td class="col-sdt">${pg.sdt || ''}</td>
                     ${pg.lich.map((shift, index) => {
                         const displayShift = getCleanShiftText(shift);
-                        // THAY ĐỔI: Chèn SVG trực tiếp
                         return `<td class="text-center ${index >= 5 ? 'weekend-cell' : ''} col-schedule"><span class="pill ${getShiftClass(shift)}">${getShiftIcon(shift)} ${displayShift}</span></td>`
                     }).join('')}
                     <td class="col-note">${pg.note || ''}</td>
@@ -349,40 +347,51 @@
             let dayIndex = selectedDate.getDay() - 1;
             if (dayIndex < 0) dayIndex = 6;
 
-            const dayNames = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật'];
-            const todayName = dayNames[dayIndex];
-
             const workingSang = data.filter(pg => (pg.lich[dayIndex] || '').toUpperCase().includes('SÁNG'));
             const workingChieu = data.filter(pg => (pg.lich[dayIndex] || '').toUpperCase().includes('CHIỀU'));
             
-            const cleaningDuty = data.filter(pg => (pg.veSinh || '').toLowerCase() === todayName.toLowerCase());
-            const cleaningSang = cleaningDuty.filter(pg => (pg.lich[dayIndex] || '').toUpperCase().includes('SÁNG'));
-            const cleaningChieu = cleaningDuty.filter(pg => (pg.lich[dayIndex] || '').toUpperCase().includes('CHIỀU'));
-
+            const cleaningDuty = data.filter(pg => (pg.veSinh || '').toLowerCase() === ['thứ 2', 'thứ 3', 'thứ 4', 'thứ 5', 'thứ 6', 'thứ 7', 'chủ nhật'][dayIndex]);
+            
             const createEmployeeList = (pgList) => {
-                if (pgList.length === 0) return '<p class="pl-8 text-gray-500">Không có.</p>';
-                return '<ul class="pl-8 list-disc list-inside space-y-1">' + pgList.map(pg => 
-                    `<li><strong>${pg.ten}</strong> <span class="text-xs">(${pg.gt})</span> - <span class="text-gray-600">${pg.nganhHang} / ${pg.hang}</span></li>`
+                if (pgList.length === 0) return '<p class="text-sm text-gray-500">Không có.</p>';
+                return '<ul class="space-y-1">' + pgList.map(pg => 
+                    `<li class="text-sm"><strong>${pg.ten}</strong> - <span class="text-xs text-gray-600">${pg.hang}</span></li>`
                 ).join('') + '</ul>';
             };
 
             dailySummaryDiv.innerHTML = `
-                <p class="font-bold text-lg">Tổng quan cho ${todayName}, ngày ${selectedDate.toLocaleDateString('vi-VN')}:</p>
-                <div><h3 class="font-semibold text-md flex items-center mb-1">${sunIcon} Ca Sáng (${workingSang.length}):</h3>${createEmployeeList(workingSang)}</div>
-                <div><h3 class="font-semibold text-md flex items-center mb-1">${moonIcon} Ca Chiều (${workingChieu.length}):</h3>${createEmployeeList(workingChieu)}</div>
-                <div><h3 class="font-semibold text-md flex items-center mb-1">${cleanIcon} Vệ Sinh Kho:</h3>
-                    <h4 class="pl-4 font-medium text-sm mt-1">Sáng (${cleaningSang.length}):</h4>
-                    ${createEmployeeList(cleaningSang)}
-                    <h4 class="pl-4 font-medium text-sm mt-1">Chiều (${cleaningChieu.length}):</h4>
-                    ${createEmployeeList(cleaningChieu)}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Cột Ca Sáng -->
+                    <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                        <h3 class="font-bold text-lg text-blue-800 mb-2">Ca Sáng (${workingSang.length})</h3>
+                        ${createEmployeeList(workingSang)}
+                    </div>
+                    <!-- Cột Ca Chiều -->
+                    <div class="bg-orange-50 border border-orange-200 p-4 rounded-lg">
+                        <h3 class="font-bold text-lg text-orange-800 mb-2">Ca Chiều (${workingChieu.length})</h3>
+                        ${createEmployeeList(workingChieu)}
+                    </div>
+                    <!-- Cột Vệ Sinh -->
+                    <div class="bg-green-50 border border-green-200 p-4 rounded-lg">
+                        <h3 class="font-bold text-lg text-green-800 mb-2">Vệ Sinh Kho (${cleaningDuty.length})</h3>
+                        ${createEmployeeList(cleaningDuty)}
+                    </div>
                 </div>
             `;
         }
         
         function setupColumnToggles() {
-            let visibilitySettings = JSON.parse(localStorage.getItem('pgColumnVisibility')) || {
-                'col-vesinh': true, 'col-sdt': false, 'col-note': false, 'col-diachi': false
-            };
+            let visibilitySettings = JSON.parse(localStorage.getItem('pgColumnVisibility'));
+            
+            if (!visibilitySettings) {
+                visibilitySettings = {
+                    'col-vesinh': true, 
+                    'col-sdt': false, 
+                    'col-note': false, 
+                    'col-diachi': false
+                };
+                localStorage.setItem('pgColumnVisibility', JSON.stringify(visibilitySettings));
+            }
             
             columnTogglesContainer.innerHTML = '<h3 class="w-full font-semibold text-gray-700 md:w-auto">Ẩn/Hiện Cột:</h3>';
             
@@ -397,15 +406,6 @@
                     </label>
                 `;
                 columnTogglesContainer.insertAdjacentHTML('beforeend', toggleHTML);
-            });
-
-            columnTogglesContainer.addEventListener('change', (e) => {
-                if (e.target.type === 'checkbox') {
-                    const colClass = e.target.dataset.colClass;
-                    visibilitySettings[colClass] = e.target.checked;
-                    localStorage.setItem('pgColumnVisibility', JSON.stringify(visibilitySettings));
-                    filterAndRender();
-                }
             });
         }
 
@@ -461,7 +461,7 @@
             rows.forEach(row => {
                 const cols = row.split('\t').map(c => c.trim());
                 try {
-                    if (cols.length > 7 && cols.slice(7, 14).some(c => /\d{2}\/\d{2}/.test(c)) && !dateRowFound) {
+                    if (cols.length > 7 && cols.slice(7, 14).some(c => /\d{1,2}[\/-]\d{1,2}/.test(c)) && !dateRowFound) {
                         newData.meta.dates = cols.slice(7, 14);
                         dateRowFound = true;
                     } else if (cols.length >= 14 && /^\d+$/.test(cols[0])) {
@@ -492,12 +492,26 @@
             
             assignCategoryColors(scheduleData);
             
-            if (data.meta && data.meta.dates && data.meta.dates.length > 0) {
+            let processedDates = [];
+            if (data.meta && data.meta.dates && Array.isArray(data.meta.dates)) {
                 const year = new Date().getFullYear();
-                weekDates = data.meta.dates.map(d => {
-                    const parts = d.split('/');
-                    return new Date(`${year}-${parts[1]}-${parts[0]}`);
-                });
+                processedDates = data.meta.dates.map(d => {
+                    if (typeof d !== 'string') return null;
+                    const match = d.match(/(\d{1,2})[\/-](\d{1,2})/);
+                    if (match) {
+                        const day = match[1];
+                        const month = match[2];
+                        const date = new Date(`${year}-${month}-${day}`);
+                        if (!isNaN(date.getTime())) {
+                            return date;
+                        }
+                    }
+                    return null;
+                }).filter(d => d !== null);
+            }
+            
+            if (processedDates.length === 7) {
+                weekDates = processedDates;
             } else {
                  const today = new Date();
                  const dayOfWeek = today.getDay();
@@ -510,8 +524,8 @@
                  });
             }
             
-            const firstDay = weekDates[0].toLocaleDateString('vi-VN');
-            const lastDay = weekDates[6].toLocaleDateString('vi-VN');
+            const firstDay = weekDates[0].toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit'});
+            const lastDay = weekDates[6].toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit'});
             weekTitle.textContent = `ĐMX SAVICO - Tuần từ ${firstDay} đến ${lastDay}`;
             
             const todayISO = new Date().toISOString().split('T')[0];
@@ -521,62 +535,55 @@
             filterAndRender();
         }
 
-        updateBtn.addEventListener('click', () => {
-            const inputText = dataInput.value;
-            if (inputText.trim() === '') {
-                alert("Vui lòng nhập dữ liệu vào ô.");
-                return;
-            }
-            const newData = parseInputData(inputText);
-            if (newData.pgs.length > 0) {
-                localStorage.setItem('pgScheduleData', JSON.stringify(newData));
-                initializePage(newData);
-                alert(`Đã cập nhật thành công ${newData.pgs.length} nhân viên!`);
-            } else {
-                alert("Không thể xử lý dữ liệu. Vui lòng kiểm tra lại định dạng.");
-            }
-        });
-
-        screenshotBtn.addEventListener('click', () => {
-            const elementsToHide = document.querySelectorAll('.print-hide');
-            elementsToHide.forEach(el => el.style.display = 'none');
-
-            html2canvas(document.getElementById('capture-area'), {
-                scale: 1.5,
-                useCORS: true,
-                backgroundColor: '#f0f4f8'
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `lich-lam-viec-${new Date().toISOString().slice(0,10)}.png`;
-                link.href = canvas.toDataURL();
-                link.click();
-                
-                elementsToHide.forEach(el => el.style.display = '');
-            }).catch(err => {
-                console.error("Lỗi chụp ảnh màn hình:", err);
-                elementsToHide.forEach(el => el.style.display = '');
-            });
-        });
-
-        searchInput.addEventListener('input', filterAndRender);
-        categoryFilter.addEventListener('change', filterAndRender);
-        summaryDateInput.addEventListener('change', () => filterAndRender());
-
         document.addEventListener('DOMContentLoaded', () => {
             setupColumnToggles();
+            
+            updateBtn.addEventListener('click', () => {
+                const inputText = dataInput.value;
+                if (inputText.trim() === '') {
+                    alert("Vui lòng nhập dữ liệu vào ô.");
+                    return;
+                }
+                const newData = parseInputData(inputText);
+                if (newData.pgs.length > 0) {
+                    localStorage.setItem('pgScheduleData', JSON.stringify(newData));
+                    initializePage(newData);
+                    alert(`Đã cập nhật thành công ${newData.pgs.length} nhân viên!`);
+                } else {
+                    alert("Không thể xử lý dữ liệu. Vui lòng kiểm tra lại định dạng.");
+                }
+            });
+
+            screenshotBtn.addEventListener('click', () => {
+                const elementsToHide = document.querySelectorAll('.print-hide');
+                elementsToHide.forEach(el => el.style.display = 'none');
+
+                html2canvas(document.getElementById('capture-area'), {
+                    scale: 1.5,
+                    useCORS: true,
+                    backgroundColor: '#f0f4f8'
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `lich-lam-viec-${new Date().toISOString().slice(0,10)}.png`;
+                    link.href = canvas.toDataURL();
+                    link.click();
+                    
+                    elementsToHide.forEach(el => el.style.display = '');
+                }).catch(err => {
+                    console.error("Lỗi chụp ảnh màn hình:", err);
+                    elementsToHide.forEach(el => el.style.display = '');
+                });
+            });
+            
+            searchInput.addEventListener('input', filterAndRender);
+            categoryFilter.addEventListener('change', filterAndRender);
+            summaryDateInput.addEventListener('change', filterAndRender);
+
             const savedData = localStorage.getItem('pgScheduleData');
             if (savedData) {
                 initializePage(JSON.parse(savedData));
             } else {
-                const today = new Date();
-                const monday = new Date(today);
-                 monday.setDate(today.getDate() - (today.getDay() === 0 ? 6 : today.getDay() - 1));
-                const initialDates = Array.from({length: 7}).map((_, i) => {
-                    const d = new Date(monday);
-                    d.setDate(monday.getDate() + i);
-                    return d.toLocaleDateString('vi-VN', {day:'2-digit', month:'2-digit'});
-                });
-                const initialFullData = { pgs: initialData, meta: { dates: initialDates } };
+                const initialFullData = { pgs: initialData, meta: { dates: [] } };
                 initializePage(initialFullData);
             }
         });
