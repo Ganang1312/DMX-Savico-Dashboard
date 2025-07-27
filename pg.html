@@ -20,10 +20,11 @@
         }
         .table-container {
             max-width: 100%;
+            overflow-x: auto; /* Cho phép cuộn ngang nếu bảng quá rộng */
         }
         table {
             border-collapse: collapse;
-            table-layout: fixed;
+            table-layout: auto; /* THAY ĐỔI: Cho phép cột tự động co dãn theo nội dung */
             width: 100%;
         }
         th, td {
@@ -87,16 +88,16 @@
             display: none;
         }
 
-        table th:nth-child(1), table td:nth-child(1) { width: 4%; }
-        table th:nth-child(2), table td:nth-child(2) { width: 10%; }
-        table th:nth-child(3), table td:nth-child(3) { width: 10%; }
-        /* Bôi đậm cột tên PG */
-        table th:nth-child(4), table td:nth-child(4) { width: 10%; font-weight: 600; }
-        table th:nth-child(5), table td:nth-child(5) { width: 4%; }
-        .col-vesinh { width: 8%; }
-        .col-sdt { width: 9%; }
-        .col-note { width: 9%; }
-        .col-diachi { width: 12%; }
+        /* THAY ĐỔI: Đặt chiều rộng tối thiểu cho các cột để tránh bị co quá nhỏ */
+        .col-stt { min-width: 40px; }
+        .col-nganhhang, .col-hang { min-width: 110px; }
+        .col-tenpg { min-width: 100px; font-weight: 600; }
+        .col-gt { min-width: 40px; }
+        .col-vesinh { min-width: 90px; }
+        .col-sdt { min-width: 100px; }
+        .col-schedule { min-width: 95px; } /* Cột lịch theo ngày */
+        .col-note { min-width: 120px; }
+        .col-diachi { min-width: 150px; }
 
     </style>
 </head>
@@ -193,28 +194,20 @@
         const moonIcon = `<svg class="icon text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" /></svg>`;
         const cleanIcon = `<svg class="icon text-cyan-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" /></svg>`;
         
-        // --- START: LOGIC MÀU SẮC CHO NGÀNH HÀNG ---
         const categoryColorMap = new Map();
-        // Bảng màu nhẹ nhàng từ Tailwind CSS
         const colorPalette = [
             'bg-sky-50', 'bg-amber-50', 'bg-emerald-50', 'bg-indigo-50',
             'bg-rose-50', 'bg-fuchsia-50', 'bg-cyan-50', 'bg-lime-50',
             'bg-red-50', 'bg-blue-50', 'bg-green-50', 'bg-purple-50'
         ];
 
-        /**
-         * Gán một màu từ bảng màu cho mỗi ngành hàng duy nhất.
-         * @param {Array} data - Mảng dữ liệu PG.
-         */
         function assignCategoryColors(data) {
             categoryColorMap.clear();
             const categories = [...new Set(data.map(pg => pg.nganhHang))];
-            // Sắp xếp để đảm bảo màu sắc nhất quán qua các lần tải lại
             categories.sort().forEach((category, index) => {
                 categoryColorMap.set(category, colorPalette[index % colorPalette.length]);
             });
         }
-        // --- END: LOGIC MÀU SẮC ---
 
         const toggleableColumns = {
             'col-vesinh': 'Lịch Vệ Sinh',
@@ -227,7 +220,7 @@
             const s = (shift || '').toUpperCase();
             if (s.includes('SÁNG')) return 'shift-sang';
             if (s.includes('CHIỀU')) return 'shift-chieu';
-            if (s.includes('OFF')) return 'shift-off';
+            if (s.includes('OFF') || s.includes('NGHỈ')) return 'shift-off';
             if (s.includes('HỌP')) return 'shift-hop';
             return 'shift-khac';
         }
@@ -235,38 +228,44 @@
         function getShiftIcon(shift) {
              const s = (shift || '').toUpperCase();
             if (s.includes('SÁNG')) return '☀️';
-            if (s.includes('CHIỀU')) return '🌙';
-            if (s.includes('OFF')) return '❌';
+            if (s.includes('CHIỀU')) return '�';
+            if (s.includes('OFF') || s.includes('NGHỈ')) return '❌';
             if (s.includes('HỌP')) return '👥';
             return '•';
         }
 
-        /**
-         * THAY ĐỔI: Cập nhật hàm renderTable để tô màu và bỏ pill
-         */
+        function getCleanShiftText(shift) {
+            const s = (shift || '').trim().toUpperCase();
+            if (s.includes('SÁNG')) return 'Sáng';
+            if (s.includes('CHIỀU')) return 'Chiều';
+            if (s.includes('OFF') || s.includes('NGHỈ')) return 'Off';
+            if (s.includes('HỌP')) return 'Họp';
+            if (s.includes('KHÁC')) return 'Khác';
+            if (s === 'S') return 'Sáng';
+            if (s === 'C') return 'Chiều';
+            return shift;
+        }
+
         function renderTable(data) {
             scheduleBody.innerHTML = '';
             noResultsDiv.classList.toggle('hidden', data.length > 0);
             data.forEach(pg => {
                 const row = document.createElement('tr');
-                // Lấy màu nền cho ngành hàng hiện tại
-                const bgColorClass = categoryColorMap.get(pg.nganhHang) || 'bg-gray-50'; // Màu dự phòng
+                const bgColorClass = categoryColorMap.get(pg.nganhHang) || 'bg-gray-50';
 
-                // Bỏ khung pill, thêm lớp màu nền cho các cột đầu tiên
+                // THAY ĐỔI: Thêm class vào các ô để kiểm soát độ rộng
                 row.innerHTML = `
-                    <td class="font-medium text-gray-900 ${bgColorClass}">${pg.stt}</td>
-                    <td class="${bgColorClass}">${pg.nganhHang}</td>
-                    <td class="${bgColorClass}">${pg.hang}</td>
-                    <td class="text-gray-900 ${bgColorClass}">${pg.ten}</td>
-                    <td class="${pg.gt.toLowerCase() === 'nam' ? 'text-blue-600' : 'text-pink-600'}">${pg.gt}</td>
+                    <td class="font-medium text-gray-900 ${bgColorClass} col-stt">${pg.stt}</td>
+                    <td class="${bgColorClass} col-nganhhang">${pg.nganhHang}</td>
+                    <td class="${bgColorClass} col-hang">${pg.hang}</td>
+                    <td class="text-gray-900 ${bgColorClass} col-tenpg">${pg.ten}</td>
+                    <td class="${pg.gt.toLowerCase() === 'nam' ? 'text-blue-600' : 'text-pink-600'} col-gt">${pg.gt}</td>
                     <td class="col-vesinh">${pg.veSinh || ''}</td>
                     <td class="col-sdt">${pg.sdt || ''}</td>
                     ${pg.lich.map((shift, index) => {
-                        let displayShift = shift || '';
-                        if (displayShift.toUpperCase().includes('ST KHÁC')) {
-                            displayShift = 'Khác';
-                        }
-                        return `<td class="text-center ${index >= 5 ? 'weekend-cell' : ''}"><span class="pill ${getShiftClass(shift)}"><span class="emoji-icon">${getShiftIcon(shift)}</span> ${displayShift}</span></td>`
+                        const displayShift = getCleanShiftText(shift);
+                        // Thêm class col-schedule
+                        return `<td class="text-center ${index >= 5 ? 'weekend-cell' : ''} col-schedule"><span class="pill ${getShiftClass(shift)}"><span class="emoji-icon">${getShiftIcon(shift)}</span> ${displayShift}</span></td>`
                     }).join('')}
                     <td class="col-note">${pg.note || ''}</td>
                     <td class="col-diachi">${pg.diaChi || ''}</td>
@@ -293,12 +292,17 @@
                     }
                 });
             });
-
+            
+            // THAY ĐỔI: Thêm class vào các header để kiểm soát độ rộng
             scheduleHead.innerHTML = `<tr>
-                <th>STT</th><th>Ngành Hàng</th><th>Hãng</th><th>Tên PG</th><th>GT</th>
+                <th class="col-stt">STT</th>
+                <th class="col-nganhhang">Ngành Hàng</th>
+                <th class="col-hang">Hãng</th>
+                <th class="col-tenpg">Tên PG</th>
+                <th class="col-gt">GT</th>
                 <th class="col-vesinh">Lịch Vệ Sinh</th>
                 <th class="col-sdt">SĐT</th>
-                ${days.map((day, index) => `<th class="${index >= 5 ? 'weekend-header' : ''}">${day}<br><span class="text-xs font-normal">${weekDates[index] ? weekDates[index].toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit'}) : ''}</span></th>`).join('')}
+                ${days.map((day, index) => `<th class="col-schedule ${index >= 5 ? 'weekend-header' : ''}">${day}<br><span class="text-xs font-normal">${weekDates[index] ? weekDates[index].toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit'}) : ''}</span></th>`).join('')}
                 <th class="col-note">Note</th>
                 <th class="col-diachi">Địa Chỉ</th>
             </tr>`;
@@ -309,7 +313,7 @@
                 </td>
                 <td class="col-vesinh"></td>
                 <td class="col-sdt"></td>
-                ${stats.map((day, index) => `<td class="text-center ${index >= 5 ? 'weekend-cell' : ''}">${day.sang.total} <span class="text-xs font-normal">(${day.sang.nam}N/${day.sang.nu}G)</span></td>`).join('')}
+                ${stats.map((day, index) => `<td class="text-center ${index >= 5 ? 'weekend-cell' : ''} col-schedule">${day.sang.total} <span class="text-xs font-normal">(${day.sang.nam}N/${day.sang.nu}G)</span></td>`).join('')}
                 <td class="col-note"></td>
                 <td class="col-diachi"></td>
             `;
@@ -320,7 +324,7 @@
                 </td>
                 <td class="col-vesinh"></td>
                 <td class="col-sdt"></td>
-                ${stats.map((day, index) => `<td class="text-center ${index >= 5 ? 'weekend-cell' : ''}">${day.chieu.total} <span class="text-xs font-normal">(${day.chieu.nam}N/${day.chieu.nu}G)</span></td>`).join('')}
+                ${stats.map((day, index) => `<td class="text-center ${index >= 5 ? 'weekend-cell' : ''} col-schedule">${day.chieu.total} <span class="text-xs font-normal">(${day.chieu.nam}N/${day.chieu.nu}G)</span></td>`).join('')}
                 <td class="col-note"></td>
                 <td class="col-diachi"></td>
             `;
@@ -479,13 +483,9 @@
             return newData;
         }
 
-        /**
-         * THAY ĐỔI: Gọi hàm gán màu khi khởi tạo trang
-         */
         function initializePage(data) {
             scheduleData = data.pgs || [];
             
-            // Gán màu cho các ngành hàng
             assignCategoryColors(scheduleData);
             
             if (data.meta && data.meta.dates && data.meta.dates.length > 0) {
@@ -526,7 +526,7 @@
             const newData = parseInputData(inputText);
             if (newData.pgs.length > 0) {
                 localStorage.setItem('pgScheduleData', JSON.stringify(newData));
-                initializePage(newData); // Hàm này sẽ gọi assignCategoryColors
+                initializePage(newData);
                 alert(`Đã cập nhật thành công ${newData.pgs.length} nhân viên!`);
             } else {
                 alert("Không thể xử lý dữ liệu. Vui lòng kiểm tra lại định dạng.");
