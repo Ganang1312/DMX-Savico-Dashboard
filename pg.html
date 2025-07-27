@@ -20,15 +20,16 @@
         }
         .table-container {
             max-width: 100%;
-            overflow-x: auto; /* Cho phép cuộn ngang nếu bảng quá rộng */
+            overflow-x: auto; /* Cho phép cuộn ngang nếu thực sự cần thiết trên màn hình rất nhỏ */
         }
         table {
             border-collapse: collapse;
-            table-layout: auto; /* THAY ĐỔI: Cho phép cột tự động co dãn theo nội dung */
+            table-layout: auto; 
             width: 100%;
+            font-size: 13px; /* THAY ĐỔI: Giảm font chữ cơ bản */
         }
         th, td {
-            padding: 12px 4px;
+            padding: 8px 3px; /* THAY ĐỔI: Giảm padding */
             border: 1px solid #e5e7eb;
             vertical-align: middle;
             word-wrap: break-word;
@@ -41,6 +42,8 @@
             color: white;
             z-index: 10;
             font-weight: 600;
+            font-size: 12px; /* THAY ĐỔI: Giảm font chữ header */
+            white-space: normal; /* Cho phép chữ trong header xuống dòng */
         }
         tfoot td {
             font-weight: 600;
@@ -53,18 +56,18 @@
             background-color: #fff7ed;
         }
         tbody tr:hover td {
-            background-color: #e0f2fe; /* Màu hover cho toàn bộ dòng */
+            background-color: #e0f2fe;
         }
         
         .pill {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 4px 10px;
+            padding: 3px 6px; /* THAY ĐỔI: Giảm padding của pill */
             border-radius: 9999px;
             font-weight: 500;
-            font-size: 0.75rem;
-            white-space: nowrap; /* Ngăn không cho nội dung trong pill xuống dòng */
+            font-size: 11px; /* THAY ĐỔI: Giảm font chữ của pill */
+            white-space: nowrap;
         }
         .shift-sang { background-color: #bae6fd; color: #0c4a6e; border: 1px solid #7dd3fc; }
         .shift-chieu { background-color: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; }
@@ -79,25 +82,20 @@
             display: inline-block;
             vertical-align: middle;
         }
-        .emoji-icon {
-            font-size: 0.9rem;
-            margin-right: 0.25rem;
-            line-height: 1;
-        }
         .hidden-col {
             display: none;
         }
 
-        /* THAY ĐỔI: Đặt chiều rộng tối thiểu cho các cột để tránh bị co quá nhỏ */
-        .col-stt { min-width: 40px; }
-        .col-nganhhang, .col-hang { min-width: 110px; }
-        .col-tenpg { min-width: 100px; font-weight: 600; }
-        .col-gt { min-width: 40px; }
-        .col-vesinh { min-width: 90px; }
-        .col-sdt { min-width: 100px; }
-        .col-schedule { min-width: 95px; } /* Cột lịch theo ngày */
-        .col-note { min-width: 120px; }
-        .col-diachi { min-width: 150px; }
+        /* THAY ĐỔI: Tinh chỉnh lại min-width */
+        .col-stt { min-width: 30px; }
+        .col-nganhhang, .col-hang { min-width: 90px; }
+        .col-tenpg { min-width: 90px; font-weight: 600; }
+        .col-gt { min-width: 35px; }
+        .col-vesinh { min-width: 80px; }
+        .col-sdt { min-width: 90px; }
+        .col-schedule { min-width: 85px; } 
+        .col-note { min-width: 100px; }
+        .col-diachi { min-width: 120px; }
 
     </style>
 </head>
@@ -216,6 +214,14 @@
             'col-diachi': 'Địa Chỉ'
         };
 
+        // --- START: CẬP NHẬT ICONS BẰNG SVG ---
+        const pillSunIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm-.707 9.193a1 1 0 010-1.414l.707-.707a1 1 0 111.414 1.414l-.707.707a1 1 0 01-1.414 0zm12.728 0l-.707-.707a1 1 0 111.414-1.414l.707.707a1 1 0 01-1.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z" clip-rule="evenodd" /></svg>`;
+        const pillMoonIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" /></svg>`;
+        const pillOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>`;
+        const pillHopIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zm-3 2a2 2 0 100-4 2 2 0 000 4zm7 1a1 1 0 011-1h3a1 1 0 110 2h-3a1 1 0 01-1-1zm-2-5a3 3 0 11-6 0 3 3 0 016 0zm-3 2a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M19 14a1 1 0 01-1 1H2a1 1 0 01-1-1v-1a3 3 0 013-3h12a3 3 0 013 3v1zm-3-1a1 1 0 00-1-1H5a1 1 0 00-1 1v1h12v-1z" clip-rule="evenodd" /></svg>`;
+        const pillKhacIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" /></svg>`;
+        // --- END: CẬP NHẬT ICONS BẰNG SVG ---
+
         function getShiftClass(shift) {
             const s = (shift || '').toUpperCase();
             if (s.includes('SÁNG')) return 'shift-sang';
@@ -226,12 +232,12 @@
         }
         
         function getShiftIcon(shift) {
-             const s = (shift || '').toUpperCase();
-            if (s.includes('SÁNG')) return '☀️';
-            if (s.includes('CHIỀU')) return '�';
-            if (s.includes('OFF') || s.includes('NGHỈ')) return '❌';
-            if (s.includes('HỌP')) return '👥';
-            return '•';
+            const s = (shift || '').toUpperCase();
+            if (s.includes('SÁNG')) return pillSunIcon;
+            if (s.includes('CHIỀU')) return pillMoonIcon;
+            if (s.includes('OFF') || s.includes('NGHỈ')) return pillOffIcon;
+            if (s.includes('HỌP')) return pillHopIcon;
+            return pillKhacIcon;
         }
 
         function getCleanShiftText(shift) {
@@ -253,7 +259,6 @@
                 const row = document.createElement('tr');
                 const bgColorClass = categoryColorMap.get(pg.nganhHang) || 'bg-gray-50';
 
-                // THAY ĐỔI: Thêm class vào các ô để kiểm soát độ rộng
                 row.innerHTML = `
                     <td class="font-medium text-gray-900 ${bgColorClass} col-stt">${pg.stt}</td>
                     <td class="${bgColorClass} col-nganhhang">${pg.nganhHang}</td>
@@ -264,8 +269,8 @@
                     <td class="col-sdt">${pg.sdt || ''}</td>
                     ${pg.lich.map((shift, index) => {
                         const displayShift = getCleanShiftText(shift);
-                        // Thêm class col-schedule
-                        return `<td class="text-center ${index >= 5 ? 'weekend-cell' : ''} col-schedule"><span class="pill ${getShiftClass(shift)}"><span class="emoji-icon">${getShiftIcon(shift)}</span> ${displayShift}</span></td>`
+                        // THAY ĐỔI: Chèn SVG trực tiếp
+                        return `<td class="text-center ${index >= 5 ? 'weekend-cell' : ''} col-schedule"><span class="pill ${getShiftClass(shift)}">${getShiftIcon(shift)} ${displayShift}</span></td>`
                     }).join('')}
                     <td class="col-note">${pg.note || ''}</td>
                     <td class="col-diachi">${pg.diaChi || ''}</td>
@@ -293,7 +298,6 @@
                 });
             });
             
-            // THAY ĐỔI: Thêm class vào các header để kiểm soát độ rộng
             scheduleHead.innerHTML = `<tr>
                 <th class="col-stt">STT</th>
                 <th class="col-nganhhang">Ngành Hàng</th>
