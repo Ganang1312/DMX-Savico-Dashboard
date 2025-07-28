@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch Làm Việc Tuần - Giao diện nâng cấp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Thư viện đọc file Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-accent: #108AB1;
+            --success-color: #06D7A0;
+            --warning-color: #FFD167;
+            --danger-color: #F04770;
+            --secondary-accent: #F78C6A;
+            --text-primary: #073A4B;
+            --text-on-dark: #FFFFFF;
+            --text-muted: #5A7A84;
+            --bg-main: #F4F7F9;
+            --border-main: #DDE3E7;
+            --shadow-main: 0 4px 12px rgba(7, 58, 75, 0.08);
+            --shadow-light: #ffffff;
+            --shadow-dark: #d1d9e6;
+        }
+
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+        }
+
+        .main-container {
+             background-color: var(--bg-main);
+             padding: 1.5rem;
+             border-radius: 20px;
+             box-shadow: 10px 10px 20px var(--shadow-dark), -10px -10px 20px var(--shadow-light);
+        }
+
+        .schedule-grid, .delivery-grid {
+            display: grid;
+            grid-template-columns: 60px 200px repeat(7, 1fr);
+            border-collapse: collapse;
+        }
+        
+        .delivery-grid {
+             grid-template-columns: 260px repeat(7, 1fr);
+        }
+
+        .grid-cell {
+            border: 1px solid var(--border-main);
+            padding: 8px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease-in-out;
+            min-height: 50px;
+        }
+        
+        .department-cell {
+            font-weight: 600;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            color: var(--text-on-dark);
+            font-size: 16px;
+            letter-spacing: 1px;
+            padding: 8px 4px;
+            border-radius: 8px;
+            margin: 2px;
+            box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
+        }
+
+        .employee-cell {
+            background-color: #FFFFFF;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .day-cell {
+            background-color: #FFFFFF;
+            padding: 4px;
+        }
+
+        .shift-blocks {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 3px;
+            width: 100%;
+        }
+
+        .shift-block {
+            height: 16px;
+            border-radius: 3px;
+            background-color: #e9ecef;
+            border: 1px solid #dce1e7;
+        }
+
+        .shift-block.active {
+            background-color: var(--success-color);
+            border-color: #05a97b;
+        }
+        
+        .header-cell {
+            background-color: #FFFFFF;
+            color: var(--text-primary);
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--border-main);
+            border-radius: 10px;
+            margin: 2px;
+            padding: 8px 4px;
+            flex-direction: column;
+            box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
+        }
+        
+        .header-cell.weekend-header {
+             background-color: var(--secondary-accent);
+             color: var(--text-on-dark);
+        }
+
+        .header-cell.selected-day-header {
+            background-color: var(--primary-accent);
+            color: var(--text-on-dark);
+            box-shadow: inset 3px 3px 6px #0c6b8b, inset -3px -3px 6px #14a9d7;
+        }
+        
+        .delivery-select {
+            width: 100%;
+            padding: 4px;
+            border-radius: 4px;
+            border: 1px solid var(--border-main);
+            background-color: #fff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-6">
+
+    <div class="max-w-screen-xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold" style="color: var(--text-primary);">Lịch Làm Việc Tuần</h1>
+            <p class="text-lg mt-1" style="color: var(--text-muted);">ĐMX Savico</p>
+        </header>
+
+        <div class="main-container mb-8">
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <a href="https://office.thegioididong.com/quan-ly-phan-ca" target="_blank" rel="noopener noreferrer" class="inline-block text-lg font-semibold mb-2 hover:underline transition-colors" style="color: var(--primary-accent);">
+                        Dữ Liệu Lịch Làm Việc 🔗
+                    </a>
+                    <p class="text-sm mb-2" style="color: var(--text-muted);">Dán dữ liệu hoặc chọn file Excel để tải lên.</p>
+                    <textarea id="rawData" rows="10" class="w-full p-2 border rounded-md font-mono text-xs" style="background-color: var(--bg-main); border-color: var(--border-main); box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light);"></textarea>
+                </div>
+                 <div>
+                    <label for="startDate" class="block text-lg font-semibold mb-2" style="color: var(--text-primary);">Tùy chọn</label>
+                    <p class="text-sm mb-2" style="color: var(--text-muted);">Chọn tuần và cập nhật lịch.</p>
+                    <input type="date" id="startDate" class="w-full p-2 border rounded-md mb-4" style="background-color: #fff; border-color: var(--border-main);">
+                    <label for="fileUpload" class="w-full text-center cursor-pointer px-6 py-2 text-white font-semibold rounded-lg shadow-md hover:brightness-110 transition-all block" style="background-color: var(--success-color);">
+                        Chọn File Excel
+                    </label>
+                    <input type="file" id="fileUpload" class="hidden" accept=".xlsx, .xls">
+                     <button id="updateButton" class="mt-4 w-full px-6 py-2 text-white font-semibold rounded-lg shadow-md hover:brightness-110 transition-all" style="background-color: var(--primary-accent);">
+                        Cập Nhật Lịch
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="main-container mb-8">
+             <h2 class="text-2xl font-bold mb-4" style="color: var(--text-primary);">Lịch Siêu Thị</h2>
+            <div class="overflow-x-auto">
+                <div id="scheduleContainer" class="min-w-[1200px]">
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-container mb-8">
+             <h2 class="text-2xl font-bold mb-4" style="color: var(--text-primary);">Lịch Kho Giao Hàng</h2>
+            <div class="overflow-x-auto">
+                <div id="deliveryScheduleContainer" class="min-w-[1200px]">
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-8">
+            <h2 class="text-2xl font-bold mb-4" style="color: var(--text-primary);">Nhân sự ngày: <span id="todayDate" style="color: var(--primary-accent);"></span></h2>
+            <div id="analysisResult" class="space-y-6">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const initialRawData = `
+BP Trang Trí kiêm Thu ngân - Sim Số - ĐM
+156494 - Thảo	46		3	3													3	3	1		3	3							3	3	1		3		3	3	1		3		3	3	1
+97536 - Khánh	54				3	3	1		3	3	3	3	1		3	3							3	3	1		3	3					3	3		3			3	3			
+BP Kho kiêm Chuyên viên HTKT - ĐM
+162055 - Huy	56				3	3	1		3	3							3	3	1		3	3					3		3	3	1				3	3	1		3	3	3	3	1
+30249 - Minh	55		3	3							3	3	1		3	3							3	3	1		3	3					3	3	3	3	1		3	3		3	1
+30899 - Đức	55		3	3					3	3	3	3	1										3	3	1		3	3					3	3		3	1		3	3	3	3	1
+90509 - Long	56				3	3	1								3	3	3	3	1		3	3							3	3	1		3	3	3	3	1		3		3	3	1
+BP Tư Vấn - ĐM
+199888 - Anh	58										3	3	1				3	3	1		3	3					3	3	3	3			3	3	3	3	1		3	3	3	3	1
+250630 - Linh	52				3	3	1		3	3							3	3	1		3	3											3	3	3	3	1		3	3	3	3	1
+61169 - Dương	52				3	3	1		3	3					3	3							3	3	1				3	3	1		3	3		3	1		3		3	3	
+61271 - Thắng	52		3	3							3	3	1		3	3							3	3	1		3	3					3		3	3	1		3		3	3	1
+98372 - Quân	53		3	3													3	3	1				3	3	1				3	3	1		3	3	3	3	1		3	3	3	3	1
+BP Quản Lý Siêu Thị
+32859 - Dương	50		3	3							3	3	1		3	3							3	3	1		3	3					3	3	3	3			3	3			
+BP Trưởng Ca
+62301 - Dũng	53				3	3	1		3	3							3	3	1		3	3							3	3	1		3		3	3	1		3		3	3	1
+`;
+
+        let scheduleData = [];
+        let deliveryAssignments = {};
+        const daysOfWeek = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
+        
+        const getWeekDates = (referenceDate) => {
+            const startDate = new Date(referenceDate);
+            const dayOfWeek = startDate.getDay();
+            const diff = startDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+            const monday = new Date(startDate.setDate(diff));
+
+            const weekDates = [];
+            for (let i = 0; i < 7; i++) {
+                const day = new Date(monday);
+                day.setDate(monday.getDate() + i);
+                const dayName = daysOfWeek[i];
+                const date = day.getDate().toString().padStart(2, '0');
+                const month = (day.getMonth() + 1).toString().padStart(2, '0');
+                weekDates.push(`${dayName} (${date}/${month})`);
+            }
+            return weekDates;
+        };
+
+        let fullDayNames = getWeekDates(new Date());
+        let selectedDayIndex = 0;
+
+        function parseRawData(rawText) {
+            const data = [];
+            const lines = rawText.trim().split('\n');
+            let currentDepartment = "Không xác định";
+
+            const isNewFormat = lines.length > 1 && lines[1].includes("Bộ phận\tUser\tHọ tên");
+
+            if (isNewFormat) {
+                const dataLines = lines.slice(2);
+
+                for (const line of dataLines) {
+                    const cols = line.trim().split('\t');
+                    if (cols.length < 4 || !cols[0].startsWith("BP")) continue;
+
+                    const department = cols[0].trim();
+                    const name = cols[2].trim();
+
+                    if (!department || !name) continue;
+
+                    const employee = {
+                        department: department,
+                        name: name,
+                        shifts: {}
+                    };
+
+                    for (let i = 0; i < 42; i++) {
+                        const colIndex = i + 4;
+                        if (cols[colIndex] && cols[colIndex].trim() !== "") {
+                            const dayIndex = Math.floor(i / 6);
+                            const shiftNumber = (i % 6) + 1;
+                            const dayKey = daysOfWeek[dayIndex];
+                            
+                            if (!employee.shifts[dayKey]) {
+                                employee.shifts[dayKey] = [];
+                            }
+                            employee.shifts[dayKey].push(shiftNumber);
+                        }
+                    }
+                    data.push(employee);
+                }
+
+            } else {
+                for (const line of lines) {
+                    const trimmedLine = line.trim();
+                    if (!trimmedLine) continue;
+
+                    if (trimmedLine.startsWith("BP ")) {
+                        currentDepartment = trimmedLine;
+                        continue;
+                    }
+
+                    const cols = trimmedLine.split('\t');
+                    if (cols.length < 4) continue;
+
+                    const namePart = cols[0].split(' - ')[1];
+                    if (!namePart) continue;
+
+                    const employee = {
+                        department: currentDepartment,
+                        name: namePart.trim(),
+                        shifts: {}
+                    };
+
+                    for (let i = 0; i < 42; i++) {
+                        const colIndex = i + 2;
+                        if (cols[colIndex] && cols[colIndex].trim() !== "") {
+                            const dayIndex = Math.floor(i / 6);
+                            const shiftNumber = (i % 6) + 1;
+                            const dayKey = daysOfWeek[dayIndex];
+                            
+                            if (!employee.shifts[dayKey]) {
+                                employee.shifts[dayKey] = [];
+                            }
+                            employee.shifts[dayKey].push(shiftNumber);
+                        }
+                    }
+                    data.push(employee);
+                }
+            }
+            return data;
+        }
+
+        function getDepartmentName(fullName) {
+            if (fullName.includes('Tư Vấn')) return 'TƯ VẤN';
+            if (fullName.includes('Thu ngân')) return 'THU NGÂN';
+            if (fullName.includes('Kho')) return 'KHO';
+            if (fullName.includes('Trưởng Ca')) return 'TRƯỞNG CA';
+            if (fullName.includes('Quản Lý')) return 'QUẢN LÝ';
+            return 'KHÁC';
+        }
+
+        function selectDay(index) {
+            selectedDayIndex = index;
+            analyzeDay(index);
+        }
+
+        function renderDayHeaders(gridContainer) {
+             fullDayNames.forEach((day, index) => {
+                const headerCell = document.createElement('div');
+                const [dayName, date] = day.split(' ');
+                headerCell.className = 'grid-cell header-cell';
+                headerCell.innerHTML = `<div class="text-lg">${dayName}</div>
+                                        <div class="text-xs font-normal">${date}</div>`;
+                
+                if (day.startsWith('T7') || day.startsWith('CN')) headerCell.classList.add('weekend-header');
+                
+                headerCell.onclick = () => {
+                    document.querySelectorAll('.header-cell.selected-day-header').forEach(c => c.classList.remove('selected-day-header'));
+                    document.querySelectorAll(`.header-cell[data-day-index='${index}']`).forEach(c => c.classList.add('selected-day-header'));
+                    selectDay(index);
+                };
+                headerCell.dataset.dayIndex = index;
+                gridContainer.appendChild(headerCell);
+            });
+        }
+
+        function renderSchedule() {
+            const container = document.getElementById('scheduleContainer');
+            container.innerHTML = '';
+            if (scheduleData.length === 0) {
+                container.innerHTML = `<p class="text-center p-8" style="color: var(--text-muted);">Chưa có dữ liệu hoặc định dạng sai.</p>`;
+                return;
+            }
+            
+            const grid = document.createElement('div');
+            grid.className = 'schedule-grid';
+
+            const deptHeader = document.createElement('div');
+            deptHeader.className = 'grid-cell font-semibold';
+            deptHeader.textContent = 'Bộ phận';
+            deptHeader.style.background = 'transparent';
+            deptHeader.style.border = 'none';
+            grid.appendChild(deptHeader);
+
+            const nameHeader = document.createElement('div');
+            nameHeader.className = 'grid-cell font-semibold';
+            nameHeader.textContent = 'Nhân viên';
+            nameHeader.style.background = 'transparent';
+            nameHeader.style.border = 'none';
+            grid.appendChild(nameHeader);
+
+            renderDayHeaders(grid);
+
+            const deptConfig = {
+                'TƯ VẤN': { color: '#06D7A0', vertical: 'TƯ VẤN' },
+                'THU NGÂN': { color: '#F78C6A', vertical: 'THU NGÂN' },
+                'KHO': { color: '#FFD167', vertical: 'KHO' },
+                'TRƯỞNG CA': { color: '#108AB1', vertical: 'TC' },
+                'QUẢN LÝ': { color: '#F04770', vertical: 'QL' },
+                'KHÁC': { color: '#5A7A84', vertical: 'KHÁC' }
+            };
+
+            const deptOrder = ['TƯ VẤN', 'THU NGÂN', 'KHO', 'TRƯỞNG CA', 'QUẢN LÝ', 'KHÁC'];
+
+            const groupedByDept = scheduleData.reduce((acc, emp) => {
+                const deptName = getDepartmentName(emp.department);
+                if (!acc[deptName]) acc[deptName] = [];
+                acc[deptName].push(emp);
+                return acc;
+            }, {});
+            
+            deptOrder.forEach(deptName => {
+                if (!groupedByDept[deptName]) return;
+
+                const employeesInDept = groupedByDept[deptName];
+                const numEmployees = employeesInDept.length;
+                const config = deptConfig[deptName];
+
+                const deptCell = document.createElement('div');
+                deptCell.className = 'grid-cell department-cell';
+                deptCell.style.gridRow = `span ${numEmployees}`;
+                deptCell.style.backgroundColor = config.color;
+                deptCell.innerHTML = `<span>${config.vertical}</span>`;
+                grid.appendChild(deptCell);
+
+                employeesInDept.forEach(emp => {
+                    const empCell = document.createElement('div');
+                    empCell.className = 'grid-cell employee-cell';
+                    empCell.textContent = emp.name;
+                    grid.appendChild(empCell);
+
+                    daysOfWeek.forEach((day) => {
+                        const dayCell = document.createElement('div');
+                        dayCell.className = 'grid-cell day-cell';
+                        
+                        const shiftBlocks = document.createElement('div');
+                        shiftBlocks.className = 'shift-blocks';
+                        const empShiftsForDay = emp.shifts[day] || [];
+
+                        for (let i = 1; i <= 6; i++) {
+                            const block = document.createElement('div');
+                            block.className = 'shift-block';
+                            if (empShiftsForDay.includes(i)) block.classList.add('active');
+                            shiftBlocks.appendChild(block);
+                        }
+                        dayCell.appendChild(shiftBlocks);
+                        grid.appendChild(dayCell);
+                    });
+                });
+            });
+            container.appendChild(grid);
+        }
+        
+        function renderDeliverySchedule() {
+            const container = document.getElementById('deliveryScheduleContainer');
+            container.innerHTML = '';
+            const khoEmployees = scheduleData.filter(emp => getDepartmentName(emp.department) === 'KHO').map(e => e.name);
+            if(khoEmployees.length === 0) return;
+
+            const grid = document.createElement('div');
+            grid.className = 'delivery-grid';
+
+            const emptyHeader = document.createElement('div');
+            emptyHeader.className = 'grid-cell font-semibold';
+            emptyHeader.textContent = 'Ca giao hàng';
+            emptyHeader.style.border = 'none';
+            grid.appendChild(emptyHeader);
+            
+            renderDayHeaders(grid);
+
+            const deliveryShifts = [
+                {key: 'GH_SANG', label: 'GH Sáng', type: 'weekday'},
+                {key: 'GH_CHIEU', label: 'GH Chiều', type: 'weekday'},
+                {key: 'GH_SANG_1', label: 'GH Sáng 1', type: 'weekend'},
+                {key: 'GH_SANG_2', label: 'GH Sáng 2', type: 'weekend'},
+                {key: 'GH_CHIEU_1', label: 'GH Chiều 1', type: 'weekend'},
+                {key: 'GH_CHIEU_2', label: 'GH Chiều 2', type: 'weekend'}
+            ];
+
+            deliveryShifts.forEach(shift => {
+                 const shiftLabelCell = document.createElement('div');
+                 shiftLabelCell.className = 'grid-cell employee-cell font-semibold';
+                 shiftLabelCell.textContent = shift.label;
+                 grid.appendChild(shiftLabelCell);
+
+                 daysOfWeek.forEach((day, dayIndex) => {
+                    const cell = document.createElement('div');
+                    cell.className = 'grid-cell day-cell';
+                    
+                    const isWeekend = dayIndex >= 5;
+
+                    if ((!isWeekend && shift.type === 'weekday') || (isWeekend && shift.type === 'weekend')) {
+                        const select = document.createElement('select');
+                        select.className = 'delivery-select';
+                        select.dataset.day = day;
+                        select.dataset.shift = shift.key;
+                        
+                        select.innerHTML = `<option value="">-- Chọn NV --</option>`;
+                        khoEmployees.forEach(name => {
+                            select.innerHTML += `<option value="${name}">${name}</option>`;
+                        });
+                        
+                        if(deliveryAssignments[day] && deliveryAssignments[day][shift.key]) {
+                            select.value = deliveryAssignments[day][shift.key];
+                        }
+
+                        select.onchange = (e) => {
+                            const dayKey = e.target.dataset.day;
+                            const shiftKey = e.target.dataset.shift;
+                            if (!deliveryAssignments[dayKey]) deliveryAssignments[dayKey] = {};
+                            deliveryAssignments[dayKey][shiftKey] = e.target.value;
+                            localStorage.setItem('deliveryAssignments', JSON.stringify(deliveryAssignments));
+                            analyzeDay(selectedDayIndex);
+                        };
+                        cell.appendChild(select);
+                    } else {
+                        cell.style.backgroundColor = '#e9ecef';
+                    }
+                    grid.appendChild(cell);
+                 });
+            });
+            container.appendChild(grid);
+        }
+
+        function analyzeDay(dayIndex) {
+            document.getElementById('todayDate').textContent = fullDayNames[dayIndex];
+            const todayKey = daysOfWeek[dayIndex];
+
+            const morningShiftDef = [1, 2, 3];
+            const afternoonShiftDef = [4, 5, 6];
+
+            const morningWorkersByDept = {};
+            const afternoonWorkersByDept = {};
+            const workingEmployeeNames = new Set();
+
+            const getGapNote = (workedShifts, periodShifts) => {
+                const worksThisPeriod = workedShifts.some(s => periodShifts.includes(s));
+                if (!worksThisPeriod) return '';
+
+                const missed = periodShifts.filter(s => s > 1 && !workedShifts.includes(s));
+                
+                if (missed.length > 0) {
+                    return ` <span style="color: var(--danger-color); font-style: italic; font-size: 0.8em;">(OFF ca ${missed.join(', ')})</span>`;
+                }
+                return '';
+            };
+
+            scheduleData.forEach(emp => {
+                const shiftsToday = emp.shifts[todayKey] || [];
+                if (shiftsToday.length > 0) {
+                    workingEmployeeNames.add(emp.name);
+                    const deptName = getDepartmentName(emp.department);
+                    
+                    if (shiftsToday.some(s => morningShiftDef.includes(s))) {
+                        const morningGapNote = getGapNote(shiftsToday, morningShiftDef);
+                        const displayName = `${emp.name}${morningGapNote}`;
+                        if (!morningWorkersByDept[deptName]) morningWorkersByDept[deptName] = [];
+                        morningWorkersByDept[deptName].push(displayName);
+                    }
+
+                    if (shiftsToday.some(s => afternoonShiftDef.includes(s))) {
+                        const afternoonGapNote = getGapNote(shiftsToday, afternoonShiftDef);
+                        const displayName = `${emp.name}${afternoonGapNote}`;
+                        if (!afternoonWorkersByDept[deptName]) afternoonWorkersByDept[deptName] = [];
+                        afternoonWorkersByDept[deptName].push(displayName);
+                    }
+                }
+            });
+
+            const allEmployeeNames = scheduleData.map(e => e.name);
+            const offEmployeeNames = allEmployeeNames.filter(name => !workingEmployeeNames.has(name));
+
+            const renderDeptList = (data) => {
+                const deptOrder = ['TƯ VẤN', 'THU NGÂN', 'KHO', 'TRƯỞNG CA', 'QUẢN LÝ', 'KHÁC'];
+                const sortedDepts = deptOrder.filter(dept => data[dept]);
+
+                if (sortedDepts.length === 0) return `<p style="color: var(--text-muted);">Không có nhân viên.</p>`;
+                
+                return sortedDepts.map(dept => `
+                    <div class="mt-2">
+                        <p class="font-semibold">${dept}: <span class="font-bold" style="color: var(--primary-accent);">${data[dept].length} NV</span></p>
+                        <div class="pl-4 text-sm" style="color: var(--text-muted);">${data[dept].map(name => `<div>${name}</div>`).join('')}</div>
+                    </div>
+                `).join('');
+            };
+            
+            const renderOffList = (data) => {
+                 if (data.length === 0) return `<p style="color: var(--text-muted);">Không có nhân viên nghỉ.</p>`;
+                 return `<p class="text-sm" style="color: var(--text-muted);">${data.join(', ')}</p>`;
+            };
+            
+            const renderDeliveryAnalysis = () => {
+                const assignments = deliveryAssignments[todayKey] || {};
+                let content = '';
+                const deliveryLabels = {
+                    'GH_SANG': 'GH Sáng', 'GH_CHIEU': 'GH Chiều',
+                    'GH_SANG_1': 'GH Sáng 1', 'GH_SANG_2': 'GH Sáng 2',
+                    'GH_CHIEU_1': 'GH Chiều 1', 'GH_CHIEU_2': 'GH Chiều 2'
+                };
+
+                if (Object.keys(assignments).some(key => assignments[key])) {
+                    content += '<div class="mt-2">';
+                    for (const shiftKey in deliveryLabels) {
+                        if (assignments[shiftKey]) {
+                             content += `<p class="font-semibold">${deliveryLabels[shiftKey]}: <span class="font-medium" style="color: var(--text-muted);">${assignments[shiftKey]}</span></p>`;
+                        }
+                    }
+                    content += '</div>';
+                } else {
+                    content = `<p style="color: var(--text-muted);">Chưa phân lịch giao hàng.</p>`;
+                }
+                return `
+                    <div class="p-4 rounded-lg" style="background-color: var(--bg-main); box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);">
+                         <p class="font-bold text-xl mb-2">Nhân sự Giao Hàng</p>
+                         ${content}
+                    </div>`;
+            };
+
+            const analysisResult = document.getElementById('analysisResult');
+            analysisResult.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="p-4 rounded-lg" style="background-color: var(--bg-main); box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);">
+                        <p class="font-bold text-xl mb-2">Ca Sáng (8h - 15h)</p>
+                        ${renderDeptList(morningWorkersByDept)}
+                    </div>
+                    <div class="p-4 rounded-lg" style="background-color: var(--bg-main); box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);">
+                        <p class="font-bold text-xl mb-2">Ca Chiều (15h - 22h)</p>
+                        ${renderDeptList(afternoonWorkersByDept)}
+                    </div>
+                </div>
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${renderDeliveryAnalysis()}
+                    <div class="p-4 rounded-lg" style="background-color: var(--bg-main); box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);">
+                         <p class="font-bold text-xl mb-2">Nhân sự nghỉ</p>
+                         ${renderOffList(offEmployeeNames)}
+                    </div>
+                </div>
+            `;
+        }
+
+        function initializeApp() {
+            const selectedDateValue = document.getElementById('startDate').value;
+            const referenceDate = selectedDateValue ? new Date(selectedDateValue) : new Date();
+            fullDayNames = getWeekDates(referenceDate);
+
+            const rawText = document.getElementById('rawData').value;
+            scheduleData = parseRawData(rawText);
+            
+            renderSchedule();
+            renderDeliverySchedule();
+
+            const today = new Date();
+            let defaultIndex = -1;
+            const todayString = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}`;
+            fullDayNames.forEach((name, index) => {
+                if (name.includes(todayString)) {
+                    defaultIndex = index;
+                }
+            });
+            
+            if (defaultIndex === -1) {
+                defaultIndex = 0;
+            }
+
+            document.querySelectorAll(`.header-cell[data-day-index='${defaultIndex}']`).forEach(c => c.classList.add('selected-day-header'));
+            selectDay(defaultIndex);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedRawData = localStorage.getItem('savedRawData');
+            document.getElementById('rawData').value = savedRawData || initialRawData;
+            
+            const savedAssignments = localStorage.getItem('deliveryAssignments');
+            if(savedAssignments) {
+                deliveryAssignments = JSON.parse(savedAssignments);
+            }
+
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            document.getElementById('startDate').value = `${yyyy}-${mm}-${dd}`;
+
+            document.getElementById('updateButton').addEventListener('click', () => {
+                const currentRawText = document.getElementById('rawData').value;
+                localStorage.setItem('savedRawData', currentRawText);
+                initializeApp();
+            });
+            
+            document.getElementById('fileUpload').addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[firstSheetName];
+                        const tsvData = XLSX.utils.sheet_to_csv(worksheet, { FS: '\t' });
+                        document.getElementById('rawData').value = tsvData;
+                        localStorage.setItem('savedRawData', tsvData);
+                    };
+                    reader.readAsArrayBuffer(file);
+                }
+            });
+
+            initializeApp();
+        });
+    </script>
+
+</body>
+</html>
