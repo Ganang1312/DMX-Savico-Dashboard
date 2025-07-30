@@ -2517,12 +2517,28 @@ ${contestSummarySections.join('\n-------------------\n')}`.trim();
             }
         }
     }
-</script>
-<textarea id="textareaData" rows="10" cols="60" placeholder="Dán dữ liệu"></textarea><br>
-<button id="btnSave">💾 Lưu dữ liệu lên GitHub</button>
+<script>
+  async function loadData() {
+    const res = await fetch('https://raw.githubusercontent.com/Ganang1312/DMX-Savico-Dashboard/main/data.json');
+    const data = await res.json();
 
-<!-- Thêm dòng dưới này để nhúng file sync.js -->
-<script src="sync.js"></script>
+    document.getElementById('textarea_kinh_doanh').value = data.kinh_doanh;
+    document.getElementById('textarea_thi_dua').value = data.thi_dua;
+
+    const tableNam = document.getElementById('table_nam_body');
+    tableNam.innerHTML = '';
+    data.du_lieu_nam.forEach(row => {
+      tableNam.innerHTML += `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td></tr>`;
+    });
+
+    const tableNgay = document.getElementById('table_ngay_body');
+    tableNgay.innerHTML = '';
+    data.so_sanh_ngay.forEach(row => {
+      tableNgay.innerHTML += `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td></tr>`;
+    });
+  }
+  loadData();
+</script>
     
 </body>
 </html>
