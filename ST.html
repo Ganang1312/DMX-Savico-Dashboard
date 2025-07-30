@@ -881,9 +881,6 @@
                 </div>
             </div>
             <div class="button-container">
-                 <button onclick="saveDataToGitHub()" class="action-btn" style="background:#24292f;">
-                  💾 Lưu dữ liệu lên GitHub
-                 </button>
                  <button id="analyzeBtn" class="action-btn analyzeBtn">TẠO DASHBOARD LUỸ KẾ</button>
                  <button id="showInputsBtnLuyKe" class="action-btn" style="display: none; background: #6c757d; max-width: 250px;">Chỉnh sửa Dữ liệu</button>
                  <button id="captureBtnLuyKe" class="action-btn captureBtn">
@@ -2609,78 +2606,5 @@ ${contestSummarySections.join('\n-------------------\n')}`.trim();
         }
     }
     </script>
-<script>
-const GITHUB_USER = "Ganang1312";
-const REPO_NAME = "DMX-Savico-Dashboard";
-const FILE_NAME = "data.json";
-const BRANCH = "main";
-const TOKEN = "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"; // 👈 Dán GitHub Token bạn tạo ở đây
-
-async function saveDataToGitHub() {
-    const data = {
-        mainData: document.getElementById('mainDataInput').value,
-        contestData: document.getElementById('contestDataInput').value,
-        yearlyData: localStorage.getItem("yearlyDataTable"),
-        dailyData: localStorage.getItem("dailyComparisonTable")
-    };
-
-    const apiURL = `https://api.github.com/repos/${GITHUB_USER}/${REPO_NAME}/contents/${FILE_NAME}`;
-
-    // Lấy SHA hiện tại (để cập nhật)
-    const getRes = await fetch(apiURL, {
-        headers: { Authorization: `Bearer ${TOKEN}` }
-    });
-
-    let fileSHA = null;
-    if (getRes.ok) {
-        const resJSON = await getRes.json();
-        fileSHA = resJSON.sha;
-    }
-
-    const contentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
-
-    const body = {
-        message: "Update data.json từ dashboard",
-        content: contentBase64,
-        branch: BRANCH,
-        ...(fileSHA && { sha: fileSHA })
-    };
-
-    const res = await fetch(apiURL, {
-        method: "PUT",
-        headers: {
-            Authorization: `Bearer ${TOKEN}`,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(body)
-    });
-
-    if (res.ok) {
-        alert("✅ Đã lưu dữ liệu lên GitHub!");
-    } else {
-        alert("❌ Không thể lưu dữ liệu. Kiểm tra lại token hoặc quyền repo.");
-    }
-}
-
-async function loadDataFromGitHub() {
-    const rawURL = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/main/${FILE_NAME}`;
-    try {
-        const res = await fetch(rawURL);
-        if (!res.ok) throw new Error("Không thể tải dữ liệu từ GitHub");
-        const data = await res.json();
-
-        document.getElementById('mainDataInput').value = data.mainData || "";
-        document.getElementById('contestDataInput').value = data.contestData || "";
-
-        if (data.yearlyData) localStorage.setItem("yearlyDataTable", data.yearlyData);
-        if (data.dailyData) localStorage.setItem("dailyComparisonTable", data.dailyData);
-    } catch (e) {
-        console.warn("⚠ Không tải được dữ liệu từ GitHub:", e.message);
-    }
-}
-
-window.addEventListener("DOMContentLoaded", loadDataFromGitHub);
-</script>
-    
 </body>
 </html>
