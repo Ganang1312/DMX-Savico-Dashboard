@@ -194,6 +194,75 @@
             evt.currentTarget.classList.add("active");
         }
     </script>
+<textarea id="textareaData" rows="10" cols="60" placeholder="Dán dữ liệu vào đây"></textarea><br>
+<button id="btnSave">💾 Lưu dữ liệu lên GitHub</button>
+
+<script>
+const token = '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'; // ← Dán token bạn tạo vào đây
+const username = 'Ganang1312';
+const repo = 'DMX-Savico-Dashboard';
+const path = 'data.json';
+const branch = 'main';
+
+// GỬI dữ liệu lên GitHub
+async function saveToGitHub(content) {
+  const url = `https://api.github.com/repos/${username}/${repo}/contents/${path}`;
+
+  // Bước 1: lấy SHA hiện tại của file
+  const getRes = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/vnd.github+json",
+    }
+  });
+
+  const getData = await getRes.json();
+  const sha = getData.sha;
+
+  // Bước 2: gửi dữ liệu lên GitHub
+  const res = await fetch(url, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/vnd.github+json",
+    },
+    body: JSON.stringify({
+      message: "🔁 Cập nhật dữ liệu từ dashboard",
+      content: btoa(unescape(encodeURIComponent(JSON.stringify({ dulieu: content })))),
+      sha: sha,
+      branch: branch
+    })
+  });
+
+  if (res.ok) {
+    alert("✅ Đã lưu dữ liệu!");
+  } else {
+    alert("❌ Lỗi khi lưu dữ liệu!");
+    console.error(await res.text());
+  }
+}
+
+// ĐỌC dữ liệu từ GitHub khi mở trang
+async function loadFromGitHub() {
+  const url = `https://raw.githubusercontent.com/${username}/${repo}/${branch}/${path}`;
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    document.getElementById('textareaData').value = data.dulieu || '';
+  } catch (e) {
+    console.error("Không thể tải dữ liệu:", e);
+  }
+}
+
+// Nút Lưu
+document.getElementById('btnSave').onclick = () => {
+  const value = document.getElementById('textareaData').value;
+  saveToGitHub(value);
+};
+
+// Tự động tải dữ liệu khi mở web
+window.onload = loadFromGitHub;
+</script>
 
 </body>
 </html>
