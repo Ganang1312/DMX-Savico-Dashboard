@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Tổng hợp - v218.35 (Cập nhật Realtime)</title>
+    <title>Dashboard Tổng hợp - v218.42 (Cập nhật Realtime)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -21,7 +21,7 @@
          * --bg-main: #F4F7F9 (Nền chính - xám rất nhạt)
          * --border-main: #DDE3E7 (Màu viền)
          * --shadow-main: 0 4px 12px rgba(7, 58, 75, 0.08) (Đổ bóng)
-        */
+         */
         :root {
             --primary-accent: #108AB1;
             --success-color: #06D7A0;
@@ -98,8 +98,7 @@
         .input-section h4 a:hover { color: var(--primary-accent); }
         textarea { width: 100%; padding: 10px; border: 1px solid var(--border-main); background: #f8f9fa; border-radius: 8px; font-size: 14px; box-sizing: border-box; resize: vertical; }
         .mainDataInput, .contestDataInput { height: 120px; }
-        .button-container { display: flex; justify-content: center; align-items: center; gap: 20px; width: 100%; margin-top: 25px; }
-        .analyzeBtn, .captureBtn { flex: 1; max-width: 400px; }
+        .button-container { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 15px; width: 100%; margin-top: 25px; }
         
         .input-wrapper { display: flex; flex-direction: column; }
         .paste-btn-container { display: flex; justify-content: flex-end; padding-top: 8px; }
@@ -140,6 +139,7 @@
         .col-action-btn svg { width: 16px; height: 16px; }
         .col-action-btn.copy svg { color: var(--success-color); }
         .col-action-btn.paste svg { color: var(--primary-accent); }
+        .col-action-btn.clear svg { color: var(--danger-color); }
 
         /* CẬP NHẬT: Hiệu ứng shadow 3D cho nút */
         .action-btn { 
@@ -156,6 +156,8 @@
             cursor: pointer; 
             transition: all 0.2s ease; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.1), inset 0 -2px 0 rgba(0,0,0,0.2);
+            flex-grow: 1;
+            max-width: 300px;
         }
         .action-btn:hover { 
             transform: translateY(-2px); 
@@ -168,7 +170,7 @@
         .action-btn svg { width: 20px; height: 20px; }
         .analyzeBtn { background: var(--primary-accent); }
         .captureBtn { background: linear-gradient(45deg, var(--success-color), #05B386); }
-        .copySummaryBtn { background: linear-gradient(45deg, var(--primary-accent), #0d6c8b); margin-top: 15px; }
+        .copySummaryBtn { background: linear-gradient(45deg, var(--primary-accent), #0d6c8b); }
 
         .dashboard-body { display: none; margin-top: 15px; }
         .report-title { text-align: center; font-size: 1.8em; font-weight: 700; margin: 10px 0 0 0; color: var(--text-primary); }
@@ -177,13 +179,21 @@
 
         .progress-bar-container { padding: 15px 25px; }
         .progress-labels { display: flex; justify-content: space-between; font-size: 1em; font-weight: 700; margin-bottom: 8px; color: var(--text-muted); }
-        .progress-track { width: 100%; height: 18px; background-color: #e9ecef; border-radius: 9px; overflow: hidden; position: relative; border: 1px solid #ddd; }
+        .progress-track { width: 100%; height: 18px; background-color: #e9ecef; border-radius: 9px; overflow: hidden; border: 1px solid #ddd; }
         .progress-fill { height: 100%; background: var(--primary-accent); border-radius: 9px; transition: width 0.8s ease-out; }
-        .progress-text { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); color: var(--text-primary); font-size: 0.9em; font-weight: bold; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; }
+        /* CẬP NHẬT: Chuyển vị trí chữ ra ngoài thanh tiến độ */
+        .progress-text-wrapper {
+            text-align: center;
+            margin-top: 4px;
+            font-size: 0.9em; 
+            font-weight: bold; 
+            color: var(--text-primary);
+        }
         
         .kpi-group-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; }
         .kpi-group-card { background-color: #fff; border-radius: 15px; box-shadow: var(--shadow-main); overflow: hidden; border: 1px solid var(--border-main); }
         .kpi-group-header { color: white; padding: 12px 20px; font-size: 1.2em; font-weight: 700; text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        /* CẬP NHẬT: Chỉnh lại kích thước icon KPI */
         .kpi-group-header svg { width: 24px; height: 24px; }
         .kpi-group-header.blue { background-color: var(--primary-accent); }
         .kpi-group-header.orange { background-color: var(--secondary-accent); }
@@ -334,6 +344,31 @@
             color: var(--text-primary);
         }
 
+        /* CẬP NHẬT: Thêm style cho nút import/export */
+        .table-io-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+        .action-btn-small {
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            opacity: 0.9;
+        }
+        .action-btn-small.import { background-color: var(--success-color); }
+        .action-btn-small.export { background-color: var(--secondary-accent); }
+        .action-btn-small:hover { 
+            opacity: 1;
+            transform: translateY(-1px); 
+        }
+
         @media (max-width: 1200px) {
             .kpi-group-container { grid-template-columns: 1fr; }
             .kpi-panel { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
@@ -365,8 +400,8 @@
 
     <script>
     /****************************************************************************
-    * SMART PASTE FUNCTIONS
-    ****************************************************************************/
+     * SMART PASTE FUNCTIONS
+     ****************************************************************************/
     function extractData(fullText, regex) {
         const match = fullText.match(regex);
         return (match && match[1]) ? match[1].trim() : '';
@@ -398,8 +433,7 @@
                     extractedData = extractData(text, /(Ngành hàng\tDT Realtime \(QĐ\)[\s\S]+?)Hỗ trợ BI/);
                     break;
                 case 'employeeSalesDataInput':
-                    // CHANGE: Updated regex for employee sales data
-                    extractedData = extractData(text, /(Nhân viên SL DT[\s\S]+)/);
+                    extractedData = extractData(text, /(Nhân viên\s+SL\s+DT[\s\S]+)/);
                     break;
                 default:
                     extractedData = text;
@@ -425,8 +459,8 @@
 
 
     /****************************************************************************
-    * INTERACTIVE TABLE FUNCTIONS
-    ****************************************************************************/
+     * INTERACTIVE TABLE FUNCTIONS
+     ****************************************************************************/
     
     async function copyColumnData(tableId, colIndex) {
         const table = document.getElementById(tableId);
@@ -483,6 +517,20 @@
         }
     }
 
+    function clearColumnData(tableId, colIndex) {
+        const table = document.getElementById(tableId);
+        if (!table) return;
+        const rows = table.tBodies[0].rows;
+        for (let i = 0; i < rows.length; i++) {
+            const cell = rows[i].cells[colIndex];
+            if (cell && cell.isContentEditable) {
+                cell.innerText = '';
+            }
+        }
+        saveTableData(tableId);
+        showToast('Đã xoá dữ liệu cột!');
+    }
+
     function handleTablePaste(event, table) {
         event.preventDefault();
         const clipboardData = event.clipboardData || window.clipboardData;
@@ -514,25 +562,16 @@
         showToast('Đã dán và lưu dữ liệu!');
     }
 
-    // CẬP NHẬT: Thêm hàm xử lý sự kiện nhấn phím Enter trong bảng
     function handleTableKeyDown(event) {
-        // Chỉ xử lý phím Enter và trong ô có thể chỉnh sửa
         if (event.key !== 'Enter' || !event.target.isContentEditable) {
             return;
         }
-
-        // Chặn hành vi mặc định của phím Enter (tạo dòng mới)
         event.preventDefault();
-
         const currentCell = event.target;
         const currentRow = currentCell.parentElement;
         const cellIndex = currentCell.cellIndex;
-        
-        // Tìm dòng tiếp theo
         const nextRow = currentRow.nextElementSibling;
-
         if (nextRow) {
-            // Tìm ô ở cùng cột của dòng tiếp theo
             const nextCell = nextRow.cells[cellIndex];
             if (nextCell && nextCell.isContentEditable) {
                 nextCell.focus();
@@ -543,7 +582,6 @@
     function saveTableData(tableId) {
         const table = document.getElementById(tableId);
         if (!table) return;
-        
         const data = [];
         const rows = table.tBodies[0].rows;
         for (let i = 0; i < rows.length; i++) {
@@ -554,7 +592,6 @@
             }
             data.push(rowData);
         }
-        
         try {
             localStorage.setItem(tableId, JSON.stringify(data));
         } catch (e) {
@@ -562,7 +599,52 @@
         }
     }
 
-    function loadTableData(tableId, defaultData = {}) {
+    // CẬP NHẬT: Hàm tải dữ liệu nâng cao, ưu tiên file JSON, sau đó đến localStorage
+    async function loadTableDataAdvanced(tableId, defaultData = {}, fromButtonClick = false) {
+        const fileName = `${tableId}_data.json`;
+        try {
+            // Thêm cache-busting để đảm bảo luôn lấy file mới nhất khi bấm nút
+            const response = await fetch(fileName, { cache: "no-store" }); 
+            if (!response.ok) {
+                throw new Error(`File ${fileName} not found, falling back to localStorage.`);
+            }
+            const dataToLoad = await response.json();
+            if (!Array.isArray(dataToLoad)) {
+                 throw new Error('Định dạng JSON không hợp lệ.');
+            }
+            
+            const table = document.getElementById(tableId);
+            if (!table) return;
+
+            const tableRows = table.tBodies[0].rows;
+            for (let i = 0; i < dataToLoad.length && i < tableRows.length; i++) {
+                const rowData = dataToLoad[i];
+                if (!Array.isArray(rowData)) continue;
+                const cells = tableRows[i].cells;
+                for (let j = 0; j < rowData.length && (j + 1) < cells.length; j++) {
+                    if (cells[j + 1] && cells[j + 1].isContentEditable) {
+                        cells[j + 1].innerText = rowData[j];
+                    }
+                }
+            }
+            saveTableData(tableId); // Lưu lại vào localStorage để đồng bộ
+            const tableName = tableId.includes('yearly') ? 'Năm' : 'So sánh Ngày';
+            if(fromButtonClick) {
+                showToast(`Đã tải dữ liệu cho bảng ${tableName} từ file!`, false);
+            }
+            console.log(`Đã tải thành công dữ liệu từ ${fileName}`);
+
+        } catch (error) {
+            console.warn(error.message);
+            // Fallback: Tải từ localStorage hoặc dữ liệu mặc định
+            if (fromButtonClick) { // Chỉ thông báo lỗi nếu người dùng chủ động bấm nút
+                 showToast(`Không tìm thấy file ${fileName}. Đang dùng dữ liệu đã lưu.`, true);
+            }
+            loadTableDataFromStorage(tableId, defaultData);
+        }
+    }
+
+    function loadTableDataFromStorage(tableId, defaultData = {}) {
         const table = document.getElementById(tableId);
         if (!table) return;
         
@@ -571,7 +653,8 @@
             const savedData = localStorage.getItem(tableId);
             if (savedData) {
                 const parsedSavedData = JSON.parse(savedData);
-                if (parsedSavedData.some(row => row.some(cell => cell.trim() !== ''))) {
+                // Chỉ sử dụng dữ liệu đã lưu nếu nó không rỗng
+                if (Array.isArray(parsedSavedData) && parsedSavedData.some(row => Array.isArray(row) && row.some(cell => cell && cell.trim() !== ''))) {
                     dataToLoad = parsedSavedData;
                 }
             }
@@ -633,9 +716,8 @@
         return data;
     }
     
-    function createYearlyDataTable(defaultData) {
+    function createYearlyDataTable() {
         const container = document.getElementById('yearlyDataInputContainer');
-        // FIX: Re-added copy/paste buttons to the table header
         let tableHTML = `
             <div class="interactive-table-wrapper">
                 <table id="yearlyDataTable" class="interactive-table">
@@ -648,6 +730,7 @@
                                     <div class="col-actions">
                                         <button class="col-action-btn copy" data-table-id="yearlyDataTable" data-col-index="1" title="Sao chép cột Doanh thu"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" /></svg></button>
                                         <button class="col-action-btn paste" data-table-id="yearlyDataTable" data-col-index="1" title="Dán vào cột Doanh thu"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M17,1H4A2,2 0 0,0 2,3V17H4V3H17V1M21,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H21A2,2 0 0,0 23,21V7A2,2 0 0,0 21,5M11.5,17.5H10V14H11.5V17.5M15.5,17.5H14V14H15.5V17.5M19,12H9V9H19V12Z" /></svg></button>
+                                        <button class="col-action-btn clear" data-table-id="yearlyDataTable" data-col-index="1" title="Xoá dữ liệu cột Doanh thu"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></svg></button>
                                     </div>
                                 </div>
                             </th>
@@ -657,6 +740,7 @@
                                     <div class="col-actions">
                                         <button class="col-action-btn copy" data-table-id="yearlyDataTable" data-col-index="2" title="Sao chép cột Target"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" /></svg></button>
                                         <button class="col-action-btn paste" data-table-id="yearlyDataTable" data-col-index="2" title="Dán vào cột Target"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M17,1H4A2,2 0 0,0 2,3V17H4V3H17V1M21,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H21A2,2 0 0,0 23,21V7A2,2 0 0,0 21,5M11.5,17.5H10V14H11.5V17.5M15.5,17.5H14V14H15.5V17.5M19,12H9V9H19V12Z" /></svg></button>
+                                        <button class="col-action-btn clear" data-table-id="yearlyDataTable" data-col-index="2" title="Xoá dữ liệu cột Target"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></svg></button>
                                     </div>
                                 </div>
                             </th>
@@ -665,24 +749,28 @@
                     <tbody>`;
         for (let i = 1; i <= 12; i++) {
             tableHTML += `<tr>
-                            <td>${i}</td>
-                            <td contenteditable="true"></td>
-                            <td contenteditable="true"></td>
-                          </tr>`;
+                                <td>${i}</td>
+                                <td contenteditable="true"></td>
+                                <td contenteditable="true"></td>
+                            </tr>`;
         }
         tableHTML += `</tbody></table></div>`;
+        tableHTML += `
+            <div class="table-io-actions">
+                <button class="action-btn-small import" data-table-id="yearlyDataTable" title="Nhập dữ liệu từ file .json">Nhập Dữ liệu</button>
+                <button class="action-btn-small export" data-table-id="yearlyDataTable" title="Xuất dữ liệu ra file .json">Xuất Dữ liệu</button>
+            </div>
+        `;
         container.innerHTML = tableHTML;
 
         const table = document.getElementById('yearlyDataTable');
         table.addEventListener('input', () => saveTableData('yearlyDataTable'));
         table.addEventListener('paste', (e) => handleTablePaste(e, table));
         table.addEventListener('keydown', handleTableKeyDown);
-        loadTableData('yearlyDataTable', defaultData);
     }
 
-    function createDailyComparisonTable(defaultData) {
+    function createDailyComparisonTable() {
         const container = document.getElementById('dailyComparisonInputContainer');
-        // FIX: Re-added copy/paste buttons to the table header
         let tableHTML = `
             <div class="interactive-table-wrapper">
                 <table id="dailyComparisonTable" class="interactive-table">
@@ -695,6 +783,7 @@
                                     <div class="col-actions">
                                         <button class="col-action-btn copy" data-table-id="dailyComparisonTable" data-col-index="1" title="Sao chép cột DT Tháng này"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" /></svg></button>
                                         <button class="col-action-btn paste" data-table-id="dailyComparisonTable" data-col-index="1" title="Dán vào cột DT Tháng này"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M17,1H4A2,2 0 0,0 2,3V17H4V3H17V1M21,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H21A2,2 0 0,0 23,21V7A2,2 0 0,0 21,5M11.5,17.5H10V14H11.5V17.5M15.5,17.5H14V14H15.5V17.5M19,12H9V9H19V12Z" /></svg></button>
+                                        <button class="col-action-btn clear" data-table-id="dailyComparisonTable" data-col-index="1" title="Xoá dữ liệu cột DT Tháng này"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></svg></button>
                                     </div>
                                 </div>
                             </th>
@@ -704,6 +793,7 @@
                                     <div class="col-actions">
                                         <button class="col-action-btn copy" data-table-id="dailyComparisonTable" data-col-index="2" title="Sao chép cột DT Tháng trước"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" /></svg></button>
                                         <button class="col-action-btn paste" data-table-id="dailyComparisonTable" data-col-index="2" title="Dán vào cột DT Tháng trước"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M17,1H4A2,2 0 0,0 2,3V17H4V3H17V1M21,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H21A2,2 0 0,0 23,21V7A2,2 0 0,0 21,5M11.5,17.5H10V14H11.5V17.5M15.5,17.5H14V14H15.5V17.5M19,12H9V9H19V12Z" /></svg></button>
+                                        <button class="col-action-btn clear" data-table-id="dailyComparisonTable" data-col-index="2" title="Xoá dữ liệu cột DT Tháng trước"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></svg></button>
                                     </div>
                                 </div>
                             </th>
@@ -712,24 +802,100 @@
                     <tbody>`;
         for (let i = 1; i <= 31; i++) {
             tableHTML += `<tr>
-                            <td>${i}</td>
-                            <td contenteditable="true"></td>
-                            <td contenteditable="true"></td>
-                          </tr>`;
+                                <td>${i}</td>
+                                <td contenteditable="true"></td>
+                                <td contenteditable="true"></td>
+                            </tr>`;
         }
         tableHTML += `</tbody></table></div>`;
+        tableHTML += `
+            <div class="table-io-actions">
+                <button class="action-btn-small import" data-table-id="dailyComparisonTable" title="Nhập dữ liệu từ file .json">Nhập Dữ liệu</button>
+                <button class="action-btn-small export" data-table-id="dailyComparisonTable" title="Xuất dữ liệu ra file .json">Xuất Dữ liệu</button>
+            </div>
+        `;
         container.innerHTML = tableHTML;
 
         const table = document.getElementById('dailyComparisonTable');
         table.addEventListener('input', () => saveTableData('dailyComparisonTable'));
         table.addEventListener('paste', (e) => handleTablePaste(e, table));
         table.addEventListener('keydown', handleTableKeyDown);
-        loadTableData('dailyComparisonTable', defaultData);
+    }
+
+    function exportTableData(tableId) {
+        const table = document.getElementById(tableId);
+        if (!table) return;
+        const data = [];
+        const rows = table.tBodies[0].rows;
+        for (let i = 0; i < rows.length; i++) {
+            const cells = rows[i].cells;
+            const rowData = [];
+            for (let j = 1; j < cells.length; j++) {
+                rowData.push(cells[j].innerText.trim());
+            }
+            data.push(rowData);
+        }
+        
+        const jsonString = JSON.stringify(data, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${tableId}_data.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Đã xuất dữ liệu!');
+    }
+
+    function importTableData(tableId) {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = e => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = readerEvent => {
+                try {
+                    const content = readerEvent.target.result;
+                    const dataToLoad = JSON.parse(content);
+                    
+                    if (!Array.isArray(dataToLoad)) {
+                        throw new Error('Định dạng JSON không hợp lệ.');
+                    }
+
+                    const table = document.getElementById(tableId);
+                    if (!table) return;
+
+                    const tableRows = table.tBodies[0].rows;
+                    for (let i = 0; i < dataToLoad.length && i < tableRows.length; i++) {
+                        const rowData = dataToLoad[i];
+                        if (!Array.isArray(rowData)) continue;
+                        const cells = tableRows[i].cells;
+                        for (let j = 0; j < rowData.length && (j + 1) < cells.length; j++) {
+                            if (cells[j + 1] && cells[j + 1].isContentEditable) {
+                                cells[j + 1].innerText = rowData[j];
+                            }
+                        }
+                    }
+                    saveTableData(tableId);
+                    showToast('Đã nhập dữ liệu thành công!');
+                } catch (err) {
+                    console.error('Lỗi khi nhập file:', err);
+                    showToast(`Lỗi: ${err.message}`, true);
+                }
+            };
+            reader.readAsText(file, 'UTF-8');
+        };
+        input.click();
     }
 
     /****************************************************************************
-    * SHARED UTILITY & SETUP FUNCTIONS
-    ****************************************************************************/
+     * SHARED UTILITY & SETUP FUNCTIONS
+     ****************************************************************************/
     var VIBRANT_PALETTE = ['#108AB1', '#06D7A0', '#FFD167', '#F78C6A', '#F04770', '#073A4B'];
     var formatNumber = (num, decimals = 0) => {
         const number = parseFloat(num);
@@ -755,6 +921,13 @@
             toast.classList.remove('show');
             setTimeout(() => toast.parentNode && toast.parentNode.removeChild(toast), 500);
         }, 3000);
+    }
+
+    // CẬP NHẬT: Hàm cập nhật dữ liệu từ file JSON
+    async function updateFromCloud() {
+        showToast('Bắt đầu cập nhật dữ liệu từ cloud...');
+        await loadTableDataAdvanced('yearlyDataTable', {}, true);
+        await loadTableDataAdvanced('dailyComparisonTable', {}, true);
     }
 
     function openTab(evt, tabName) {
@@ -789,7 +962,6 @@
         return `<div class="contest-item-new"><div class="contest-main-info"><span class="name-rank">#${rank} ${item.name}</span><span class="stats">${statsHtml}</span></div><div class="contest-progress-track"><div class="contest-progress-fill" style="width: ${item.percentProjected > 100 ? 100 : item.percentProjected}%; background-color: ${getColor(item.percentProjected)};"></div></div></div>`;
     }
 
-    // CẬP NHẬT: Thay đổi logic phân loại thi đua dựa trên %HT thực tế
     function processFullContestData(allContests, daysRemaining) {
         let processedItems = [];
         if (!allContests || allContests.length === 0) return { all: [], veDich:[], canCoGang:[], canTapTrung:[], baoDong:[], onTrack:[], behind:[] };
@@ -817,13 +989,10 @@
         });
         const sortedItems = processedItems.sort((a,b) => b.percentProjected - a.percentProjected);
         
-        // Phân loại dựa trên %HT thực tế cho phần nhận xét
         return {
             all: sortedItems,
-            // Phân loại cũ dựa trên % dự kiến cho hiển thị trực quan
             onTrack: sortedItems.filter(p => p.percentProjected >= 100),
             behind: sortedItems.filter(p => p.percentProjected < 100),
-            // Phân loại mới dựa trên %HT thực tế cho phần nhận xét
             veDich_actual: sortedItems.filter(p => p.percentActual >= 100),
             canCoGang_actual: sortedItems.filter(p => p.percentActual >= 80 && p.percentActual < 100),
             canTapTrung_actual: sortedItems.filter(p => p.percentActual >= 50 && p.percentActual < 80),
@@ -847,7 +1016,7 @@
             <div id="luyKeInputGrid" class="input-grid">
                 <div class="input-section">
                     <div class="input-header-flex">
-                         <h4><a href="https://bi.thegioididong.com/sieu-thi-con?id=16753&tab=bcdtnh&rt=2&dm=1" target="_blank" rel="noopener noreferrer">Dữ liệu Báo cáo Kinh doanh</a></h4>
+                        <h4><a href="https://bi.thegioididong.com/sieu-thi-con?id=16753&tab=bcdtnh&rt=2&dm=1" target="_blank" rel="noopener noreferrer">Dữ liệu Báo cáo Kinh doanh</a></h4>
                     </div>
                     <div class="input-wrapper">
                         <textarea id="mainDataInput" class="mainDataInput" placeholder="Dán dữ liệu từ BI vào đây..."></textarea>
@@ -882,21 +1051,32 @@
             </div>
             <div class="button-container">
                  <button id="analyzeBtn" class="action-btn analyzeBtn">TẠO DASHBOARD LUỸ KẾ</button>
-                 <button id="showInputsBtnLuyKe" class="action-btn" style="display: none; background: #6c757d; max-width: 250px;">Chỉnh sửa Dữ liệu</button>
+                 <button id="updateFromCloudBtn" class="action-btn" style="background: var(--secondary-accent);">
+                     <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19.35,10.04C18.67,6.59 15.64,4 12,4C9.11,4 6.6,5.64 5.35,8.04C2.34,8.36 0,10.91 0,14A6,6 0 0,0 6,20H19A5,5 0 0,0 24,15C24,12.36 21.95,10.22 19.35,10.04M19,18H6A4,4 0 0,1 2,14C2,11.95 3.53,10.24 5.56,10.03L6.63,9.92L7.13,8.97C8.08,7.14 9.94,6 12,6C14.62,6 16.88,7.86 17.39,10.43L17.69,11.93L19.22,12.04C20.78,12.14 22,13.45 22,15A3,3 0 0,1 19,18M8,13H10.55V16H13.45V13H16L12,9L8,13Z" /></svg>
+                     Cập nhật từ Cloud
+                 </button>
+                 <button id="showInputsBtnLuyKe" class="action-btn" style="display: none; background: #6c757d;">Chỉnh sửa Dữ liệu</button>
                  <button id="captureBtnLuyKe" class="action-btn captureBtn">
-                    <svg fill="currentColor" viewBox="0 0 24 24"><path d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9Z" /></svg>
-                    Chụp ảnh Báo cáo
-                </button>
+                     <svg fill="currentColor" viewBox="0 0 24 24"><path d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9Z" /></svg>
+                     Chụp ảnh Báo cáo
+                 </button>
             </div>
             <div id="dashboard-body-luyke" class="dashboard-body">
                 <div id="capture-area-luyke">
                     <div id="capture-content-luyke">
                         <div id="reportTitleLuyKe" class="report-title"></div>
-                        <div class="progress-bar-container card"><div class="progress-labels"><span>Tiến độ Tháng</span><span id="progress-summary-date"></span></div><div class="progress-track"><div class="progress-fill" id="progress-fill-date"><span class="progress-text" id="progress-text-date"></span></div></div></div>
-                        <div class="progress-bar-container card"><div class="progress-labels"><span>Tiến độ Target</span><span id="progress-summary-target"></span></div><div class="progress-track"><div class="progress-fill" id="progress-fill-target"><span class="progress-text" id="progress-text-target"></span></div></div></div>
+                        <div class="progress-bar-container card">
+                            <div class="progress-labels"><span>Tiến độ Tháng</span><span id="progress-summary-date"></span></div>
+                            <div class="progress-track"><div class="progress-fill" id="progress-fill-date"></div></div>
+                            <div class="progress-text-wrapper"><span id="progress-text-date"></span></div>
+                        </div>
+                        <div class="progress-bar-container card">
+                            <div class="progress-labels"><span>Tiến độ Target</span><span id="progress-summary-target"></span></div>
+                            <div class="progress-track"><div class="progress-fill" id="progress-fill-target"></div></div>
+                            <div class="progress-text-wrapper"><span id="progress-text-target"></span></div>
+                        </div>
                         
-                        <div id="kpi-group-container" class="kpi-group-container">
-                            </div>
+                        <div id="kpi-group-container" class="kpi-group-container"></div>
                         
                         <div class="dashboard-layout-grid" style="grid-template-columns: 2fr 1fr;">
                             <div class="charts-column">
@@ -913,11 +1093,11 @@
 
                     </div>
                     <div class="details-toggle">
-                        <button id="toggleSpecificTablesBtn">📊 Ẩn/Hiện Kết quả Thi đua & Chi tiết Ngành hàng</button>
+                        <button id="toggleSpecificTablesBtn">📊 Ẩn/Hiện Bảng Chi tiết Ngành hàng</button>
                     </div>
                     <div id="specificTablesContainer" class="tables-container">
-                        <div class="dashboard-layout-grid" style="grid-template-columns: 1fr 1fr; gap: 25px;">
-                            <div id="contest-results-container" class="report-section card contest-results-container"></div>
+                        <div class="dashboard-layout-grid" style="gap: 25px;">
+                            <div id="contest-results-container" class="report-section card contest-results-container" style="display:none;"></div>
                             <div class="report-section card" id="category-table-container"></div>
                         </div>
                     </div>
@@ -963,7 +1143,7 @@
              </div>
              <div class="button-container">
                 <button id="analyzeBtn-rt" class="action-btn analyzeBtn">TẠO DASHBOARD REAL-TIME</button>
-                <button id="showInputsBtnRt" class="action-btn" style="display: none; background: #6c757d; max-width: 250px;">Chỉnh sửa Dữ liệu</button>
+                <button id="showInputsBtnRt" class="action-btn" style="display: none; background: #6c757d;">Chỉnh sửa Dữ liệu</button>
                 <button id="captureBtnRt" class="action-btn captureBtn">
                    <svg fill="currentColor" viewBox="0 0 24 24"><path d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9Z" /></svg>
                    Chụp ảnh Báo cáo
@@ -973,8 +1153,16 @@
                 <div id="capture-area-rt">
                     <div id="capture-content-rt">
                         <div id="reportTitleRt" class="report-title"></div>
-                        <div class="progress-bar-container card"><div class="progress-labels"><span>Tiến độ Thời gian làm việc (9h-22h)</span><span id="progress-summary-time">0%</span></div><div class="progress-track"><div class="progress-fill" id="progress-fill-time"><span class="progress-text" id="progress-text-time"></span></div></div></div>
-                        <div class="progress-bar-container card"><div class="progress-labels"><span>Tiến độ Target Ngày</span><span id="progress-summary-target-rt"></span></div><div class="progress-track"><div class="progress-fill" id="progress-fill-target-rt"><span class="progress-text" id="progress-text-target-rt"></span></div></div></div>
+                        <div class="progress-bar-container card">
+                            <div class="progress-labels"><span>Tiến độ Thời gian làm việc (9h-22h)</span><span id="progress-summary-time">0%</span></div>
+                            <div class="progress-track"><div class="progress-fill" id="progress-fill-time"></div></div>
+                            <div class="progress-text-wrapper"><span id="progress-text-time"></span></div>
+                        </div>
+                        <div class="progress-bar-container card">
+                            <div class="progress-labels"><span>Tiến độ Target Ngày</span><span id="progress-summary-target-rt"></span></div>
+                            <div class="progress-track"><div class="progress-fill" id="progress-fill-target-rt"></div></div>
+                            <div class="progress-text-wrapper"><span id="progress-text-target-rt"></span></div>
+                        </div>
                         <div id="kpi-panel-rt" class="kpi-panel"></div>
                         <div id="employee-sales-chart-wrapper" class="card chart-wrapper" style="display: none; padding: 25px;"></div>
                         <div class="dashboard-layout-grid" style="grid-template-columns: 1fr 1fr; align-items: start; gap: 25px;">
@@ -982,19 +1170,9 @@
                             <div id="category-table-rt-wrapper" class="report-section card"></div>
                         </div>
                     </div>
-                    <div class="details-toggle">
-                        <button id="toggleSpecificTablesBtn-rt">📊 Ẩn/Hiện Kết quả Thi đua</button>
-                    </div>
-                    <div id="specificTablesContainer-rt" class="tables-container">
-                        <div id="contest-results-container-rt" class="report-section card contest-results-container"></div>
-                    </div>
                 </div>
                 <div id="summary-report-wrapper-rt" class="report-section card" style="display:none;"></div>
-                <div class="details-toggle"><button id="toggleTablesBtn-rt">🔍 Ẩn/Hiện Bảng Dữ liệu Đầy đủ</button></div>
-                <div id="tablesContainer-rt" class="tables-container">
-                    <div id="realtime-main-table-wrapper" class="table-container card"></div>
-                    <div id="realtime-contest-tables-wrapper" class="table-container card"></div>
-                </div>
+                <div id="summary-report-wrapper-rt-employee" class="report-section card" style="display:none; margin-top: 25px;"></div>
             </div>`;
 
         Chart.register(ChartDataLabels);
@@ -1018,26 +1196,43 @@
             ]
         };
 
-        createYearlyDataTable(defaultData);
-        createDailyComparisonTable(defaultData);
+        createYearlyDataTable();
+        createDailyComparisonTable();
+        loadTableDataAdvanced('yearlyDataTable', defaultData);
+        loadTableDataAdvanced('dailyComparisonTable', defaultData);
 
         setupLuyKeTab();
         setupRealtimeTab();
         
         setupSmartPasteButtons();
         
+        document.getElementById('updateFromCloudBtn').addEventListener('click', updateFromCloud);
+
         document.body.addEventListener('click', function(e) {
-            const button = e.target.closest('.col-action-btn');
-            if (!button) return;
+            const colButton = e.target.closest('.col-action-btn');
+            if (colButton) {
+                const tableId = colButton.dataset.tableId;
+                const colIndex = parseInt(colButton.dataset.colIndex, 10);
 
-            const tableId = button.dataset.tableId;
-            const colIndex = parseInt(button.dataset.colIndex, 10);
-            const action = button.classList.contains('copy') ? 'copy' : 'paste';
+                if (colButton.classList.contains('copy')) {
+                    copyColumnData(tableId, colIndex);
+                } else if (colButton.classList.contains('paste')) {
+                    pasteColumnData(tableId, colIndex);
+                } else if (colButton.classList.contains('clear')) {
+                    clearColumnData(tableId, colIndex);
+                }
+                return; 
+            }
 
-            if (action === 'copy') {
-                copyColumnData(tableId, colIndex);
-            } else if (action === 'paste') {
-                pasteColumnData(tableId, colIndex);
+            const ioButton = e.target.closest('.action-btn-small');
+            if (ioButton) {
+                const tableId = ioButton.dataset.tableId;
+                if (ioButton.classList.contains('import')) {
+                    importTableData(tableId);
+                } else if (ioButton.classList.contains('export')) {
+                    exportTableData(tableId);
+                }
+                return;
             }
         });
 
@@ -1054,8 +1249,8 @@
     });
 
     /****************************************************************************
-    * TAB 1: LUỸ KẾ LOGIC                              *
-    ****************************************************************************/
+     * TAB 1: LUỸ KẾ LOGIC                                     *
+     ****************************************************************************/
     function setupLuyKeTab() {
         let allChartsLuyKe = [];
         const destroyAllChartsLuyKe = () => { allChartsLuyKe.forEach(chart => chart && chart.destroy()); allChartsLuyKe = []; };
@@ -1084,7 +1279,6 @@
                 const mainParsedData = parseLuyKeData(mainDataFromTextarea); 
                 const contestParsedData = contestDataFromTextarea.trim() ? parseAllContestData(contestDataFromTextarea) : []; 
                 
-                // Ẩn form nhập liệu và hiện nút chỉnh sửa
                 document.getElementById('luyKeInputGrid').style.display = 'none';
                 document.getElementById('showInputsBtnLuyKe').style.display = 'inline-flex';
 
@@ -1123,13 +1317,12 @@
                 : document.getElementById('capture-content-luyke');
 
             const mainContainer = document.querySelector('body');
-            mainContainer.classList.add('capture-mode'); // Thêm class để "làm phẳng" giao diện
-
-            // Dùng setTimeout để đảm bảo trình duyệt đã render lại CSS trước khi chụp
+            mainContainer.classList.add('capture-mode');
+            
             setTimeout(() => {
                 html2canvas(captureElement, { 
                     useCORS: true, 
-                    backgroundColor: '#F4F7F9', // Dùng mã màu trực tiếp
+                    backgroundColor: '#F4F7F9',
                     scale: 2.5 
                 }).then(canvas => {
                     const link = document.createElement('a');
@@ -1140,9 +1333,9 @@
                     showToast('Lỗi khi chụp ảnh. Hãy thử lại.', true);
                     console.error(err);
                 }).finally(() => {
-                    mainContainer.classList.remove('capture-mode'); // Xóa class để giao diện trở lại bình thường
+                    mainContainer.classList.remove('capture-mode');
                 });
-            }, 100); // Chờ 100ms
+            }, 100);
         });
 
         function parseLuyKeData(text) { 
@@ -1210,16 +1403,20 @@
 
             renderLuyKeCategoryTables(categoryData);
             renderLuyKeContestTable(processedContestData);
-            renderLuyKeContestResults(processedContestData);
+            
+            // CẬP NHẬT: Ẩn bảng kết quả thi đua và điều chỉnh layout
+            document.getElementById('contest-results-container').style.display = 'none';
+            const specificGrid = document.querySelector('#specificTablesContainer .dashboard-layout-grid');
+            if (specificGrid) {
+                specificGrid.style.gridTemplateColumns = '1fr';
+            }
+            // renderLuyKeContestResults(processedContestData); // Không render nữa
+
             renderLuyKeSummary(mainKpis, processedContestData, reportDate);
             displayLuyKeHiddenTables(mainData, contestData);
         }
         
-        // ====================================================================
-        // ======================= START OF MODIFIED CODE =====================
-        // ====================================================================
         function renderLuyKeKPIs(kpis, daysUsed, daysInMonth, yearlyData, reportDate) {
-            // --- Progress Bars ---
             const progressPercentDate = (daysUsed / daysInMonth) * 100;
             document.getElementById('progress-fill-date').style.width = `${progressPercentDate}%`;
             document.getElementById('progress-text-date').textContent = `Đã qua ${daysUsed}/${daysInMonth} ngày`;
@@ -1233,15 +1430,11 @@
             document.getElementById('progress-text-target').textContent = `${formatNumber(kpis.htTarget, 1)}%`;
             document.getElementById('progress-summary-target').textContent = `${formatNumber(kpis.luyKe)} / ${formatNumber(kpis.target)}`;
             
-            // --- KPI Cards ---
             const kpiContainer = document.getElementById('kpi-group-container');
-
-            // --- Calculations for new KPIs ---
             const today = new Date();
             const currentMonth = reportDate.getMonth() + 1;
-            const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
+            const dayOfWeek = today.getDay();
 
-            // Doanh thu còn lại
             const doanhThuConLai = kpis.target - kpis.luyKe;
             const doanhThuConLaiDisplay = doanhThuConLai <= 0 ? '🏆' : `${formatNumber(doanhThuConLai, 0)} Triệu`;
             const doanhThuConLaiColor = doanhThuConLai <= 0 ? 'var(--success-color)' : 'var(--text-primary)';
@@ -1249,7 +1442,6 @@
                 ? '<path fill="currentColor" d="M19.5,2H4.5A2.5,2.5 0 0,0 2,4.5V7H4V18A4,4 0 0,0 8,22H16A4,4 0 0,0 20,18V7H22V4.5A2.5,2.5 0 0,0 19.5,2M18,7V18A2,2 0 0,1 16,20H8A2,2 0 0,1 6,18V7Z"/>' 
                 : '<path fill="currentColor" d="M13,9H11V4H13V9M12,13.5A1.5,1.5 0 0,1 10.5,12A1.5,1.5 0 0,1 12,10.5A1.5,1.5 0 0,1 13.5,12A1.5,1.5 0 0,1 12,13.5M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12C22,6.48 17.5,2 12,2Z"/>';
 
-            // Nợ & Mục tiêu nợ
             const yearlyTargetTotal = yearlyData
                 .filter(row => parseInt(row['Tháng']) <= currentMonth)
                 .reduce((sum, row) => sum + (row['Target tháng'] || 0), 0);
@@ -1263,7 +1455,6 @@
             const daysRemainingInMonth = daysInMonth - today.getDate() + 1;
             const mucTieuTraNoNgay = daysRemainingInMonth > 0 ? (yearlyRemaining / daysRemainingInMonth) : 0;
             
-            // FIX: Corrected calculation for mucTieuNgayKyVong
             const mucTieuKyVongThang = kpis.target / daysInMonth;
             let mucTieuNgayKyVong = Math.max(mucTieuKyVongThang, kpis.mucTieuNgay);
             
@@ -1340,7 +1531,6 @@
                     plugins: { 
                         legend: { display: false }, 
                         datalabels: { 
-                            // FIX: Added revenue value to the chart label
                             formatter: (v, ctx) => { 
                                 const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0); 
                                 const p = (v * 100 / total).toFixed(0) + '%'; 
@@ -1361,8 +1551,6 @@
             const growthDriverChart = new Chart('growthDriverChart', { type: 'bar', data: { labels: calcData.map(d => d.name), datasets: [{ data: calcData.map(d => d.diff), backgroundColor: VIBRANT_PALETTE }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { color: '#fff', font: { weight: 'bold', size: 12 }, textStrokeColor: 'rgba(0,0,0,0.5)', textStrokeWidth: 2, formatter: (v) => formatNumber(v), anchor: 'center', align: 'center' } }, scales: { x: { grid: { display: false } }, y: { grid: { display: false } } } } });
             allChartsLuyKe.push(growthDriverChart);
         }
-        // ======================= END OF MODIFIED CODE =======================
-        // ====================================================================
         
         function renderLuyKeContestTable(processedContest) {
             const wrapper = document.getElementById('contest-table-luyke-wrapper');
@@ -1382,10 +1570,9 @@
                         <span>${completedItems} / ${totalItems} Nhóm</span>
                     </div>
                     <div class="progress-track">
-                        <div class="progress-fill" style="width: ${progressPercentContest}%; background-color: ${contestProgressColor};">
-                            <span class="progress-text">${formatNumber(progressPercentContest, 1)}%</span>
-                        </div>
+                        <div class="progress-fill" style="width: ${progressPercentContest}%; background-color: ${contestProgressColor};"></div>
                     </div>
+                    <div class="progress-text-wrapper"><span class="progress-text">${formatNumber(progressPercentContest, 1)}%</span></div>
                 </div>`;
 
             const topPerformers = processedContest.all.filter(p => p.percentProjected >= 70);
@@ -1473,62 +1660,6 @@
             wrapper.innerHTML = finalHtml;
         }
         
-        function renderLuyKeCharts(data) {
-            const chartData = data.filter(row => row["DTQĐ"] > 0);
-            const growthData = data.filter(r => r.DTQĐ !== 0 || (r["+/- DTCK Tháng (QĐ)"] !== 0 && r["+/- DTCK Tháng (QĐ)"] !== -100));
-            
-            const contributionWrapper = document.getElementById('contribution-chart-wrapper');
-            contributionWrapper.innerHTML = `<h2><svg class="title-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M11 2v9h9a9 9 0 00-9-9zm2 1.08a7 7 0 016.92 6.92H13V3.08zM4 12a8 8 0 018-8v8H4zm9 8a8 8 0 01-8-8h8v8z"/></svg>Tỷ trọng Doanh thu</h2><div class="chart-container" style="height: 300px;"><canvas id="contributionChart"></canvas></div>`;
-            const growthWrapper = document.getElementById('growth-chart-wrapper');
-            growthWrapper.innerHTML = `<h2><svg class="title-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M22,21H2V3H4V19H22V21M18,17V9H20V17H18M14,17V12H16V17H14M10,17V5H12V17H10M6,17V14H8V17H6Z"/></svg>Tăng/Giảm Cùng kỳ</h2><div class="chart-container" style="height: 300px;"><canvas id="growthDriverChart"></canvas></div>`;
-            
-            const sortedDataByDT = [...chartData].sort((a, b) => b.DTQĐ - a.DTQĐ);
-            const top6 = sortedDataByDT.slice(0, 6);
-            const othersValue = sortedDataByDT.slice(6).reduce((s, r) => s + r.DTQĐ, 0);
-            if (othersValue > 0) {
-                top6.push({ "Nhóm ngành hàng": "Ngành hàng khác", "DTQĐ": othersValue });
-            }
-
-            const contributionLabels = top6.map(d => d["Nhóm ngành hàng"]);
-            const contributionValues = top6.map(d => d.DTQĐ);
-            
-            const contributionChart = new Chart('contributionChart', { 
-                type: 'doughnut', 
-                data: { 
-                    labels: contributionLabels, 
-                    datasets: [{ 
-                        data: contributionValues, 
-                        backgroundColor: VIBRANT_PALETTE 
-                    }] 
-                }, 
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    plugins: { 
-                        legend: { display: false }, 
-                        datalabels: { 
-                            // FIX: Added revenue value to the chart label
-                            formatter: (v, ctx) => { 
-                                const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0); 
-                                const p = (v * 100 / total).toFixed(0) + '%'; 
-                                const l = ctx.chart.data.labels[ctx.dataIndex]; 
-                                return `${l}\n${formatNumber(v, 0)}\n(${p})`;
-                            }, 
-                            color: '#fff', 
-                            font: { weight: 'bold', size: 12 }, 
-                            textStrokeColor: 'rgba(0,0,0,0.5)', 
-                            textStrokeWidth: 2 
-                        } 
-                    } 
-                } 
-            });
-            allChartsLuyKe.push(contributionChart);
-
-            const calcData = growthData.map(r => ({ name: r["Nhóm ngành hàng"], diff: r.DTQĐ - ((1 + r["+/- DTCK Tháng (QĐ)"] / 100) !== 0 ? r.DTQĐ / (1 + r["+/- DTCK Tháng (QĐ)"] / 100) : 0) })).filter(d => d.diff !== 0).sort((a, b) => a.diff - b.diff);
-            const growthDriverChart = new Chart('growthDriverChart', { type: 'bar', data: { labels: calcData.map(d => d.name), datasets: [{ data: calcData.map(d => d.diff), backgroundColor: VIBRANT_PALETTE }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { color: '#fff', font: { weight: 'bold', size: 12 }, textStrokeColor: 'rgba(0,0,0,0.5)', textStrokeWidth: 2, formatter: (v) => formatNumber(v), anchor: 'center', align: 'center' } }, scales: { x: { grid: { display: false } }, y: { grid: { display: false } } } } });
-            allChartsLuyKe.push(growthDriverChart);
-        }
-
         function renderYearlyRevenueChart(yearlyData, kpis, reportDate) {
             const wrapper = document.getElementById('yearly-revenue-chart-wrapper');
             wrapper.innerHTML = `<h2><svg class="title-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M9,10H7V12H9V10M13,10H11V12H13V10M17,10H15V12H17V10M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3H6V1H8V3H16V1H18V3H19M19,19V8H5V19H19Z"/></svg>Doanh thu Năm</h2><div class="chart-container" style="height: 300px;"><canvas id="yearlyRevenueChart"></canvas></div>`;
@@ -1548,7 +1679,7 @@
                         {
                             label: 'Target tháng',
                             data: targets,
-                            backgroundColor: VIBRANT_PALETTE[4] + '99',
+                            backgroundColor: VIBRANT_PALETTE[4],
                             borderColor: VIBRANT_PALETTE[4],
                             borderWidth: 1,
                             datalabels: {
@@ -1561,7 +1692,7 @@
                         {
                             label: 'Doanh thu thực hiện',
                             data: actuals,
-                            backgroundColor: VIBRANT_PALETTE[0] + '99',
+                            backgroundColor: VIBRANT_PALETTE[0],
                             borderColor: VIBRANT_PALETTE[0],
                             borderWidth: 1,
                             datalabels: {
@@ -1637,12 +1768,11 @@
                 }
             });
 
-            // CẬP NHẬT: Sửa lỗi mất màu biểu đồ bằng cách gán mã màu trực tiếp
             const weekendColorCallback = (context) => {
                 const day = context.dataIndex + 1;
                 const date = new Date(reportDate.getFullYear(), reportDate.getMonth(), day);
                 const dayOfWeek = date.getDay();
-                return dayOfWeek === 0 || dayOfWeek === 6 ? '#F04770' : '#108AB1'; // Sử dụng mã hex trực tiếp
+                return dayOfWeek === 0 || dayOfWeek === 6 ? '#F04770' : '#108AB1';
             };
 
             const dailyChart = new Chart('dailyComparisonChart', {
@@ -1741,12 +1871,12 @@
                         x: {
                              grid: { display: false },
                              ticks: {
-                                callback: function(val) {
-                                    return this.getLabelForValue(val).replace('Ngày ','');
-                                },
-                                autoSkip: false,
-                                maxRotation: 0,
-                                minRotation: 0
+                                 callback: function(val) {
+                                     return this.getLabelForValue(val).replace('Ngày ','');
+                                 },
+                                 autoSkip: false,
+                                 maxRotation: 0,
+                                 minRotation: 0
                              }
                         }
                     }
@@ -1787,6 +1917,7 @@
             `;
         }
         
+        // CẬP NHẬT: Hàm này không còn được gọi để hiển thị, chỉ để tham khảo logic
         function renderLuyKeContestResults(processedContest) {
             const container = document.getElementById('contest-results-container');
             container.innerHTML = ''; 
@@ -1836,7 +1967,6 @@
             container.appendChild(contentGrid);
         }
         
-        // CẬP NHẬT: Thay đổi logic render nhận xét để dùng %HT thực tế
         function renderLuyKeSummary(kpis, contest, reportDate) {
             const container = document.getElementById('summary-report-wrapper-luyke');
             container.style.display = 'block';
@@ -1887,11 +2017,11 @@
 ${contestSummarySections.join('\n\n')}`.trim();
 
             const html = `<h2><svg class="title-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M12,19L8,15H10.5V12H13.5V15H16L12,19Z" /></svg>Nhận xét (Dạng văn bản)</h2>
-                         <textarea class="summary-textarea" readonly>${summaryText}</textarea>
-                         <button class="action-btn copySummaryBtn">
-                            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" /></svg>
-                            Sao chép Nhận xét
-                         </button>`;
+                                 <textarea class="summary-textarea" readonly>${summaryText}</textarea>
+                                 <button class="action-btn copySummaryBtn" style="width: 100%; max-width: 400px; margin: 15px auto 0 auto;">
+                                     <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" /></svg>
+                                     Sao chép Nhận xét
+                                 </button>`;
             container.innerHTML = html;
             container.querySelector('.copySummaryBtn').addEventListener('click', (e) => {
                 const textarea = e.currentTarget.previousElementSibling;
@@ -1910,12 +2040,13 @@ ${contestSummarySections.join('\n\n')}`.trim();
 
 
     /****************************************************************************
-    * TAB 2: REAL-TIME LOGIC                             *
-    ****************************************************************************/
+     * TAB 2: REAL-TIME LOGIC                                     *
+     ****************************************************************************/
     function setupRealtimeTab() {
         let timeInterval;
         let employeeChart = null;
         let installmentChart = null;
+        let lastEmployeeData = [];
 
         document.getElementById('analyzeBtn-rt').addEventListener('click', () => { 
             const mainDataRaw = document.getElementById('realtimeDataInput').value; 
@@ -1936,7 +2067,8 @@ ${contestSummarySections.join('\n\n')}`.trim();
                 const contestParsedData = contestDataRaw.trim() ? parseRealtimeData(contestDataRaw) : []; 
                 const employeeParsedData = employeeDataRaw.trim() ? parseEmployeeSalesData(employeeDataRaw) : [];
 
-                // Ẩn form nhập liệu và hiện nút chỉnh sửa
+                lastEmployeeData = employeeParsedData;
+
                 document.getElementById('realtimeInputGrid').style.display = 'none';
                 document.getElementById('showInputsBtnRt').style.display = 'inline-flex';
 
@@ -1953,33 +2085,23 @@ ${contestSummarySections.join('\n\n')}`.trim();
             inputGrid.style.display = isHidden ? 'grid' : 'none';
             this.textContent = isHidden ? 'Ẩn Mục Nhập Liệu' : 'Chỉnh sửa Dữ liệu';
         });
-
-        document.getElementById('toggleTablesBtn-rt').addEventListener('click', () => document.getElementById('tablesContainer-rt').classList.toggle('show'));
         
-        document.getElementById('toggleSpecificTablesBtn-rt').addEventListener('click', () => {
-            document.getElementById('specificTablesContainer-rt').classList.toggle('show');
-        });
-
-         document.getElementById('captureBtnRt').addEventListener('click', () => {
+        document.getElementById('captureBtnRt').addEventListener('click', () => {
             const dashboardBody = document.getElementById('dashboard-body-rt');
             if (dashboardBody.style.display === 'none') {
                 showToast('Chưa có dữ liệu Realtime để chụp ảnh.', true);
                 return;
             }
-            const specificTablesContainer = document.getElementById('specificTablesContainer-rt');
-            const tablesAreVisible = specificTablesContainer.classList.contains('show');
-            const captureElement = tablesAreVisible 
-                ? document.getElementById('capture-area-rt') 
-                : document.getElementById('capture-content-rt');
+            
+            const captureElement = document.getElementById('capture-content-rt');
 
             const mainContainer = document.querySelector('body');
-            mainContainer.classList.add('capture-mode'); // Thêm class để "làm phẳng" giao diện
-
-            // Dùng setTimeout để đảm bảo trình duyệt đã render lại CSS trước khi chụp
+            mainContainer.classList.add('capture-mode');
+            
             setTimeout(() => {
                 html2canvas(captureElement, { 
                     useCORS: true, 
-                    backgroundColor: '#F4F7F9', // Dùng mã màu trực tiếp
+                    backgroundColor: '#F4F7F9',
                     scale: 2.5 
                 }).then(canvas => {
                     const link = document.createElement('a');
@@ -1990,9 +2112,9 @@ ${contestSummarySections.join('\n\n')}`.trim();
                     showToast('Lỗi khi chụp ảnh. Hãy thử lại.', true);
                     console.error(err);
                 }).finally(() => {
-                    mainContainer.classList.remove('capture-mode'); // Xóa class để giao diện trở lại bình thường
+                    mainContainer.classList.remove('capture-mode');
                 });
-            }, 100); // Chờ 100ms
+            }, 100);
         });
 
         function parseRealtimeData(text) {
@@ -2036,14 +2158,12 @@ ${contestSummarySections.join('\n\n')}`.trim();
             });
         }
         
-        // CHANGE: Updated employee sales parsing logic
         function parseEmployeeSalesData(text) {
             const lines = text.trim().split('\n');
             const data = [];
             
             lines.forEach(line => {
                 line = line.trim();
-                // Skip header, total, online, and empty lines
                 if (!line || 
                     line.toLowerCase().startsWith('nhân viên') || 
                     line.toLowerCase().startsWith('tổng') ||
@@ -2051,7 +2171,6 @@ ${contestSummarySections.join('\n\n')}`.trim();
                     return;
                 }
 
-                // Regex to capture name and the last number (revenue)
                 const regex = /^\d+\s*-\s*(.+?)\s+[\d-]+\s+(-?[\d,.]+)$/;
                 const match = line.match(regex);
 
@@ -2089,9 +2208,9 @@ ${contestSummarySections.join('\n\n')}`.trim();
             renderEmployeeSalesChart(employeeData);
             renderRealtimeContestTable(processedContestData);
             renderRealtimeCategoryTable(mainData);
-            renderRealtimeContestResults(processedContestData);
+            
             renderRealtimeSummary(totalRow, processedContestData);
-            displayRealtimeHiddenTables(mainData, contestData);
+            renderEmployeeSummary(employeeData);
         }
 
         function getTimePassedFraction() {
@@ -2105,7 +2224,6 @@ ${contestSummarySections.join('\n\n')}`.trim();
             return elapsedMinutes / totalMinutes;
         }
 
-        // CẬP NHẬT: Thay đổi logic phân loại thi đua realtime
         function processRealtimeContestData(contestData) {
             if (!contestData || contestData.length === 0) return { all: [], onTrack: [], behind: [], veDich_actual: [], canCoGang_actual: [], canTapTrung_actual: [] };
             const timeFraction = getTimePassedFraction();
@@ -2132,7 +2250,6 @@ ${contestSummarySections.join('\n\n')}`.trim();
                 all: items,
                 onTrack: items.filter(p => p.percentProjected >= 100),
                 behind: items.filter(p => p.percentProjected < 100),
-                // Phân loại mới dựa trên %HT thực tế cho phần nhận xét
                 veDich_actual: items.filter(p => p.percentActual >= 100),
                 canCoGang_actual: items.filter(p => p.percentActual >= 80 && p.percentActual < 100),
                 canTapTrung_actual: items.filter(p => p.percentActual < 80)
@@ -2143,7 +2260,7 @@ ${contestSummarySections.join('\n\n')}`.trim();
             const percent = getTimePassedFraction() * 100;
             const now = new Date();
             document.getElementById('progress-fill-time').style.width = `${percent}%`;
-            document.getElementById('progress-text-time').textContent = `Đã qua ${formatNumber(percent,1)}% thời gian`;
+            document.getElementById('progress-text-time').textContent = `Đã qua ${formatNumber(percent,1)}% thời gian (${now.toLocaleTimeString('vi-VN')})`;
             document.getElementById('progress-summary-time').textContent = now.toLocaleTimeString('vi-VN');
         }
 
@@ -2276,8 +2393,9 @@ ${contestSummarySections.join('\n\n')}`.trim();
                         backgroundColor: (context) => context.raw >= 0 ? gradient : negativeGradient,
                         borderColor: (context) => context.raw >= 0 ? 'rgba(7, 58, 75, 0.7)' : 'rgba(150, 30, 60, 0.7)',
                         borderWidth: 2,
-                        borderRadius: { topRight: 8, bottomRight: 8, topLeft: 0, bottomLeft: 0 },
-                        borderSkipped: 'start',
+                        // CẬP NHẬT: Sửa lỗi bo tròn cho cột âm
+                        borderRadius: 8,
+                        borderSkipped: false,
                     }]
                 },
                 options: {
@@ -2338,7 +2456,6 @@ ${contestSummarySections.join('\n\n')}`.trim();
             });
         }
         
-        // CHANGE: Re-added toggle button logic for no-revenue items
         function renderRealtimeContestTable(processedContest) {
             const wrapper = document.getElementById('contest-table-rt-wrapper');
             if (!processedContest.all || processedContest.all.length === 0) {
@@ -2361,48 +2478,47 @@ ${contestSummarySections.join('\n\n')}`.trim();
                         <span>${completedItems} / ${totalItems} Nhóm</span>
                     </div>
                     <div class="progress-track">
-                        <div class="progress-fill" style="width: ${progressPercentContest}%; background-color: ${contestProgressColor};">
-                            <span class="progress-text">${formatNumber(progressPercentContest, 1)}%</span>
-                        </div>
+                        <div class="progress-fill" style="width: ${progressPercentContest}%; background-color: ${contestProgressColor};"></div>
                     </div>
+                    <div class="progress-text-wrapper"><span class="progress-text">${formatNumber(progressPercentContest, 1)}%</span></div>
                 </div>`;
             
             let tableHtml = `<h2><svg class="title-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M5,4H19A2,2 0 0,1 21,6V18A2,2 0 0,1 19,20H5A2,2 0 0,1 3,18V6A2,2 0 0,1 5,4M5,8V12H11V8H5M13,8V12H19V8H13M5,14V18H11V14H5M13,14V18H19V14H13Z" /></svg>Bảng chi tiết Thi đua Real-time</h2>
-                            ${progressBarHtml}
-                            <table class="rt-styled-table">
-                                <thead>
-                                    <tr><th>#</th><th>Ngành hàng</th><th>DT Realtime</th><th>Còn lại</th><th>Target Ngày</th><th>% HT</th><th>% HT Dự kiến</th></tr>
-                                </thead>
-                                <tbody>`;
+                                 ${progressBarHtml}
+                                 <table class="rt-styled-table">
+                                     <thead>
+                                         <tr><th>#</th><th>Ngành hàng</th><th>DT Realtime</th><th>Còn lại</th><th>Target Ngày</th><th>% HT</th><th>% HT Dự kiến</th></tr>
+                                     </thead>
+                                     <tbody>`;
 
             itemsWithRevenue.forEach((item, index) => {
                 const remainingCell = item.remaining <= 0 ? `<td style="color: var(--success-color); font-weight: bold; font-size: 1.5em;">🏆</td>` : `<td style="color: var(--danger-color); font-weight: bold;">${formatNumber(item.remaining, 1)}</td>`;
                 const icon = item.percentProjected >= 100 ? ' <span title="Dự kiến hoàn thành!">🚀</span>' : '';
                 tableHtml += `<tr>
-                        <td>${index + 1}${icon}</td>
-                        <td style="text-align: left !important;">${item.name}</td>
-                        <td>${formatNumber(item.actual)}</td>
-                        ${remainingCell}
-                        <td>${formatNumber(item.target)}</td>
-                        <td style="color: ${getColor(item.percentActual)}; font-weight: bold;">${formatNumber(item.percentActual, 1)}%</td>
-                        <td style="color: ${getColor(item.percentProjected)}; font-weight: bold;">${formatNumber(item.percentProjected, 1)}%</td>
-                    </tr>`;
+                    <td>${index + 1}${icon}</td>
+                    <td style="text-align: left !important;">${item.name}</td>
+                    <td>${formatNumber(item.actual)}</td>
+                    ${remainingCell}
+                    <td>${formatNumber(item.target)}</td>
+                    <td style="color: ${getColor(item.percentActual)}; font-weight: bold;">${formatNumber(item.percentActual, 1)}%</td>
+                    <td style="color: ${getColor(item.percentProjected)}; font-weight: bold;">${formatNumber(item.percentProjected, 1)}%</td>
+                </tr>`;
             });
             tableHtml += '</tbody></table>';
             wrapper.innerHTML = tableHtml;
 
             if (itemsWithoutRevenue.length > 0) {
                  const noRevenueHtml = `<div id="contest-no-revenue-section" class="no-revenue-section" style="display:none;">
-                                <h4>Nhóm chưa phát sinh doanh thu (${itemsWithoutRevenue.length}):</h4>
-                                <ul class="no-revenue-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
-                                    ${itemsWithoutRevenue.map((item, index) => `<li>${index + 1}. ${item.name}</li>`).join('')}
-                                </ul>
-                              </div>`;
+                                     <h4>Nhóm chưa phát sinh doanh thu (${itemsWithoutRevenue.length}):</h4>
+                                     <ul class="no-revenue-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+                                         ${itemsWithoutRevenue.map((item, index) => `<li>${index + 1}. ${item.name}</li>`).join('')}
+                                     </ul>
+                                   </div>`;
                 const buttonHtml = `<div class="details-toggle" style="margin-top: 15px;">
-                        <button id="toggle-contest-no-revenue-btn">
-                            Hiện ${itemsWithoutRevenue.length} nhóm chưa có DT
-                        </button>
-                    </div>`;
+                                    <button id="toggle-contest-no-revenue-btn">
+                                        Hiện ${itemsWithoutRevenue.length} nhóm chưa có DT
+                                    </button>
+                                </div>`;
                 
                 wrapper.insertAdjacentHTML('beforeend', buttonHtml + noRevenueHtml);
 
@@ -2416,7 +2532,6 @@ ${contestSummarySections.join('\n\n')}`.trim();
             }
         }
         
-        // CHANGE: Added filter for Target > 0 and re-added toggle button logic
         function renderRealtimeCategoryTable(mainData) {
             const wrapper = document.getElementById('category-table-rt-wrapper');
             if (!mainData || mainData.length === 0) {
@@ -2438,20 +2553,21 @@ ${contestSummarySections.join('\n\n')}`.trim();
             if (totalRow) {
                 const htThuc = totalRow['% HT Target Ngày (QĐ)'];
                 mainProgressBarHtml = `<div class="progress-bar-container" style="padding: 0 0 20px 0;">
-                        <div class="progress-labels"><span>Tiến độ Target Ngày (Tổng)</span><span>${formatNumber(totalRow['DT Realtime (QĐ)'])} / ${formatNumber(totalRow['Target Ngày (QĐ)'])}</span></div>
-                        <div class="progress-track"><div class="progress-fill" style="width: ${htThuc > 100 ? 100 : htThuc}%; background-color: ${getColor(htThuc)};"><span class="progress-text">${formatNumber(htThuc, 1)}%</span></div></div>
-                    </div>`;
+                                    <div class="progress-labels"><span>Tiến độ Target Ngày (Tổng)</span><span>${formatNumber(totalRow['DT Realtime (QĐ)'])} / ${formatNumber(totalRow['Target Ngày (QĐ)'])}</span></div>
+                                    <div class="progress-track"><div class="progress-fill" style="width: ${htThuc > 100 ? 100 : htThuc}%; background-color: ${getColor(htThuc)};"></div></div>
+                                    <div class="progress-text-wrapper"><span class="progress-text">${formatNumber(htThuc, 1)}%</span></div>
+                                </div>`;
             }
 
             let tableHtml = `<h2><svg class="title-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M3,4H21V6H3V4M3,7H21V9H3V7M3,10H21V12H3V10M3,13H21V15H3V13M3,16H21V18H3V16Z"/></svg>Bảng chi tiết Ngành hàng</h2>
-                            ${mainProgressBarHtml}
-                            <table class="rt-styled-table">
-                                <thead><tr><th>Ngành hàng</th><th>SL</th><th>DT Realtime</th><th>Target Ngày</th><th>% HT</th><th>% Trả Góp</th></tr></thead>
-                                <tbody>`;
+                                 ${mainProgressBarHtml}
+                                 <table class="rt-styled-table">
+                                     <thead><tr><th>Ngành hàng</th><th>SL</th><th>DT Realtime</th><th>Target Ngày</th><th>% HT</th><th>% Trả Góp</th></tr></thead>
+                                     <tbody>`;
             if (totalRow) {
                  tableHtml += `<tr style="font-weight:bold; background-color: #e9ecef;">
-                                <td style="text-align: left !important;">${totalRow["Nhóm ngành hàng"]}</td><td>${formatNumber(totalRow["Số lượng"])}</td><td>${formatNumber(totalRow["DT Realtime (QĐ)"])}</td><td>${formatNumber(totalRow["Target Ngày (QĐ)"])}</td><td style="color: ${getColor(totalRow["% HT Target Ngày (QĐ)"])};">${formatNumber(totalRow["% HT Target Ngày (QĐ)"], 1)}%</td><td>${formatNumber(totalRow["Tỷ trọng trả góp"], 2)}%</td>
-                            </tr>`;
+                                     <td style="text-align: left !important;">${totalRow["Nhóm ngành hàng"]}</td><td>${formatNumber(totalRow["Số lượng"])}</td><td>${formatNumber(totalRow["DT Realtime (QĐ)"])}</td><td>${formatNumber(totalRow["Target Ngày (QĐ)"])}</td><td style="color: ${getColor(totalRow["% HT Target Ngày (QĐ)"])};">${formatNumber(totalRow["% HT Target Ngày (QĐ)"], 1)}%</td><td>${formatNumber(totalRow["Tỷ trọng trả góp"], 2)}%</td>
+                                 </tr>`;
             }
             categoriesWithRevenue.forEach(row => { 
                 tableHtml += `<tr><td style="text-align: left !important;">${row["Nhóm ngành hàng"]}</td><td>${formatNumber(row["Số lượng"])}</td><td>${formatNumber(row["DT Realtime (QĐ)"])}</td><td>${formatNumber(row["Target Ngày (QĐ)"])}</td><td style="color: ${getColor(row["% HT Target Ngày (QĐ)"])}; font-weight: bold;">${formatNumber(row["% HT Target Ngày (QĐ)"], 1)}%</td><td>${formatNumber(row["Tỷ trọng trả góp"], 2)}%</td></tr>`;
@@ -2461,17 +2577,17 @@ ${contestSummarySections.join('\n\n')}`.trim();
 
             if (categoriesWithoutRevenue.length > 0) {
                 const noRevenueHtml = `<div id="category-no-revenue-section" class="no-revenue-section" style="display:none;">
-                                <h4>Ngành hàng chưa phát sinh doanh thu (${categoriesWithoutRevenue.length}):</h4>
-                                <ul class="no-revenue-grid">
-                                    ${categoriesWithoutRevenue.map((item, index) => `<li>${index + 1}. ${item["Nhóm ngành hàng"]}</li>`).join('')}
-                                </ul>
-                              </div>`;
+                                     <h4>Ngành hàng chưa phát sinh doanh thu (${categoriesWithoutRevenue.length}):</h4>
+                                     <ul class="no-revenue-grid">
+                                         ${categoriesWithoutRevenue.map((item, index) => `<li>${index + 1}. ${item["Nhóm ngành hàng"]}</li>`).join('')}
+                                     </ul>
+                                   </div>`;
 
                 const buttonHtml = `<div class="details-toggle" style="margin-top: 15px;">
-                        <button id="toggle-category-no-revenue-btn">
-                            Hiện ${categoriesWithoutRevenue.length} ngành hàng chưa có DT
-                        </button>
-                    </div>`;
+                                    <button id="toggle-category-no-revenue-btn">
+                                        Hiện ${categoriesWithoutRevenue.length} ngành hàng chưa có DT
+                                    </button>
+                                </div>`;
                 
                 wrapper.insertAdjacentHTML('beforeend', buttonHtml + noRevenueHtml);
 
@@ -2485,99 +2601,50 @@ ${contestSummarySections.join('\n\n')}`.trim();
             }
         }
 
-        function renderRealtimeContestResults(processedContest) {
-            const container = document.getElementById('contest-results-container-rt');
-            container.innerHTML = ''; 
-            
-            if (!processedContest.all || processedContest.all.length === 0) {
-                container.innerHTML = `<h2><svg class="title-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>Kết Quả Thi Đua</h2><div style="text-align:center; color: var(--text-muted);">Không có dữ liệu thi đua.</div>`;
-                return; 
-            }
-
-            const headerHtml = `<h2><svg class="title-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>Kết Quả Thi Đua</h2>`;
-            const contentGrid = document.createElement('div');
-            contentGrid.className = 'card-content';
-
-            const onTrackItems = processedContest.onTrack;
-            const behindItems = processedContest.behind;
-
-            if (onTrackItems.length > 0) {
-                const onTrackCol = document.createElement('div');
-                onTrackCol.className = 'contest-column-visual';
-                let onTrackHtml = onTrackItems.map((item, index) => createContestItem(item, index + 1, true)).join('');
-                onTrackCol.innerHTML = `
-                    <div class="status-icon-wrapper green">
-                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                    </div>
-                    <h4 class="on-track">Dự kiến Về Đích (${onTrackItems.length})</h4>
-                    <div class="contest-list-new">${onTrackHtml}</div>
-                `;
-                contentGrid.appendChild(onTrackCol);
-            }
-
-            if (behindItems.length > 0) {
-                const behindCol = document.createElement('div');
-                behindCol.className = 'contest-column-visual';
-                let behindHtml = behindItems.map((item, index) => createContestItem(item, index + 1, true)).join('');
-                behindCol.innerHTML = `
-                    <div class="status-icon-wrapper red">
-                         <svg fill="currentColor" viewBox="0 0 24 24"><path d="M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.47 2,12C2,17.53 6.47,22 12,22C17.53,22 22,17.53 22,12C22,6.47 17.53,2 12,2Z"/></svg>
-                    </div>
-                    <h4 class="behind">Chậm Tiến Độ (${behindItems.length})</h4>
-                    <div class="contest-list-new">${behindHtml}</div>
-                `;
-                contentGrid.appendChild(behindCol);
-            }
-            
-            container.innerHTML = headerHtml;
-            container.appendChild(contentGrid);
-        }
-        
-        // CẬP NHẬT: Thay đổi logic render nhận xét realtime để dùng %HT thực tế
+        // CẬP NHẬT: Thêm nhận xét thi đua vào summary tổng
         function renderRealtimeSummary(totalRow, contestData) {
             const container = document.getElementById('summary-report-wrapper-rt');
             container.style.display = 'block';
+            if (!totalRow) { container.innerHTML = ''; return; }
+            
             const now = new Date();
+            const timeString = now.toLocaleTimeString('vi-VN');
+            const ht = totalRow['% HT Target Ngày (QĐ)'];
             const timeFraction = getTimePassedFraction();
-            const projectedSales = timeFraction > 0 ? (totalRow['DT Realtime (QĐ)'] / timeFraction) : 0;
+            const projectedSales = timeFraction > 0 && timeFraction < 1 ? (totalRow['DT Realtime (QĐ)'] / timeFraction) : totalRow['DT Realtime (QĐ)'];
+            const projectedHt = totalRow['Target Ngày (QĐ)'] > 0 ? (projectedSales / totalRow['Target Ngày (QĐ)'] * 100) : 0;
             const onTrackCount = contestData.onTrack.length;
             const totalCount = contestData.all.length;
+            const remaining = totalRow['Target Ngày (QĐ)'] - totalRow['DT Realtime (QĐ)'];
 
-            const createSubListWithActual = (items) => {
-                if (!items || items.length === 0) return '';
-                return items.map(item => `  - ${item.name} (${formatNumber(item.percentActual, 1)}%)`).join('\n');
-            };
-
-            let contestSummarySections = [];
-            if (contestData.veDich_actual.length > 0) {
-                contestSummarySections.push(`✅ ĐÃ VỀ ĐÍCH (${contestData.veDich_actual.length} nhóm):\n${createSubListWithActual(contestData.veDich_actual)}`);
-            }
-            if (contestData.canCoGang_actual.length > 0) {
-                contestSummarySections.push(`💪 CẦN CỐ GẮNG (${contestData.canCoGang_actual.length} nhóm - HT >80%):\n${createSubListWithActual(contestData.canCoGang_actual)}`);
-            }
-            if (contestData.canTapTrung_actual.length > 0) {
-                const canTapTrungList = contestData.canTapTrung_actual.map(item => `${item.name} (${formatNumber(item.percentActual, 1)}%)`).join(', ');
-                contestSummarySections.push(`🚨 CẦN TẬP TRUNG (${contestData.canTapTrung_actual.length} nhóm - HT <80%): ${canTapTrungList}`);
+            let contestSummary = '';
+            if (contestData.all.length > 0) {
+                const onTrackNames = contestData.onTrack.map(item => `${item.name} (${formatNumber(item.percentProjected, 0)}%)`).join(', ');
+                const behindNames = contestData.behind.map(item => `${item.name} (${formatNumber(item.percentProjected, 0)}%)`).join(', ');
+                
+                contestSummary += `\n-------------------\n� TÌNH HÌNH THI ĐUA 🏁`;
+                if(onTrackNames) contestSummary += `\n✅ Đang Về Đích: ${onTrackNames}`;
+                if(behindNames) contestSummary += `\n🏃‍♂️ Cần Tăng Tốc: ${behindNames}`;
             }
 
-            const summaryText = `📊 BÁO CÁO SỨC KHOẺ SIÊU THỊ đến ${now.toLocaleTimeString('vi-VN')}
+            const summaryText = `📊 BÁO CÁO NHANH REAL-TIME - ${timeString} 📊
 -------------------
 - 🎯 Target Ngày: ${formatNumber(totalRow['Target Ngày (QĐ)'])}
-- 📈 Thực hiện: ${formatNumber(totalRow['DT Realtime (QĐ)'])} (${formatNumber(totalRow['% HT Target Ngày (QĐ)'], 1)}%)
-- 📉 DT còn lại: ${formatNumber(totalRow['Target Ngày (QĐ)'] - totalRow['DT Realtime (QĐ)'])}
-- 🚀 Dự kiến đạt: ${formatNumber(projectedSales)} (${formatNumber(projectedSales/totalRow['Target Ngày (QĐ)']*100, 1)}%)
-- 💳 Tỷ trọng trả góp: ${formatNumber(totalRow['Tỷ trọng trả góp'], 2)}%
-- 💵 Doanh thu trả góp: ${formatNumber(totalRow['DT Trả Góp'])}
-- 🏆 Số ngành hàng thi đua dự kiến đạt: ${onTrackCount}/${totalCount}
+- 📈 Realtime: ${formatNumber(totalRow['DT Realtime (QĐ)'])} (${formatNumber(ht, 1)}%)
+- 📉 Còn lại: ${formatNumber(remaining)}
+- 🚀 Dự kiến: ${formatNumber(projectedSales)} (${formatNumber(projectedHt, 1)}%)
+- 🏆 Thi đua dự kiến đạt: ${onTrackCount}/${totalCount}
 -------------------
-${contestSummarySections.join('\n-------------------\n')}`.trim();
+- 💳 DT Trả góp: ${formatNumber(totalRow['DT Trả Góp'])} (${formatNumber(totalRow['Tỷ trọng trả góp'], 1)}%)
+- 📱 Số lượng bán: ${formatNumber(totalRow['Số lượng'])}
+${contestSummary}`.trim();
 
-            const html = `<h2><svg class="title-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M12,19L8,15H10.5V12H13.5V15H16L12,19Z" /></svg>Nhận xét Real-time</h2>
-                          <textarea class="summary-textarea" readonly>${summaryText}</textarea>
-                          <button class="action-btn copySummaryBtn">
-                             <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" /></svg>
-                             Sao chép Nhận xét
-                          </button>`;
+            const html = `<h2><svg class="title-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M12,19L8,15H10.5V12H13.5V15H16L12,19Z" /></svg>Nhận xét Real-time (Tổng)</h2>
+                                 <textarea class="summary-textarea" readonly>${summaryText}</textarea>
+                                 <button class="action-btn copySummaryBtn" style="width: 100%; max-width: 400px; margin: 15px auto 0 auto;">
+                                     <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" /></svg>
+                                     Sao chép Nhận xét
+                                 </button>`;
             container.innerHTML = html;
             container.querySelector('.copySummaryBtn').addEventListener('click', (e) => {
                 const textarea = e.currentTarget.previousElementSibling;
@@ -2586,23 +2653,97 @@ ${contestSummarySections.join('\n-------------------\n')}`.trim();
                 showToast('Đã sao chép nhận xét!');
             });
         }
-
-        function displayRealtimeHiddenTables(mainData, contestData) { 
-            const mainWrapper = document.getElementById('realtime-main-table-wrapper'); 
-            const mainHeaders = Object.keys(mainData[0]);
-            let mainHtml = '<h2>Bảng 4: Realtime Ngành hàng</h2><table><thead><tr>' + mainHeaders.map(h => `<th>${h}</th>`).join('') + '</tr></thead><tbody>';
-            mainData.forEach(rowData => { mainHtml += '<tr>' + mainHeaders.map(h => `<td>${typeof rowData[h] === 'number' ? formatNumber(rowData[h], 2) : rowData[h]}</td>`).join('') + '</tr>'; });
-            mainHtml += '</tbody></table>';
-            mainWrapper.innerHTML = mainHtml;
-
-            const contestWrapper = document.getElementById('realtime-contest-tables-wrapper'); contestWrapper.innerHTML = ""; 
-            if(contestData && contestData.length > 0) { 
-                const tableContainer = document.createElement('div'); 
-                tableContainer.className = 'table-container'; 
-                const headers = Object.keys(contestData[0] || {});
-                tableContainer.innerHTML = `<h2 style="margin-top: 25px;">Bảng 5: Realtime Thi đua</h2><table><thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${contestData.map(row => `<tr>${headers.map(h => `<td>${row[h] !== undefined ? (typeof row[h] === 'number' ? formatNumber(row[h], 2) : row[h]) : 'N/A'}</td>`).join('')}</tr>`).join('')}</tbody></table>`; 
-                contestWrapper.appendChild(tableContainer); 
+        
+        // CẬP NHẬT: Nhận xét nhân viên theo yêu cầu mới
+        function renderEmployeeSummary(data) {
+            const container = document.getElementById('summary-report-wrapper-rt-employee');
+            if (!data || data.length === 0) {
+                container.style.display = 'none';
+                return;
             }
+            container.style.display = 'block';
+
+            const sortedData = [...data].sort((a, b) => b.revenue - a.revenue);
+            
+            let summaryLines = [];
+            summaryLines.push(`🚀 BẢNG PHONG THẦN - ĐUA TOP DOANH THU 🚀`);
+            summaryLines.push(`-------------------`);
+
+            const hasPositiveRevenue = sortedData.some(e => e.revenue > 0);
+
+            if (!hasPositiveRevenue) {
+                summaryLines.push(`🤔 Hôm nay anh em chưa ai mở hàng à? Cùng nhau phá băng nào!`);
+                sortedData.forEach(emp => {
+                    summaryLines.push(`- ${emp.name}: Chờ đơn đầu tiên khai hỏa! 🔥`);
+                });
+            } else {
+                // Ghi nhận TOP 3
+                const topPerformers = sortedData.slice(0, 3);
+                summaryLines.push(`👑 TOP 3 CHIẾN THẦN HÔM NAY:`);
+                topPerformers.forEach((emp, index) => {
+                    if (emp.revenue > 0) {
+                        const icons = ['🥇', '🥈', '🥉'];
+                        const comments = [
+                            `Thánh chốt đơn gọi tên ${emp.name} với ${formatNumber(emp.revenue / 1000000, 2)} triệu! Quá đẳng cấp!`,
+                            `Á quân ${emp.name} bám rất sát với ${formatNumber(emp.revenue / 1000000, 2)} triệu! Cố lên!`,
+                            `Vị trí thứ 3 thuộc về ${emp.name} với ${formatNumber(emp.revenue / 1000000, 2)} triệu! Tuyệt vời!`
+                        ];
+                        summaryLines.push(`${icons[index]} ${comments[index]}`);
+                    }
+                });
+
+                // Nhóm giữa và nhóm cuối
+                if (sortedData.length > 3) {
+                    const remainingEmployees = sortedData.slice(3);
+                    const bottomCount = 3;
+                    
+                    // Đảm bảo không lấy nhiều hơn số nhân viên còn lại
+                    const actualBottomCount = Math.min(bottomCount, remainingEmployees.length);
+                    
+                    const middleEmployees = remainingEmployees.slice(0, -actualBottomCount);
+                    const bottomEmployees = remainingEmployees.slice(-actualBottomCount);
+
+                    if (middleEmployees.length > 0) {
+                        summaryLines.push(`\n🌟 CÁC CHIẾN BINH ĐANG TĂNG TỐC:`);
+                        middleEmployees.forEach((emp, index) => {
+                            const rank = index + 4; // Bắt đầu từ hạng 4
+                            if (emp.revenue > 0) {
+                                summaryLines.push(`- Hạng ${rank}: ${emp.name} - ${formatNumber(emp.revenue / 1000000, 2)} triệu. Giữ vững tay lái nhé!`);
+                            } else {
+                                summaryLines.push(`- ${emp.name}: "Em bé" vẫn chưa về. Cố lên bạn ơi! 🐢`);
+                            }
+                        });
+                    }
+
+                    if (bottomEmployees.length > 0) {
+                        summaryLines.push(`\n⚠️ NHÓM CẦN CẢI THIỆN GẤP:`);
+                        bottomEmployees.forEach((emp) => {
+                            if (emp.revenue > 0) {
+                                 summaryLines.push(`- ${emp.name} (${formatNumber(emp.revenue / 1000000, 2)} triệu): Doanh thu còn thấp, cần một cú hích mạnh mẽ hơn! 💥`);
+                            } else {
+                                 summaryLines.push(`- ${emp.name}: Báo động đỏ! 🚨 Khách hàng đang đi lạc đâu hết rồi, mau tìm lại thôi!`);
+                            }
+                        });
+                    }
+                }
+            }
+
+            const summaryText = summaryLines.join('\n');
+            const html = `
+                <h2><svg class="title-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" /></svg>Nhận xét Doanh thu Nhân viên</h2>
+                <textarea id="employeeSummaryTextarea" class="summary-textarea" readonly>${summaryText}</textarea>
+                <button class="action-btn copySummaryBtn" style="width: 100%; max-width: 400px; margin: 15px auto 0 auto;">
+                    <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" /></svg>
+                    Sao chép Nhận xét
+                </button>`;
+            container.innerHTML = html;
+
+            container.querySelector('.copySummaryBtn').addEventListener('click', (e) => {
+                const textarea = document.getElementById('employeeSummaryTextarea');
+                textarea.select();
+                document.execCommand('copy');
+                showToast('Đã sao chép nhận xét nhân viên!');
+            });
         }
     }
     </script>
