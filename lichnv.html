@@ -847,14 +847,36 @@ document.addEventListener('DOMContentLoaded', () => {
     
     exportAuxBtn.addEventListener('click', () => {
         if (!scheduleState) return showToast("Chưa có dữ liệu để xuất.", false);
-        const { singleCellTaskMap } = scheduleState;
+        const { singleCellTaskMap, CA_SANG, CA_CHIEU } = scheduleState;
         let csvContent = "data:text/csv;charset=utf-8,Day,Period,Task,Worker\n";
         
+        const halfDayTasksForExport = {}; 
+
         Object.entries(singleCellTaskMap).forEach(([worker, dayTasks]) => {
-            Object.entries(dayTasks).forEach(([day, tasks]) => {
-                if(tasks.Sang) csvContent += `${day},Sang,${tasks.Sang},${worker}\n`;
-                if(tasks.Chieu) csvContent += `${day},Chieu,${tasks.Chieu},${worker}\n`;
+            Object.entries(dayTasks).forEach(([day, shiftTasks]) => {
+                const key = `${day}-${worker}`;
+                if (!halfDayTasksForExport[key]) {
+                    halfDayTasksForExport[key] = {};
+                }
+
+                Object.entries(shiftTasks).forEach(([shift, task]) => {
+                    if (CA_SANG.includes(shift)) {
+                        halfDayTasksForExport[key].Sang = task;
+                    } else if (CA_CHIEU.includes(shift)) {
+                        halfDayTasksForExport[key].Chieu = task;
+                    }
+                });
             });
+        });
+
+        Object.entries(halfDayTasksForExport).forEach(([key, tasks]) => {
+            const [day, worker] = key.split('-');
+            if (tasks.Sang) {
+                csvContent += `${day},Sang,${tasks.Sang},${worker}\n`;
+            }
+            if (tasks.Chieu) {
+                csvContent += `${day},Chieu,${tasks.Chieu},${worker}\n`;
+            }
         });
 
         const encodedUri = encodeURI(csvContent);
