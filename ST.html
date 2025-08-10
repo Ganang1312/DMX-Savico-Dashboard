@@ -2622,7 +2622,7 @@ ${contestSummarySections.join('\n\n')}`.trim();
                 const onTrackNames = contestData.onTrack.map(item => `${item.name} (${formatNumber(item.percentProjected, 0)}%)`).join(', ');
                 const behindNames = contestData.behind.map(item => `${item.name} (${formatNumber(item.percentProjected, 0)}%)`).join(', ');
                 
-                contestSummary += `\n-------------------\n� TÌNH HÌNH THI ĐUA 🏁`;
+                contestSummary += `\n-------------------\n🏁 TÌNH HÌNH THI ĐUA 🏁`;
                 if(onTrackNames) contestSummary += `\n✅ Đang Về Đích: ${onTrackNames}`;
                 if(behindNames) contestSummary += `\n🏃‍♂️ Cần Tăng Tốc: ${behindNames}`;
             }
