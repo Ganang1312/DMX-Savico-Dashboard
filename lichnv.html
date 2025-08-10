@@ -40,16 +40,16 @@
         .ca-sang { background-color: #e0f2fe; color: #0c4a6e; }
         .ca-chieu { background-color: #fff7ed; color: #9a3412; }
         .ca-nghi { background-color: #f9fafb; }
-        .task-gh1 { background-color: #dcfce7; color: #166534; font-weight: 500;}
-        .task-gh2 { background-color: #bbf7d0; color: #15803d; font-weight: 500;}
-        .task-erp { background-color: #ede9fe; color: #5b21b6; font-weight: 500;}
+        .task-gh1 { background-color: #dbeafe; color: #1e40af; font-weight: 500;}
+        .task-gh2 { background-color: #d1fae5; color: #065f46; font-weight: 500;}
+        .task-erp { background-color: #e9d5ff; color: #581c87; font-weight: 500;}
         .aux-sang { background-color: #f0f9ff !important; }
         .aux-chieu { background-color: #fffbeb !important; }
-        .aux-gh1 select { background-color: #dcfce7 !important; color: #166534; font-weight: 500; }
-        .aux-gh2 select { background-color: #bbf7d0 !important; color: #15803d; font-weight: 500; }
-        .aux-erp select { background-color: #ede9fe !important; color: #5b21b6; font-weight: 500; }
+        .aux-gh1 select { background-color: #dbeafe !important; color: #1e40af; font-weight: 500; }
+        .aux-gh2 select { background-color: #d1fae5 !important; color: #065f46; font-weight: 500; }
+        .aux-erp select { background-color: #e9d5ff !important; color: #581c87; font-weight: 500; }
         .header-sticky { position: sticky; top: 0; z-index: 10; background-color: #f8fafc; }
-        .col-sticky { position: sticky; left: 0; z-index: 5; background-color: #f8fafc; }
+        .col-sticky { position: sticky; left: 0; z-index: 5; background-color: #f8fafc; min-width: 180px;}
         .day-separator { border-right: 2px solid #93c5fd !important; }
         .weekend-header { background-color: #eef2ff !important; color: #312e81; }
         .day-header { cursor: pointer; transition: background-color 0.2s; }
@@ -85,6 +85,14 @@
             background-color: #edfaff;
             height: 32px;
         }
+        .kpi-header { background-color: #f1f5f9 !important; color: #475569; }
+        .kpi-header-erp { background-color: #e9d5ff !important; color: #581c87; }
+        .kpi-header-gh1 { background-color: #dbeafe !important; color: #1e40af; }
+        .kpi-header-gh2 { background-color: #d1fae5 !important; color: #065f46; }
+        th.col-sticky { text-align: left; padding-left: 1rem; }
+        td.col-sticky > div { justify-content: flex-start; padding-left: 1rem; }
+        tr.aux-row > td.col-sticky { text-align: center; }
+        tr.aux-row > td.col-sticky > div { justify-content: center; padding-left: 0; }
     </style>
 </head>
 <body class="p-2 md:p-6">
@@ -113,43 +121,25 @@
 
         <div id="capture-all" class="space-y-8">
             <div id="capture-main-content" class="space-y-8">
-                <!-- BẢNG LỊCH PHÂN CA CHÍNH -->
+                <!-- BẢNG LỊCH TỔNG HỢP -->
                 <section id="main-schedule-section" class="section-card hidden">
                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-bold text-gray-800 border-l-4 pl-3" style="border-color: var(--success-color);">2. Bảng lịch phân ca chi tiết</h2>
-                        <button data-target="main-schedule-section" class="screenshot-btn text-sm py-2 px-4 styled-button" style="background-color: var(--secondary-accent);">📸 Chụp ảnh</button>
-                    </div>
-                    <div id="main-schedule-container" class="table-container"></div>
-                </section>
-
-                <!-- BẢNG LỊCH PHỤ TRỢ -->
-                <section id="aux-schedule-section" class="section-card hidden">
-                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-bold text-gray-800 border-l-4 pl-3" style="border-color: var(--warning-color);">3. Lịch phụ trợ (Giao hàng & ERP)</h2>
-                        <div class="flex gap-2">
+                        <h2 class="text-xl font-bold text-gray-800 border-l-4 pl-3" style="border-color: var(--success-color);">2. Bảng Lịch Tổng Hợp</h2>
+                         <div class="flex gap-2">
                             <button id="export-aux-btn" class="text-sm py-2 px-4 styled-button" style="background-color: #2563eb;">Xuất Dữ Liệu</button>
                             <label for="import-aux-input" class="text-sm py-2 px-4 styled-button" style="background-color: #16a34a;">Nhập Dữ Liệu</label>
                             <input type="file" id="import-aux-input" class="hidden" accept=".csv">
-                            <button data-target="aux-schedule-section" class="screenshot-btn text-sm py-2 px-4 styled-button" style="background-color: var(--secondary-accent);">📸</button>
+                            <button data-target="main-schedule-section" class="screenshot-btn text-sm py-2 px-4 styled-button" style="background-color: var(--secondary-accent);">📸</button>
                         </div>
                     </div>
-                     <div id="aux-schedule-container" class="table-container"></div>
-                </section>
-                
-                <!-- TỔNG KẾT & KPI -->
-                <section id="summary-section" class="section-card hidden">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-bold text-gray-800 border-l-4 pl-3" style="border-color: var(--danger-color);">4. Tổng kết & KPI</h2>
-                        <button data-target="summary-section" class="screenshot-btn text-sm py-2 px-4 styled-button" style="background-color: var(--secondary-accent);">📸 Chụp ảnh</button>
-                    </div>
-                    <div id="summary-container"></div>
+                    <div id="main-schedule-container" class="table-container"></div>
                 </section>
             </div>
 
             <!-- NHẬN XÉT NGÀY -->
             <section id="daily-summary-section" class="section-card hidden">
                  <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-bold text-gray-800 border-l-4 pl-3" style="border-color: var(--info-color);">5. Nhận xét ngày</h2>
+                    <h2 class="text-xl font-bold text-gray-800 border-l-4 pl-3" style="border-color: var(--info-color);">3. Nhận xét ngày</h2>
                     <button data-target="daily-summary-section" class="screenshot-btn text-sm py-2 px-4 styled-button" style="background-color: var(--secondary-accent);">📸 Chụp ảnh</button>
                 </div>
                  <div id="daily-summary-container" class="mt-4"></div>
@@ -167,22 +157,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const excelUploadInput = document.getElementById('excel-upload');
     const fileNameDisplay = document.getElementById('file-name-display');
     const mainScheduleContainer = document.getElementById('main-schedule-container');
-    const auxScheduleContainer = document.getElementById('aux-schedule-container');
-    const summaryContainer = document.getElementById('summary-container');
     const dailySummaryContainer = document.getElementById('daily-summary-container');
     const exportAuxBtn = document.getElementById('export-aux-btn');
     const importAuxInput = document.getElementById('import-aux-input');
 
     const sections = [
         document.getElementById('main-schedule-section'),
-        document.getElementById('aux-schedule-section'),
-        document.getElementById('summary-section'),
         document.getElementById('daily-summary-section')
     ];
     
     // --- GLOBAL STATE --- //
     let scheduleState = null;
-    const LOCAL_STORAGE_KEY = 'dmxScheduleData_v8';
+    const LOCAL_STORAGE_KEY = 'dmxScheduleData_v9';
 
     // --- FUNCTIONS --- //
     function showToast(message, isSuccess = true) {
@@ -348,34 +334,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         });
+        
+        // Sắp xếp nhân viên
+        state.employees.sort((a, b) => {
+            if (b.kpi.erp !== a.kpi.erp) {
+                return b.kpi.erp - a.kpi.erp;
+            }
+            return b.kpi.gh1 - a.kpi.gh1;
+        });
     }
 
     function renderAllFromState() {
         if (!scheduleState) return;
         recalculateKpi(scheduleState);
-        renderMainSchedule(scheduleState);
-        renderAuxSchedule(scheduleState);
-        renderKpiSummary(scheduleState);
+        renderCombinedTable(scheduleState);
         const activeDayHeader = document.querySelector('.day-header.active');
         const dayToRender = activeDayHeader ? activeDayHeader.dataset.daykey : scheduleState.dateHeaders[0]?.name;
         if(dayToRender) renderDailySummary(dayToRender);
         saveStateToLocalStorage();
     }
     
-    function renderMainSchedule(data) {
+    function renderCombinedTable(data) {
         const { headerLine2, dateHeaders, employees, staticHeaderCount, singleCellTaskMap, CA_SANG, CA_CHIEU } = data;
+        const kpiHeaders = [
+            { key: 'erp', text: '📦 Ca ERP', class: 'kpi-header-erp' },
+            { key: 'gh1', text: '🚚 Ca GH1', class: 'kpi-header-gh1' },
+            { key: 'gh2', text: '🚛 Ca GH2', class: 'kpi-header-gh2' },
+            { key: 'gc', text: '⏱️ Giờ công', class: 'kpi-header' }
+        ];
 
         let html = '<table><thead class="header-sticky">';
+        // Dòng header 1
         html += '<tr>';
         html += `<th class="col-sticky p-2 border-r">Nhân viên</th>`;
+        html += `<th colspan="${kpiHeaders.length}" class="kpi-header day-separator">Tổng kết & KPI</th>`;
         dateHeaders.forEach(day => {
             const isWeekend = day.name.startsWith('T7') || day.name.startsWith('CN');
             html += `<th colspan="${day.span}" data-daykey="${day.name}" class="day-header p-2 ${isWeekend ? 'weekend-header' : ''} day-separator">${day.name}</th>`;
         });
         html += '</tr>';
         
+        // Dòng header 2
         html += '<tr style="top: 41px;">';
         html += `<th class="col-sticky p-2 border-r">Ca</th>`;
+        kpiHeaders.forEach(h => html += `<th class="${h.class} p-1 border-r">${h.text}</th>`);
         let shiftCounter = 0;
         dateHeaders.forEach(day => {
             for(let i = 0; i < day.span; i++) {
@@ -391,6 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Hàng đếm số lượng nhân viên
         html += '<tr class="shift-count-row header-sticky" style="top: 82px;">';
         html += '<th class="col-sticky p-1 border-r">Tổng NV</th>';
+        html += `<td colspan="${kpiHeaders.length}" class="kpi-header day-separator"></td>`;
         for(let i = 0; i < headerLine2.length - staticHeaderCount; i++) {
             const count = employees.filter(emp => emp.shifts[i]?.trim()).length;
             let separatorClass = '';
@@ -406,9 +409,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         html += '</tr></thead><tbody>';
 
+        // Hàng nhân viên
         employees.forEach(emp => {
             html += `<tr data-empid="${emp.id}"><td class="col-sticky p-2 border-r font-semibold"><div>${emp.hoTen}</div></td>`;
             
+            // KPI Cells
+            kpiHeaders.forEach((h, i) => {
+                const isLast = i === kpiHeaders.length - 1;
+                html += `<td class="${h.class} ${isLast ? 'day-separator' : ''}"><div>${emp.kpi[h.key]}</div></td>`;
+            });
+
             let cumulativeSpan = 0;
             dateHeaders.forEach(day => {
                 for (let i = 0; i < day.span; i++) {
@@ -440,27 +450,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             html += '</tr>';
         });
-
-        html += '</tbody></table>';
-        mainScheduleContainer.innerHTML = html;
-    }
-
-    function renderAuxSchedule(data) {
-        const { dateHeaders, singleCellTaskMap, employees, CA_SANG, CA_CHIEU, headerLine2, staticHeaderCount } = data;
-
-        let html = '<table class="w-full text-sm"><thead><tr class="bg-yellow-100">';
-        html += '<th class="p-2 border-r">Nhiệm vụ</th>';
-        dateHeaders.forEach(day => {
-            const isWeekend = day.name.startsWith('T7') || day.name.startsWith('CN');
-            html += `<th colspan="2" class="p-2 border-r ${isWeekend ? 'weekend-header' : ''} day-separator">${day.name}</th>`;
-        });
-        html += '</tr><tr class="bg-yellow-50">';
-        html += '<th class="p-2 border-r">Ca</th>';
-        dateHeaders.forEach(() => { html += '<th class="p-1 border-r">Sáng</th><th class="p-1 border-r">Chiều</th>' });
-        html += '</tr></thead><tbody>';
-
+        
+        // Hàng phụ trợ
         ['GH1', 'GH2', 'ERP'].forEach(taskName => {
-            html += `<tr class="border-b"><td class="p-2 border-r font-semibold"><div>${taskName === 'ERP' ? 'ERP (Nữ)' : `Giao Hàng ${taskName.slice(-1)}`}</div></td>`;
+            const taskClass = `task-${taskName.toLowerCase()}`;
+            const icon = taskName === 'ERP' ? '📦' : (taskName === 'GH1' ? '🚚' : '🚛');
+            html += `<tr class="border-b aux-row"><td colspan="${1 + kpiHeaders.length}" class="col-sticky p-2 border-r font-semibold ${taskClass} day-separator"><div>${icon} ${taskName === 'ERP' ? 'ERP (Nữ)' : `Giao Hàng ${taskName.slice(-1)}`}</div></td>`;
+            
             dateHeaders.forEach(day => {
                 let workerSang = '', workerChieu = '';
                 
@@ -504,63 +500,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const selectSang = `<select data-daykey="${day.name}" data-period="Sang" data-task="${taskName}" class="aux-edit-select w-full h-full">${optionsSang}</select>`;
                 const selectChieu = `<select data-daykey="${day.name}" data-period="Chieu" data-task="${taskName}" class="aux-edit-select w-full h-full">${optionsChieu}</select>`;
 
-                html += `<td class="p-0 aux-sang aux-${taskName.toLowerCase()} day-separator">${selectSang}</td>`;
-                html += `<td class="p-0 aux-chieu aux-${taskName.toLowerCase()}">${selectChieu}</td>`;
+                html += `<td colspan="${CA_SANG.length}" class="p-0 aux-sang aux-${taskName.toLowerCase()}">${selectSang}</td>`;
+                html += `<td colspan="${CA_CHIEU.length}" class="p-0 aux-chieu aux-${taskName.toLowerCase()} day-separator">${selectChieu}</td>`;
             });
             html += '</tr>';
         });
+
         html += '</tbody></table>';
-        auxScheduleContainer.innerHTML = html;
+        mainScheduleContainer.innerHTML = html;
     }
 
-    function renderKpiSummary(data) {
-        const { employees } = data;
-        const ghEmployees = employees.filter(emp => emp.kpi.gh1 > 0 || emp.kpi.gh2 > 0);
-        const erpEmployees = employees.filter(emp => !(emp.kpi.gh1 > 0 || emp.kpi.gh2 > 0));
-
-        let html = '';
-
-        if (ghEmployees.length > 0) {
-            html += `<h3 class="text-lg font-semibold text-gray-700 mb-2 mt-4">KPI Giao Hàng</h3>`;
-            html += '<div class="table-container mb-6">';
-            html += '<table class="w-full text-sm"><thead><tr class="bg-red-100">';
-            ['Họ tên', 'Ca GH1', 'Ca GH2', 'Giờ công'].forEach(h => {
-                html += `<th class="p-2 border-r">${h}</th>`;
-            });
-            html += '</tr></thead><tbody>';
-
-            ghEmployees.forEach(emp => {
-                html += `<tr class="border-b">`;
-                html += `<td class="p-2 border-r font-semibold"><div>${emp.hoTen}</div></td>`;
-                html += `<td class="p-2 border-r"><div>${emp.kpi.gh1}</div></td>`;
-                html += `<td class="p-2 border-r"><div>${emp.kpi.gh2}</div></td>`;
-                html += `<td class="p-2 border-r"><div>${emp.kpi.gc}</div></td>`;
-                html += `</tr>`;
-            });
-            html += '</tbody></table></div>';
-        }
-
-        if (erpEmployees.length > 0) {
-            html += `<h3 class="text-lg font-semibold text-gray-700 mb-2 mt-4">KPI Kho / ERP</h3>`;
-            html += '<div class="table-container">';
-            html += '<table class="w-full text-sm"><thead><tr class="bg-blue-100">';
-            ['Họ tên', 'Ca ERP', 'Giờ công'].forEach(h => {
-                html += `<th class="p-2 border-r">${h}</th>`;
-            });
-            html += '</tr></thead><tbody>';
-
-            erpEmployees.forEach(emp => {
-                html += `<tr class="border-b">`;
-                html += `<td class="p-2 border-r font-semibold"><div>${emp.hoTen}</div></td>`;
-                html += `<td class="p-2 border-r"><div>${emp.kpi.erp}</div></td>`;
-                html += `<td class="p-2 border-r"><div>${emp.kpi.gc}</div></td>`;
-                html += `</tr>`;
-            });
-            html += '</tbody></table></div>';
-        }
-
-        summaryContainer.innerHTML = html;
-    }
 
     function renderDailySummary(dayKey) {
         if (!scheduleState) return;
@@ -814,7 +763,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    auxScheduleContainer.addEventListener('change', (e) => {
+    mainScheduleContainer.addEventListener('change', (e) => {
         if(e.target.classList.contains('aux-edit-select')) {
             handleAuxEdit(e);
         }
@@ -829,7 +778,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 html2canvas(elementToCapture, {
                     scale: 1.5, useCORS: true,
                     onclone: (doc) => {
-                        sections.forEach(s => doc.getElementById(s.id)?.classList.remove('hidden'));
+                        doc.getElementById('main-schedule-section')?.classList.remove('hidden');
+                        doc.getElementById('daily-summary-section')?.classList.remove('hidden');
                     }
                 }).then(canvas => {
                     const link = document.createElement('a');
