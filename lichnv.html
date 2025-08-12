@@ -125,9 +125,10 @@
                 <section id="main-schedule-section" class="section-card hidden">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-xl font-bold text-gray-800 border-l-4 pl-3" style="border-color: var(--success-color);">2. Bảng Lịch Tổng Hợp</h2>
-                         <div class="flex gap-2">
-                            <button id="export-aux-btn" class="text-sm py-2 px-4 styled-button" style="background-color: #2563eb;">Xuất Dữ Liệu</button>
-                            <label for="import-aux-input" class="text-sm py-2 px-4 styled-button" style="background-color: #16a34a;">Nhập Dữ Liệu</label>
+                         <div class="flex gap-2 flex-wrap justify-end">
+                            <button id="export-json-btn" class="text-sm py-2 px-4 styled-button" style="background-color: #f59e0b;">Xuất JSON</button>
+                            <button id="export-aux-btn" class="text-sm py-2 px-4 styled-button" style="background-color: #2563eb;">Xuất CSV</button>
+                            <label for="import-aux-input" class="text-sm py-2 px-4 styled-button" style="background-color: #16a34a;">Nhập CSV</label>
                             <input type="file" id="import-aux-input" class="hidden" accept=".csv">
                             <button data-target="main-schedule-section" class="screenshot-btn text-sm py-2 px-4 styled-button" style="background-color: var(--secondary-accent);">📸</button>
                         </div>
@@ -160,6 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const dailySummaryContainer = document.getElementById('daily-summary-container');
     const exportAuxBtn = document.getElementById('export-aux-btn');
     const importAuxInput = document.getElementById('import-aux-input');
+    const exportJsonBtn = document.getElementById('export-json-btn');
 
     const sections = [
         document.getElementById('main-schedule-section'),
@@ -168,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- GLOBAL STATE --- //
     let scheduleState = null;
-    const LOCAL_STORAGE_KEY = 'dmxScheduleData_v9';
+    const LOCAL_STORAGE_KEY = 'dmxScheduleData_v10'; // Incremented version to avoid conflicts
 
     // --- FUNCTIONS --- //
     function showToast(message, isSuccess = true) {
@@ -181,7 +183,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function saveStateToLocalStorage() {
         if (scheduleState) {
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(scheduleState));
+            try {
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(scheduleState));
+            } catch (error) {
+                console.error("Lỗi khi lưu vào LocalStorage:", error);
+                showToast("Không thể lưu trạng thái vào bộ nhớ máy.", false);
+            }
         }
     }
 
@@ -190,14 +197,34 @@ document.addEventListener('DOMContentLoaded', () => {
         if (savedData) {
             try {
                 scheduleState = JSON.parse(savedData);
-                renderAllFromState();
+                renderAllFromState(false); // Don't save again when loading
                 sections.forEach(s => s.classList.remove('hidden'));
                 document.querySelectorAll('.screenshot-btn').forEach(b => b.classList.remove('hidden'));
-                showToast("Đã tải lại phiên làm việc trước.", true);
+                showToast("Đã tải lại phiên làm việc từ bộ nhớ máy.", true);
             } catch (error) {
                 console.error("Lỗi khi tải dữ liệu từ LocalStorage:", error);
                 localStorage.removeItem(LOCAL_STORAGE_KEY);
             }
+        }
+    }
+
+    async function initializeData() {
+        try {
+            // Cố gắng fetch file lichnv.json. Thêm cache-busting để luôn lấy file mới nhất.
+            const response = await fetch(`lichnv.json?v=${new Date().getTime()}`);
+            if (!response.ok) {
+                throw new Error('File lichnv.json không tìm thấy, thử tải từ bộ nhớ máy.');
+            }
+            const data = await response.json();
+            scheduleState = data;
+            renderAllFromState(false); // Don't save again when loading
+            sections.forEach(s => s.classList.remove('hidden'));
+            document.querySelectorAll('.screenshot-btn').forEach(b => b.classList.remove('hidden'));
+            showToast("Đã tải dữ liệu từ file lichnv.json thành công!", true);
+        } catch (error) {
+            console.log(error.message); // Log lỗi để debug
+            // Nếu fetch thất bại, quay lại dùng localStorage
+            loadStateFromLocalStorage();
         }
     }
 
@@ -344,14 +371,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function renderAllFromState() {
+    function renderAllFromState(shouldSave = true) {
         if (!scheduleState) return;
         recalculateKpi(scheduleState);
         renderCombinedTable(scheduleState);
         const activeDayHeader = document.querySelector('.day-header.active');
         const dayToRender = activeDayHeader ? activeDayHeader.dataset.daykey : scheduleState.dateHeaders[0]?.name;
         if(dayToRender) renderDailySummary(dayToRender);
-        saveStateToLocalStorage();
+        if (shouldSave) {
+            saveStateToLocalStorage();
+        }
     }
     
     function renderCombinedTable(data) {
@@ -795,6 +824,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
+    exportJsonBtn.addEventListener('click', () => {
+        if (!scheduleState) return showToast("Chưa có dữ liệu để xuất.", false);
+
+        try {
+            const jsonString = JSON.stringify(scheduleState, null, 2); // Định dạng JSON cho dễ đọc
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'lichnv.json');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            showToast("Đã xuất dữ liệu ra file lichnv.json thành công!", true);
+        } catch (error) {
+            console.error("Lỗi khi xuất JSON:", error);
+            showToast("Có lỗi xảy ra khi xuất file JSON.", false);
+        }
+    });
+
     exportAuxBtn.addEventListener('click', () => {
         if (!scheduleState) return showToast("Chưa có dữ liệu để xuất.", false);
         const { singleCellTaskMap, CA_SANG, CA_CHIEU } = scheduleState;
@@ -836,7 +886,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        showToast("Đã xuất dữ liệu phụ trợ thành công!");
+        showToast("Đã xuất dữ liệu phụ trợ (CSV) thành công!");
     });
 
     importAuxInput.addEventListener('change', (e) => {
@@ -857,16 +907,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                 });
-                showToast("Nhập dữ liệu phụ trợ thành công!");
+                renderAllFromState(); // Re-render sau khi import xong
+                showToast("Nhập dữ liệu phụ trợ (CSV) thành công!");
             } catch (error) {
-                 showToast("Lỗi khi nhập file. Vui lòng kiểm tra định dạng.", false);
+                 showToast("Lỗi khi nhập file CSV. Vui lòng kiểm tra định dạng.", false);
             }
         };
         reader.readAsText(file);
     });
 
-    // Tải dữ liệu từ LocalStorage khi trang được mở
-    loadStateFromLocalStorage();
+    // Tải dữ liệu khi trang được mở
+    initializeData();
 });
 </script>
 
