@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- GLOBAL STATE --- //
     let scheduleState = null;
-    const LOCAL_STORAGE_KEY = 'dmxScheduleData_v11'; // Incremented version
+    const LOCAL_STORAGE_KEY = 'dmxScheduleData_v12'; // Incremented version
 
     // --- FUNCTIONS --- //
     function showToast(message, isSuccess = true) {
@@ -181,17 +181,11 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => { toast.className = toast.className.replace('show', ''); }, 3000);
     }
     
-    function getCurrentDayKey() {
+    function getCurrentDayName() {
         const now = new Date();
         const dayOfWeek = now.getDay(); // 0 for Sunday, 1 for Monday, etc.
-        const date = now.getDate();
-        const month = now.getMonth() + 1; // getMonth() is zero-based
-
         const weekdayMap = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-        const weekdayName = weekdayMap[dayOfWeek];
-
-        // Format: "T2 (12/8)"
-        return `${weekdayName} (${date}/${month})`;
+        return weekdayMap[dayOfWeek];
     }
 
     function saveStateToLocalStorage() {
@@ -389,17 +383,17 @@ document.addEventListener('DOMContentLoaded', () => {
         recalculateKpi(scheduleState);
         renderCombinedTable(scheduleState);
         
-        const currentDayKey = getCurrentDayKey();
         const activeDayHeader = document.querySelector('.day-header.active');
         let dayToRender;
 
-        // Ưu tiên chọn ngày hiện tại nếu có trong lịch
-        const currentDayExists = scheduleState.dateHeaders.some(header => header.name === currentDayKey);
+        // Find today's header based on the day of the week (e.g., "T3")
+        const currentDayName = getCurrentDayName(); // e.g., "T3"
+        const todayHeader = scheduleState.dateHeaders.find(header => header.name.trim().startsWith(currentDayName));
 
-        if (currentDayExists) {
-            dayToRender = currentDayKey;
+        if (todayHeader) {
+            dayToRender = todayHeader.name;
         } else {
-            // Nếu không, dùng ngày đang active hoặc ngày đầu tiên trong lịch
+            // If not found, use the currently active day or the first day as a fallback
             dayToRender = activeDayHeader ? activeDayHeader.dataset.daykey : scheduleState.dateHeaders[0]?.name;
         }
         
