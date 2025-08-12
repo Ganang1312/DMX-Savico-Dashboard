@@ -1,0 +1,295 @@
+{
+  "meta": {
+    "dates": [
+      "11/08",
+      "12/08",
+      "13/08",
+      "14/08",
+      "15/08",
+      "16/08",
+      "17/08"
+    ]
+  },
+  "pgs": [
+    {
+      "stt": 1,
+      "nganhHang": "ĐIỆN TỬ",
+      "hang": "SONY",
+      "ten": "YẾN",
+      "sdt": "362282223",
+      "gt": "Nữ",
+      "veSinh": "THỨ 2",
+      "lich": [
+        "SÁNG",
+        "CHIỀU",
+        "OFF",
+        "SÁNG",
+        "SÁNG",
+        "CHIỀU",
+        "SÁNG"
+      ],
+      "note": "T2 hãng mới phản hồi mail lịch gẫy",
+      "diaChi": "447 Lạc Long Quân, Tây Hồ, HN"
+    },
+    {
+      "stt": 2,
+      "nganhHang": "ĐIỆN TỬ",
+      "hang": "SAMSUNG",
+      "ten": "THẢO",
+      "sdt": "0338096094",
+      "gt": "Nữ",
+      "veSinh": "THỨ 3",
+      "lich": [
+        "CHIỀU",
+        "SÁNG",
+        "SÁNG",
+        "OFF",
+        "CHIỀU",
+        "SÁNG",
+        "CHIỀU"
+      ],
+      "note": "T2 hãng mới phản hồi mail lịch gẫy",
+      "diaChi": "Vĩnh Hưng , Hoàng Mai .HN"
+    },
+    {
+      "stt": 3,
+      "nganhHang": "ĐIỆN TỬ",
+      "hang": "LG",
+      "ten": "HÀ",
+      "sdt": "090 4808424",
+      "gt": "Nam",
+      "veSinh": "THỨ 5",
+      "lich": [
+        "SÁNG",
+        "OFF",
+        "SÁNG",
+        "SÁNG",
+        "SÁNG",
+        "SÁNG",
+        "SÁNG"
+      ],
+      "note": "Xin phép qly làm đến 12h về họp, t2 hãng mới phản hồi mail lịch gãy",
+      "diaChi": "390 Nguyễn Văn Cừ"
+    },
+    {
+      "stt": 4,
+      "nganhHang": "ĐIỆN TỬ",
+      "hang": "XIAOMI",
+      "ten": "ĐỨC",
+      "sdt": "393461656",
+      "gt": "Nam",
+      "veSinh": "CHỦ NHẬT",
+      "lich": [
+        "OFF",
+        "ST KHÁC",
+        "CHIỀU",
+        "CHIỀU",
+        "ST KHÁC",
+        "ST KHÁC",
+        "CA GÃY (23-5)"
+      ],
+      "note": "",
+      "diaChi": "17 Đào Nguyên B - Trâu Quỳ - Gia Lâm - Hà Nội"
+    },
+    {
+      "stt": 5,
+      "nganhHang": "GIA DỤNG",
+      "hang": "PANASONIC",
+      "ten": "THÚY",
+      "sdt": "0862321997",
+      "gt": "Nữ",
+      "veSinh": "CHỦ NHẬT",
+      "lich": [
+        "ST KHÁC",
+        "HỌP",
+        "OFF",
+        "ST KHÁC",
+        "CHIỀU",
+        "CA GÃY (23-5)",
+        "SÁNG"
+      ],
+      "note": "",
+      "diaChi": "564 Nguyễn Văn Cừ."
+    },
+    {
+      "stt": 6,
+      "nganhHang": "GIA DỤNG",
+      "hang": "HAFELE",
+      "ten": "VÂN",
+      "sdt": "973756696",
+      "gt": "Nữ",
+      "veSinh": "THỨ 5",
+      "lich": [
+        "HỌP",
+        "OFF",
+        "CHIỀU",
+        "SÁNG",
+        "SÁNG",
+        "SÁNG",
+        "CA GÃY (23-5)"
+      ],
+      "note": "",
+      "diaChi": "Kđt việt hưng, giang biên, long biên"
+    },
+    {
+      "stt": 7,
+      "nganhHang": "GIA DỤNG",
+      "hang": "KANGGAROO",
+      "ten": "BẢO",
+      "sdt": "352242281",
+      "gt": "Nam",
+      "veSinh": "THỨ 7",
+      "lich": [
+        "CHIỀU",
+        "CHIỀU",
+        "ST KHÁC",
+        "CHIỀU",
+        "ST KHÁC",
+        "CA GÃY (2-456)",
+        "ST KHÁC"
+      ],
+      "note": "",
+      "diaChi": "Chương dương độ, Hoàn Kiếm, Hà Nội"
+    },
+    {
+      "stt": 8,
+      "nganhHang": "GIA DỤNG",
+      "hang": "SUNHOUSE",
+      "ten": "HẰNG",
+      "sdt": "0392946783",
+      "gt": "Nữ",
+      "veSinh": "THỨ 4",
+      "lich": [
+        "SÁNG",
+        "SÁNG",
+        "SÁNG",
+        "OFF",
+        "ST KHÁC",
+        "SÁNG",
+        "CA GÃY (2-456)"
+      ],
+      "note": "",
+      "diaChi": "Bồ Đề- Long Biên"
+    },
+    {
+      "stt": 9,
+      "nganhHang": "GIA DỤNG",
+      "hang": "MUTOSHI",
+      "ten": "TRANG",
+      "sdt": "0967841092",
+      "gt": "Nữ",
+      "veSinh": "THỨ 6",
+      "lich": [
+        "ST KHÁC",
+        "ST KHÁC",
+        "OFF",
+        "ST KHÁC",
+        "SÁNG",
+        "CA GÃY (23-5)",
+        "SÁNG"
+      ],
+      "note": "",
+      "diaChi": "Phù lỗ , sóc sơn"
+    },
+    {
+      "stt": 10,
+      "nganhHang": "ĐIỆN LẠNH",
+      "hang": "TOSHIBA",
+      "ten": "TÚ",
+      "sdt": "383209079",
+      "gt": "Nam",
+      "veSinh": "CHỦ NHẬT",
+      "lich": [
+        "OFF",
+        "HỌP",
+        "CHIỀU",
+        "CHIỀU",
+        "CHIỀU",
+        "CHIỀU",
+        "CA GÃY (23-5)"
+      ],
+      "note": "",
+      "diaChi": "Việt Hưng - LB"
+    },
+    {
+      "stt": 11,
+      "nganhHang": "ĐIỆN LẠNH",
+      "hang": "ELECTROLUX",
+      "ten": "TÚ",
+      "sdt": "",
+      "gt": "Nam",
+      "veSinh": "THỨ 3",
+      "lich": [
+        "HỌP",
+        "SÁNG",
+        "OFF",
+        "SÁNG",
+        "CHIỀU",
+        "CA GÃY (2-456)",
+        "SÁNG"
+      ],
+      "note": "",
+      "diaChi": ""
+    },
+    {
+      "stt": 12,
+      "nganhHang": "ĐIỆN LẠNH",
+      "hang": "PANASONIC",
+      "ten": "TUẤN",
+      "sdt": "0987093298",
+      "gt": "Nam",
+      "veSinh": "THỨ 4",
+      "lich": [
+        "HỌP",
+        "OFF",
+        "SÁNG",
+        "SÁNG",
+        "SÁNG",
+        "CA GÃY (23-5)",
+        "OFF"
+      ],
+      "note": "",
+      "diaChi": "Ngõ 2 Xuân Đỉnh"
+    },
+    {
+      "stt": 13,
+      "nganhHang": "ĐIỆN LẠNH",
+      "hang": "HITACHI",
+      "ten": "LINH",
+      "sdt": "326343998",
+      "gt": "Nữ",
+      "veSinh": "THỨ 7",
+      "lich": [
+        "CHIỀU",
+        "OFF",
+        "CHIỀU",
+        "HỌP",
+        "OFF",
+        "CA GÃY (23-5)",
+        "SÁNG"
+      ],
+      "note": "",
+      "diaChi": "Số 17 tổ 8 Thượng Thanh Long Biên"
+    },
+    {
+      "stt": 14,
+      "nganhHang": "ĐIỆN LẠNH",
+      "hang": "SAMSUNG",
+      "ten": "NHUNG",
+      "sdt": "974528882",
+      "gt": "Nữ",
+      "veSinh": "THỨ 2",
+      "lich": [
+        "SÁNG",
+        "CHIỀU",
+        "OFF",
+        "CHIỀU",
+        "CHIỀU",
+        "SÁNG",
+        "CA GÃY (2-456)"
+      ],
+      "note": "",
+      "diaChi": "Ngõ 455 Hà Huy Tập, Yên Viên , Gia Lâm Hà Nội"
+    }
+  ]
+}
