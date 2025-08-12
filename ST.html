@@ -397,8 +397,8 @@
 <body>
     <div class="container">
     </div>
-
-    <script>
+	
+	<script>
     /****************************************************************************
      * SMART PASTE FUNCTIONS
      ****************************************************************************/
@@ -599,11 +599,9 @@
         }
     }
 
-    // CẬP NHẬT: Hàm tải dữ liệu nâng cao, ưu tiên file JSON, sau đó đến localStorage
     async function loadTableDataAdvanced(tableId, defaultData = {}, fromButtonClick = false) {
         const fileName = `${tableId}_data.json`;
         try {
-            // Thêm cache-busting để đảm bảo luôn lấy file mới nhất khi bấm nút
             const response = await fetch(fileName, { cache: "no-store" }); 
             if (!response.ok) {
                 throw new Error(`File ${fileName} not found, falling back to localStorage.`);
@@ -627,7 +625,7 @@
                     }
                 }
             }
-            saveTableData(tableId); // Lưu lại vào localStorage để đồng bộ
+            saveTableData(tableId); 
             const tableName = tableId.includes('yearly') ? 'Năm' : 'So sánh Ngày';
             if(fromButtonClick) {
                 showToast(`Đã tải dữ liệu cho bảng ${tableName} từ file!`, false);
@@ -636,8 +634,7 @@
 
         } catch (error) {
             console.warn(error.message);
-            // Fallback: Tải từ localStorage hoặc dữ liệu mặc định
-            if (fromButtonClick) { // Chỉ thông báo lỗi nếu người dùng chủ động bấm nút
+            if (fromButtonClick) { 
                  showToast(`Không tìm thấy file ${fileName}. Đang dùng dữ liệu đã lưu.`, true);
             }
             loadTableDataFromStorage(tableId, defaultData);
@@ -653,7 +650,6 @@
             const savedData = localStorage.getItem(tableId);
             if (savedData) {
                 const parsedSavedData = JSON.parse(savedData);
-                // Chỉ sử dụng dữ liệu đã lưu nếu nó không rỗng
                 if (Array.isArray(parsedSavedData) && parsedSavedData.some(row => Array.isArray(row) && row.some(cell => cell && cell.trim() !== ''))) {
                     dataToLoad = parsedSavedData;
                 }
@@ -923,7 +919,6 @@
         }, 3000);
     }
 
-    // CẬP NHẬT: Hàm cập nhật dữ liệu từ file JSON
     async function updateFromCloud() {
         showToast('Bắt đầu cập nhật dữ liệu từ cloud...');
         await loadTableDataAdvanced('yearlyDataTable', {}, true);
@@ -999,6 +994,106 @@
             baoDong_actual: sortedItems.filter(p => p.percentActual < 50)
         };
     }
+    
+    /****************************************************************************
+     * EMPLOYEE COMMENT TEMPLATES
+     ****************************************************************************/
+    const employeeCommentTemplates = {
+        pre21: { // Bình luận trước 21h (mang tính động viên)
+            top3: [
+                "Thánh chốt đơn gọi tên @NAME@ với @REVENUE@ triệu! Quá đẳng cấp!",
+                "Phong độ là nhất thời, đẳng cấp là mãi mãi! @NAME@ đang dẫn đầu với @REVENUE@ triệu!",
+                "Không ai cản nổi @NAME@ hôm nay! Doanh thu đã là @REVENUE@ triệu!",
+                "Dẫn đầu đoàn đua với @REVENUE@ triệu, xin chúc mừng chiến thần @NAME@!",
+                "Tốc độ bán hàng của @NAME@ thật đáng kinh ngạc: @REVENUE@ triệu và vẫn đang tăng!"
+            ],
+            top3_second: [
+                "Á quân @NAME@ bám rất sát với @REVENUE@ triệu! Cuộc đua đang rất gay cấn!",
+                "Vị trí thứ 2 gọi tên @NAME@ - @REVENUE@ triệu! Chỉ một chút nữa thôi là lên đỉnh!",
+                "@NAME@ đang thể hiện tuyệt vời với @REVENUE@ triệu, phả hơi nóng vào người dẫn đầu!",
+                "Không thể xem thường @NAME@ với @REVENUE@ triệu! Ngôi vương vẫn trong tầm với!",
+                "Xuất sắc! @NAME@ đang ở vị trí thứ 2 với @REVENUE@ triệu!"
+            ],
+            top3_third: [
+                "Top 3 có mặt của @NAME@ với @REVENUE@ triệu! Giữ vững phong độ nhé!",
+                "@NAME@ chắc chân trong top 3 với @REVENUE@ triệu! Rất tuyệt vời!",
+                "Xin chúc mừng @NAME@ đã đạt @REVENUE@ triệu và lọt vào top 3!",
+                "Nỗ lực tuyệt vời của @NAME@ đã được đền đáp với @REVENUE@ triệu, tạm giữ vị trí thứ 3.",
+                "Hạng 3 tạm thời thuộc về @NAME@ với @REVENUE@ triệu. Cố lên!"
+            ],
+            middlePerformers: [
+                "Các chiến binh vẫn đang nỗ lực hết mình. Cố gắng bứt phá hơn nữa nhé!",
+                "Doanh thu đang tăng đều, hãy tạo ra một cú đột phá trong những giờ tới!",
+                "Giữ vững tay lái và tăng tốc nào các bạn ơi!",
+                "Mục tiêu vẫn ở phía trước, cùng nhau chinh phục nào!",
+                "Nỗ lực của các bạn đang được ghi nhận, hãy biến nó thành những con số ấn tượng hơn!"
+            ],
+            bottomPerformers: [
+                "Cơ hội vẫn còn rất nhiều! Cần một cú hích mạnh mẽ để thay đổi cục diện!",
+                "Khách hàng đang ở đâu đó ngoài kia, hãy tìm và chinh phục họ nào!",
+                "Tăng tốc lên nào các chiến binh, đừng để bị bỏ lại phía sau!",
+                "Một chút may mắn và nhiều nỗ lực hơn nữa sẽ tạo ra khác biệt!",
+                "Báo động nhẹ! Cần tập trung cao độ để cải thiện doanh thu ngay!"
+            ],
+            noRevenue: [
+                "Anh em ơi, cùng nhau phá băng, mở hàng cho ngày hôm nay nào!",
+                "Khách hàng đầu tiên đang chờ, ai sẽ là người khai hỏa đây? Cố lên!",
+                "Một ngày mới đã bắt đầu, hãy tìm kiếm những cơ hội đầu tiên!",
+                "Đừng lo lắng, hãy khởi động và chuẩn bị cho một ngày bùng nổ!",
+                "Tất cả vẫn đang ở vạch xuất phát. Ai sẽ là người vươn lên đầu tiên? Cố lên nào!"
+            ]
+        },
+        post21: { // Bình luận sau 21h (mang tính tổng kết)
+            top3: [
+                "Xin chúc mừng @NAME@ đã trở thành nhà vô địch hôm nay với thành tích @REVENUE@ triệu!",
+                "Ngôi vương doanh thu ngày hôm nay đã thuộc về @NAME@ với @REVENUE@ triệu! Một ngày làm việc quá hiệu quả!",
+                "Kết quả thật ấn tượng! @NAME@ dẫn đầu với @REVENUE@ triệu. Xin chúc mừng!",
+                "Hôm nay là một ngày của @NAME@! Thành quả @REVENUE@ triệu là hoàn toàn xứng đáng.",
+                "Nhà vua của ngày hôm nay là @NAME@ với @REVENUE@ triệu! Tuyệt vời!"
+            ],
+            top3_second: [
+                "Về nhì với thành tích @REVENUE@ triệu, @NAME@ đã có một ngày thi đấu xuất sắc!",
+                "Á quân @NAME@ với @REVENUE@ triệu! Một kết quả rất đáng tự hào!",
+                "Chúc mừng @NAME@ đã có một ngày làm việc hiệu quả và về đích ở vị trí thứ 2 với @REVENUE@ triệu!",
+                "Thành tích @REVENUE@ triệu của @NAME@ là rất đáng nể. Chúc mừng vị trí á quân!",
+                "Suýt chút nữa là ngôi vương! @NAME@ về nhì với @REVENUE@ triệu, quá giỏi!"
+            ],
+            top3_third: [
+                "Top 3 gọi tên @NAME@ với @REVENUE@ triệu! Chúc mừng bạn đã có một ngày làm việc thành công!",
+                "Hoàn thành top 3 với @REVENUE@ triệu, một nỗ lực tuyệt vời từ @NAME@!",
+                "Xin chúc mừng @NAME@ đã về đích trong top 3 với doanh thu @REVENUE@ triệu!",
+                "Một vị trí trong top 3 là phần thưởng xứng đáng cho nỗ lực của @NAME@ với @REVENUE@ triệu.",
+                "Chúc mừng @NAME@ và thành tích @REVENUE@ triệu, góp mặt trong top 3 của ngày!"
+            ],
+            middlePerformers: [
+                "Cảm ơn sự nỗ lực của các bạn hôm nay. Ngày mai chúng ta sẽ làm tốt hơn nữa!",
+                "Mỗi một đơn hàng đều đáng quý. Hãy nghỉ ngơi và chuẩn bị cho một ngày mai bùng nổ hơn!",
+                "Kết quả hôm nay là nền tảng cho ngày mai. Cùng nhau cố gắng nhé!",
+                "Một ngày làm việc đã kết thúc. Cảm ơn sự cống hiến của các bạn!",
+                "Ghi nhận sự cố gắng của các bạn. Ngày mai sẽ là một cơ hội mới để bứt phá."
+            ],
+            bottomPerformers: [
+                "Hôm nay có thể chưa phải ngày may mắn. Hãy rút kinh nghiệm và chuẩn bị cho ngày mai tốt hơn.",
+                "Đừng nản lòng! Ngày mai là một trang mới, một cơ hội mới. Cố lên!",
+                "Hãy xem lại những gì chúng ta có thể làm tốt hơn và quay lại mạnh mẽ vào ngày mai.",
+                "Nghỉ ngơi để tái tạo năng lượng. Ngày mai chúng ta sẽ phục thù!",
+                "Kết quả hôm nay chưa như ý, nhưng tinh thần chiến đấu thì không được tắt. Cố lên cho ngày mai!"
+            ],
+            noRevenue: [
+                "Không sao cả, ai cũng có những ngày không may mắn. Ngày mai sẽ khác!",
+                "Hôm nay chưa có duyên với khách, ngày mai lộc sẽ về. Cố gắng lên nhé!",
+                "Hãy quên ngày hôm nay đi và tập trung cho một khởi đầu mới vào ngày mai.",
+                "Một ngày không có doanh thu không nói lên tất cả. Quan trọng là không bỏ cuộc!",
+                "Sau cơn mưa trời lại sáng. Ngày mai sẽ là ngày của bạn, cố lên!"
+            ]
+        }
+    };
+
+    function getRandomComment(templateArray) {
+        if (!templateArray || templateArray.length === 0) return "";
+        return templateArray[Math.floor(Math.random() * templateArray.length)];
+    }
+
 
     document.addEventListener('DOMContentLoaded', () => {
         const container = document.querySelector('.container');
@@ -1404,13 +1499,11 @@
             renderLuyKeCategoryTables(categoryData);
             renderLuyKeContestTable(processedContestData);
             
-            // CẬP NHẬT: Ẩn bảng kết quả thi đua và điều chỉnh layout
             document.getElementById('contest-results-container').style.display = 'none';
             const specificGrid = document.querySelector('#specificTablesContainer .dashboard-layout-grid');
             if (specificGrid) {
                 specificGrid.style.gridTemplateColumns = '1fr';
             }
-            // renderLuyKeContestResults(processedContestData); // Không render nữa
 
             renderLuyKeSummary(mainKpis, processedContestData, reportDate);
             displayLuyKeHiddenTables(mainData, contestData);
@@ -1453,7 +1546,7 @@
             const yearlyRemaining = yearlyTargetTotal - yearlyActualTotal;
             
             const daysRemainingInMonth = daysInMonth - today.getDate() + 1;
-            const mucTieuTraNoNgay = daysRemainingInMonth > 0 ? (yearlyRemaining / daysRemainingInMonth) : 0;
+            const mucTieuTraNoNgay = daysRemainingInMonth > 0 ? Math.max(0, (kpis.dtDuKien + yearlyRemaining - kpis.luyKe) / daysRemainingInMonth) : 0;
             
             const mucTieuKyVongThang = kpis.target / daysInMonth;
             let mucTieuNgayKyVong = Math.max(mucTieuKyVongThang, kpis.mucTieuNgay);
@@ -1917,56 +2010,6 @@
             `;
         }
         
-        // CẬP NHẬT: Hàm này không còn được gọi để hiển thị, chỉ để tham khảo logic
-        function renderLuyKeContestResults(processedContest) {
-            const container = document.getElementById('contest-results-container');
-            container.innerHTML = ''; 
-            
-            if (!processedContest.all || processedContest.all.length === 0) { 
-                container.style.display = 'none';
-                return; 
-            }
-            container.style.display = 'block';
-
-            const headerHtml = `<h2><svg class="title-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>Kết Quả Thi Đua</h2>`;
-            const contentGrid = document.createElement('div');
-            contentGrid.className = 'card-content';
-
-            const onTrackItems = processedContest.onTrack;
-            const behindItems = processedContest.behind;
-
-            if (onTrackItems.length > 0) {
-                const onTrackCol = document.createElement('div');
-                onTrackCol.className = 'contest-column-visual';
-                let onTrackHtml = onTrackItems.map((item, index) => createContestItem(item, index + 1)).join('');
-                onTrackCol.innerHTML = `
-                    <div class="status-icon-wrapper green">
-                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                    </div>
-                    <h4 class="on-track">Dự kiến Về Đích (${onTrackItems.length})</h4>
-                    <div class="contest-list-new">${onTrackHtml}</div>
-                `;
-                contentGrid.appendChild(onTrackCol);
-            }
-
-            if (behindItems.length > 0) {
-                const behindCol = document.createElement('div');
-                behindCol.className = 'contest-column-visual';
-                let behindHtml = behindItems.map((item, index) => createContestItem(item, index + 1)).join('');
-                behindCol.innerHTML = `
-                    <div class="status-icon-wrapper red">
-                         <svg fill="currentColor" viewBox="0 0 24 24"><path d="M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.47 2,12C2,17.53 6.47,22 12,22C17.53,22 22,17.53 22,12C22,6.47 17.53,2 12,2Z"/></svg>
-                    </div>
-                    <h4 class="behind">Chậm Tiến Độ (${behindItems.length})</h4>
-                    <div class="contest-list-new">${behindHtml}</div>
-                `;
-                contentGrid.appendChild(behindCol);
-            }
-
-            container.innerHTML = headerHtml;
-            container.appendChild(contentGrid);
-        }
-        
         function renderLuyKeSummary(kpis, contest, reportDate) {
             const container = document.getElementById('summary-report-wrapper-luyke');
             container.style.display = 'block';
@@ -2170,15 +2213,17 @@ ${contestSummarySections.join('\n\n')}`.trim();
                     line.toLowerCase().includes('online')) {
                     return;
                 }
-
-                const regex = /^\d+\s*-\s*(.+?)\s+[\d-]+\s+(-?[\d,.]+)$/;
+                
+                // *** CORRECTED REGEX to handle format "ID - Name SL Revenue" ***
+                const regex = /^(\d+)\s*-\s*(.+?)\s+\d+\s+(-?[\d,.]+)$/;
                 const match = line.match(regex);
 
                 if (match) {
-                    const name = match[1].trim();
-                    const revenueStr = match[2] || '0'; 
+                    const id = match[1].trim();
+                    const name = match[2].trim();
+                    const revenueStr = match[3] || '0'; 
                     const revenue = parseFloat(revenueStr.replace(/,/g, '')) || 0;
-                    data.push({ name, revenue });
+                    data.push({ id, name, revenue });
                 }
             });
             
@@ -2225,7 +2270,7 @@ ${contestSummarySections.join('\n\n')}`.trim();
         }
 
         function processRealtimeContestData(contestData) {
-            if (!contestData || contestData.length === 0) return { all: [], onTrack: [], behind: [], veDich_actual: [], canCoGang_actual: [], canTapTrung_actual: [] };
+            if (!contestData || contestData.length === 0) return { all: [], onTrack: [], behind: [], veDich_actual: [], canCoGang_actual: [], canTapTrung_actual: [], baoDong_actual: [] };
             const timeFraction = getTimePassedFraction();
             
             const items = contestData
@@ -2252,7 +2297,8 @@ ${contestSummarySections.join('\n\n')}`.trim();
                 behind: items.filter(p => p.percentProjected < 100),
                 veDich_actual: items.filter(p => p.percentActual >= 100),
                 canCoGang_actual: items.filter(p => p.percentActual >= 80 && p.percentActual < 100),
-                canTapTrung_actual: items.filter(p => p.percentActual < 80)
+                canTapTrung_actual: items.filter(p => p.percentActual >= 50 && p.percentActual < 80),
+                baoDong_actual: items.filter(p => p.percentActual < 50)
             };
         }
 
@@ -2370,7 +2416,7 @@ ${contestSummarySections.join('\n\n')}`.trim();
                 } else {
                     icon = '💤 '; 
                 }
-                return icon + d.name;
+                return `${icon}@${d.id} - ${d.name}`;
             });
             const revenues = sortedData.map(d => d.revenue);
 
@@ -2393,7 +2439,6 @@ ${contestSummarySections.join('\n\n')}`.trim();
                         backgroundColor: (context) => context.raw >= 0 ? gradient : negativeGradient,
                         borderColor: (context) => context.raw >= 0 ? 'rgba(7, 58, 75, 0.7)' : 'rgba(150, 30, 60, 0.7)',
                         borderWidth: 2,
-                        // CẬP NHẬT: Sửa lỗi bo tròn cho cột âm
                         borderRadius: 8,
                         borderSkipped: false,
                     }]
@@ -2601,7 +2646,6 @@ ${contestSummarySections.join('\n\n')}`.trim();
             }
         }
 
-        // CẬP NHẬT: Thêm nhận xét thi đua vào summary tổng
         function renderRealtimeSummary(totalRow, contestData) {
             const container = document.getElementById('summary-report-wrapper-rt');
             container.style.display = 'block';
@@ -2617,14 +2661,29 @@ ${contestSummarySections.join('\n\n')}`.trim();
             const totalCount = contestData.all.length;
             const remaining = totalRow['Target Ngày (QĐ)'] - totalRow['DT Realtime (QĐ)'];
 
-            let contestSummary = '';
-            if (contestData.all.length > 0) {
-                const onTrackNames = contestData.onTrack.map(item => `${item.name} (${formatNumber(item.percentProjected, 0)}%)`).join(', ');
-                const behindNames = contestData.behind.map(item => `${item.name} (${formatNumber(item.percentProjected, 0)}%)`).join(', ');
-                
-                contestSummary += `\n-------------------\n🏁 TÌNH HÌNH THI ĐUA 🏁`;
-                if(onTrackNames) contestSummary += `\n✅ Đang Về Đích: ${onTrackNames}`;
-                if(behindNames) contestSummary += `\n🏃‍♂️ Cần Tăng Tốc: ${behindNames}`;
+            const createSubListWithActual = (items) => {
+                if (!items || items.length === 0) return '';
+                return items.map(item => `  - ${item.name} (${formatNumber(item.percentActual, 1)}%)`).join('\n');
+            };
+
+            let contestSummarySections = [];
+            if(contestData.all.length > 0) {
+                contestSummarySections.push(`\n-------------------\n🏁 TÌNH HÌNH THI ĐUA (THỰC TẾ) 🏁`);
+                if (contestData.veDich_actual.length > 0) {
+                    contestSummarySections.push(`✅ ĐÃ VỀ ĐÍCH (${contestData.veDich_actual.length} nhóm):\n${createSubListWithActual(contestData.veDich_actual)}`);
+                }
+                if (contestData.canCoGang_actual.length > 0) {
+                    const list = contestData.canCoGang_actual.map(item => `${item.name} (${formatNumber(item.percentActual, 1)}%)`).join(', ');
+                    contestSummarySections.push(`💪 CẦN CỐ GẮNG (${contestData.canCoGang_actual.length} nhóm - HT >80%): ${list}`);
+                }
+                if (contestData.canTapTrung_actual.length > 0) {
+                     const list = contestData.canTapTrung_actual.map(item => `${item.name} (${formatNumber(item.percentActual, 1)}%)`).join(', ');
+                    contestSummarySections.push(`🎯 CẦN TẬP TRUNG (${contestData.canTapTrung_actual.length} nhóm - HT >50%): ${list}`);
+                }
+                 if (contestData.baoDong_actual.length > 0) {
+                    const list = contestData.baoDong_actual.map(item => `${item.name} (${formatNumber(item.percentActual, 1)}%)`).join(', ');
+                    contestSummarySections.push(`🚨 BÁO ĐỘNG (${contestData.baoDong_actual.length} nhóm - HT <50%): ${list}`);
+                }
             }
 
             const summaryText = `📊 BÁO CÁO NHANH REAL-TIME - ${timeString} 📊
@@ -2637,7 +2696,7 @@ ${contestSummarySections.join('\n\n')}`.trim();
 -------------------
 - 💳 DT Trả góp: ${formatNumber(totalRow['DT Trả Góp'])} (${formatNumber(totalRow['Tỷ trọng trả góp'], 1)}%)
 - 📱 Số lượng bán: ${formatNumber(totalRow['Số lượng'])}
-${contestSummary}`.trim();
+${contestSummarySections.join('\n\n')}`.trim();
 
             const html = `<h2><svg class="title-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M12,19L8,15H10.5V12H13.5V15H16L12,19Z" /></svg>Nhận xét Real-time (Tổng)</h2>
                                  <textarea class="summary-textarea" readonly>${summaryText}</textarea>
@@ -2654,7 +2713,6 @@ ${contestSummary}`.trim();
             });
         }
         
-        // CẬP NHẬT: Nhận xét nhân viên theo yêu cầu mới
         function renderEmployeeSummary(data) {
             const container = document.getElementById('summary-report-wrapper-rt-employee');
             if (!data || data.length === 0) {
@@ -2664,7 +2722,9 @@ ${contestSummary}`.trim();
             container.style.display = 'block';
 
             const sortedData = [...data].sort((a, b) => b.revenue - a.revenue);
-            
+            const currentHour = new Date().getHours();
+            const templates = currentHour < 21 ? employeeCommentTemplates.pre21 : employeeCommentTemplates.post21;
+
             let summaryLines = [];
             summaryLines.push(`🚀 BẢNG PHONG THẦN - ĐUA TOP DOANH THU 🚀`);
             summaryLines.push(`-------------------`);
@@ -2672,59 +2732,39 @@ ${contestSummary}`.trim();
             const hasPositiveRevenue = sortedData.some(e => e.revenue > 0);
 
             if (!hasPositiveRevenue) {
-                summaryLines.push(`🤔 Hôm nay anh em chưa ai mở hàng à? Cùng nhau phá băng nào!`);
-                sortedData.forEach(emp => {
-                    summaryLines.push(`- ${emp.name}: Chờ đơn đầu tiên khai hỏa! 🔥`);
-                });
+                summaryLines.push(getRandomComment(templates.noRevenue));
             } else {
-                // Ghi nhận TOP 3
-                const topPerformers = sortedData.slice(0, 3);
-                summaryLines.push(`👑 TOP 3 CHIẾN THẦN HÔM NAY:`);
-                topPerformers.forEach((emp, index) => {
-                    if (emp.revenue > 0) {
-                        const icons = ['🥇', '🥈', '🥉'];
-                        const comments = [
-                            `Thánh chốt đơn gọi tên ${emp.name} với ${formatNumber(emp.revenue / 1000000, 2)} triệu! Quá đẳng cấp!`,
-                            `Á quân ${emp.name} bám rất sát với ${formatNumber(emp.revenue / 1000000, 2)} triệu! Cố lên!`,
-                            `Vị trí thứ 3 thuộc về ${emp.name} với ${formatNumber(emp.revenue / 1000000, 2)} triệu! Tuyệt vời!`
-                        ];
-                        summaryLines.push(`${icons[index]} ${comments[index]}`);
-                    }
-                });
+                const topPerformers = sortedData.slice(0, 3).filter(e => e.revenue > 0);
+                if (topPerformers.length > 0) {
+                    summaryLines.push(`👑 TOP 3 CHIẾN THẦN HÔM NAY:`);
+                    const topTemplates = [templates.top3, templates.top3_second, templates.top3_third];
+                    topPerformers.forEach((emp, index) => {
+                        const comment = getRandomComment(topTemplates[index])
+                            .replace('@NAME@', `@${emp.id} - ${emp.name}`)
+                            .replace('@REVENUE@', formatNumber(emp.revenue / 1000000, 2));
+                        const icon = ['🥇', '🥈', '🥉'][index];
+                        summaryLines.push(`${icon} ${comment}`);
+                    });
+                }
 
-                // Nhóm giữa và nhóm cuối
-                if (sortedData.length > 3) {
-                    const remainingEmployees = sortedData.slice(3);
-                    const bottomCount = 3;
-                    
-                    // Đảm bảo không lấy nhiều hơn số nhân viên còn lại
-                    const actualBottomCount = Math.min(bottomCount, remainingEmployees.length);
-                    
-                    const middleEmployees = remainingEmployees.slice(0, -actualBottomCount);
-                    const bottomEmployees = remainingEmployees.slice(-actualBottomCount);
+                const remainingEmployees = sortedData.slice(topPerformers.length);
+                const middlePerformers = remainingEmployees.filter(e => e.revenue > 0);
+                const bottomPerformers = remainingEmployees.filter(e => e.revenue <= 0);
 
-                    if (middleEmployees.length > 0) {
-                        summaryLines.push(`\n🌟 CÁC CHIẾN BINH ĐANG TĂNG TỐC:`);
-                        middleEmployees.forEach((emp, index) => {
-                            const rank = index + 4; // Bắt đầu từ hạng 4
-                            if (emp.revenue > 0) {
-                                summaryLines.push(`- Hạng ${rank}: ${emp.name} - ${formatNumber(emp.revenue / 1000000, 2)} triệu. Giữ vững tay lái nhé!`);
-                            } else {
-                                summaryLines.push(`- ${emp.name}: "Em bé" vẫn chưa về. Cố lên bạn ơi! 🐢`);
-                            }
-                        });
-                    }
+                if (middlePerformers.length > 0) {
+                    summaryLines.push(`\n🌟 CÁC CHIẾN BINH ĐANG TĂNG TỐC:`);
+                    middlePerformers.forEach((emp, index) => {
+                        summaryLines.push(`- Hạng ${topPerformers.length + index + 1}: @${emp.id} - ${emp.name} (${formatNumber(emp.revenue / 1000000, 2)} triệu)`);
+                    });
+                    summaryLines.push(getRandomComment(templates.middlePerformers));
+                }
 
-                    if (bottomEmployees.length > 0) {
-                        summaryLines.push(`\n⚠️ NHÓM CẦN CẢI THIỆN GẤP:`);
-                        bottomEmployees.forEach((emp) => {
-                            if (emp.revenue > 0) {
-                                 summaryLines.push(`- ${emp.name} (${formatNumber(emp.revenue / 1000000, 2)} triệu): Doanh thu còn thấp, cần một cú hích mạnh mẽ hơn! 💥`);
-                            } else {
-                                 summaryLines.push(`- ${emp.name}: Báo động đỏ! 🚨 Khách hàng đang đi lạc đâu hết rồi, mau tìm lại thôi!`);
-                            }
-                        });
-                    }
+                if (bottomPerformers.length > 0) {
+                    summaryLines.push(`\n⚠️ NHÓM CẦN BỨT PHÁ:`);
+                    bottomPerformers.forEach(emp => {
+                        summaryLines.push(`- @${emp.id} - ${emp.name}`);
+                    });
+                     summaryLines.push(getRandomComment(templates.bottomPerformers));
                 }
             }
 
@@ -2746,6 +2786,6 @@ ${contestSummary}`.trim();
             });
         }
     }
-    </script>
+	</script>
 </body>
 </html>
