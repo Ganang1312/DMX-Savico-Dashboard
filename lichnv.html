@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- GLOBAL STATE --- //
     let scheduleState = null;
-    const LOCAL_STORAGE_KEY = 'dmxScheduleData_v10'; // Incremented version to avoid conflicts
+    const LOCAL_STORAGE_KEY = 'dmxScheduleData_v11'; // Incremented version
 
     // --- FUNCTIONS --- //
     function showToast(message, isSuccess = true) {
@@ -181,6 +181,19 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => { toast.className = toast.className.replace('show', ''); }, 3000);
     }
     
+    function getCurrentDayKey() {
+        const now = new Date();
+        const dayOfWeek = now.getDay(); // 0 for Sunday, 1 for Monday, etc.
+        const date = now.getDate();
+        const month = now.getMonth() + 1; // getMonth() is zero-based
+
+        const weekdayMap = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+        const weekdayName = weekdayMap[dayOfWeek];
+
+        // Format: "T2 (12/8)"
+        return `${weekdayName} (${date}/${month})`;
+    }
+
     function saveStateToLocalStorage() {
         if (scheduleState) {
             try {
@@ -375,9 +388,25 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!scheduleState) return;
         recalculateKpi(scheduleState);
         renderCombinedTable(scheduleState);
+        
+        const currentDayKey = getCurrentDayKey();
         const activeDayHeader = document.querySelector('.day-header.active');
-        const dayToRender = activeDayHeader ? activeDayHeader.dataset.daykey : scheduleState.dateHeaders[0]?.name;
-        if(dayToRender) renderDailySummary(dayToRender);
+        let dayToRender;
+
+        // Ưu tiên chọn ngày hiện tại nếu có trong lịch
+        const currentDayExists = scheduleState.dateHeaders.some(header => header.name === currentDayKey);
+
+        if (currentDayExists) {
+            dayToRender = currentDayKey;
+        } else {
+            // Nếu không, dùng ngày đang active hoặc ngày đầu tiên trong lịch
+            dayToRender = activeDayHeader ? activeDayHeader.dataset.daykey : scheduleState.dateHeaders[0]?.name;
+        }
+        
+        if(dayToRender) {
+            renderDailySummary(dayToRender);
+        }
+
         if (shouldSave) {
             saveStateToLocalStorage();
         }
