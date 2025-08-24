@@ -1,948 +1,869 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Hiển Thị Lịch Phân Ca - Điện Máy Xanh</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary-accent: #108AB1;
-            --success-color: #06D7A0;
-            --warning-color: #FFD167;
-            --danger-color: #F04770;
-            --secondary-accent: #F78C6A;
-            --info-color: #3b82f6;
-            --text-primary: #073A4B;
-            --text-on-dark: #FFFFFF;
-            --bg-main: #F4F7F9;
-            --border-main: #DDE3E7;
-            --shadow-light: rgba(255, 255, 255, 0.5);
-            --shadow-dark: rgba(0, 0, 0, 0.1);
-        }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-primary); }
-        .section-card {
-            background-color: white; border-radius: 16px; padding: 2rem;
-            border: 1px solid var(--border-main);
-            box-shadow: -6px -6px 12px var(--shadow-light), 6px 6px 12px var(--shadow-dark);
-        }
-        .table-container { width: 100%; overflow-x: auto; border: 1px solid var(--border-main); border-radius: 8px; }
-        table { width: 100%; border-collapse: separate; border-spacing: 0; }
-        th, td { white-space: nowrap; padding: 0; text-align: center; height: 40px; border-left: 1px solid var(--border-main); border-bottom: 1px solid var(--border-main); }
-        th { background-image: linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(0,0,0,0.05)); font-weight: 600; }
-        th:first-child, td:first-child { border-left: 0; }
-        tr:last-child td { border-bottom: 0; }
-        td > div, td > select { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 8px 4px; border: none; background: transparent;}
-        td > div { cursor: pointer; }
-        .ca-sang { background-color: #e0f2fe; color: #0c4a6e; }
-        .ca-chieu { background-color: #fff7ed; color: #9a3412; }
-        .ca-nghi { background-color: #f9fafb; }
-        .task-gh1 { background-color: #dbeafe; color: #1e40af; font-weight: 500;}
-        .task-gh2 { background-color: #d1fae5; color: #065f46; font-weight: 500;}
-        .task-erp { background-color: #e9d5ff; color: #581c87; font-weight: 500;}
-        .aux-sang { background-color: #f0f9ff !important; }
-        .aux-chieu { background-color: #fffbeb !important; }
-        .aux-gh1 select { background-color: #dbeafe !important; color: #1e40af; font-weight: 500; }
-        .aux-gh2 select { background-color: #d1fae5 !important; color: #065f46; font-weight: 500; }
-        .aux-erp select { background-color: #e9d5ff !important; color: #581c87; font-weight: 500; }
-        .header-sticky { position: sticky; top: 0; z-index: 10; background-color: #f8fafc; }
-        .col-sticky { position: sticky; left: 0; z-index: 5; background-color: #f8fafc; min-width: 180px;}
-        .day-separator { border-right: 2px solid #93c5fd !important; }
-        .weekend-header { background-color: #eef2ff !important; color: #312e81; }
-        .day-header { cursor: pointer; transition: background-color 0.2s; }
-        .day-header.active { background-color: var(--info-color) !important; color: white; }
-        .styled-button {
-            font-weight: 600; padding: 0.75rem 1.5rem; border-radius: 8px; transition: all 0.2s ease;
-            cursor: pointer; color: var(--text-on-dark);
-            box-shadow: -3px -3px 7px var(--shadow-light), 3px 3px 5px var(--shadow-dark);
-        }
-        .styled-button:hover { transform: translateY(-2px); }
-        #toast-message {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            padding: 12px 24px; border-radius: 8px; color: white; z-index: 100;
-            opacity: 0; transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; pointer-events: none;
-        }
-        #toast-message.show { opacity: 1; transform: translateX(-50%) translateY(-20px); }
-        .hidden { display: none; }
-        .summary-card-3d {
-            background: #ffffff;
-            border-radius: 15px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            padding: 1.5rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .summary-card-3d:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-        .shift-count-row td, .shift-count-row th {
-            color: var(--primary-accent);
-            font-weight: 700;
-            background-color: #edfaff;
-            height: 32px;
-        }
-        .kpi-header { background-color: #f1f5f9 !important; color: #475569; }
-        .kpi-header-erp { background-color: #e9d5ff !important; color: #581c87; }
-        .kpi-header-gh1 { background-color: #dbeafe !important; color: #1e40af; }
-        .kpi-header-gh2 { background-color: #d1fae5 !important; color: #065f46; }
-        th.col-sticky { text-align: left; padding-left: 1rem; }
-        td.col-sticky > div { justify-content: flex-start; padding-left: 1rem; }
-        tr.aux-row > td.col-sticky { text-align: center; }
-        tr.aux-row > td.col-sticky > div { justify-content: center; padding-left: 0; }
-    </style>
-</head>
-<body class="p-2 md:p-6">
-
-    <div class="max-w-full mx-auto space-y-8">
-        <!-- TIÊU ĐỀ -->
-        <div class="text-center section-card">
-            <h1 class="text-2xl md:text-4xl font-bold" style="color: var(--primary-accent);">HỆ THỐNG HIỂN THỊ LỊCH PHÂN CA</h1>
-            <p class="text-md text-gray-500">Tải file Excel để tự động điền vào các bảng báo cáo</p>
-        </div>
-
-        <!-- PHẦN NHẬP LIỆU -->
-        <section class="section-card">
-            <h2 class="text-xl font-bold text-gray-800 mb-4 border-l-4 pl-3" style="border-color: var(--primary-accent);">1. Nhập dữ liệu</h2>
-            <div class="flex flex-col items-center justify-center bg-gray-50 p-6 border-2 border-dashed border-gray-300 rounded-lg">
-                 <label for="excel-upload" class="styled-button" style="background-color: var(--success-color);">
-                    📁 Chọn File Excel
-                </label>
-                <input type="file" id="excel-upload" class="hidden" accept=".xlsx, .xls, .csv">
-                <p id="file-name-display" class="mt-4 text-sm text-gray-500">Chưa có file nào được chọn.</p>
-            </div>
-             <div class="mt-6 flex justify-center items-center gap-4">
-                <button data-target="capture-main-content" class="screenshot-btn styled-button hidden" style="background-color: var(--secondary-accent);">📸 Chụp ảnh tổng thể</button>
-            </div>
-        </section>
-
-        <div id="capture-all" class="space-y-8">
-            <div id="capture-main-content" class="space-y-8">
-                <!-- BẢNG LỊCH TỔNG HỢP -->
-                <section id="main-schedule-section" class="section-card hidden">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-bold text-gray-800 border-l-4 pl-3" style="border-color: var(--success-color);">2. Bảng Lịch Tổng Hợp</h2>
-                         <div class="flex gap-2 flex-wrap justify-end">
-                            <button id="export-json-btn" class="text-sm py-2 px-4 styled-button" style="background-color: #f59e0b;">Xuất JSON</button>
-                            <button id="export-aux-btn" class="text-sm py-2 px-4 styled-button" style="background-color: #2563eb;">Xuất CSV</button>
-                            <label for="import-aux-input" class="text-sm py-2 px-4 styled-button" style="background-color: #16a34a;">Nhập CSV</label>
-                            <input type="file" id="import-aux-input" class="hidden" accept=".csv">
-                            <button data-target="main-schedule-section" class="screenshot-btn text-sm py-2 px-4 styled-button" style="background-color: var(--secondary-accent);">📸</button>
-                        </div>
-                    </div>
-                    <div id="main-schedule-container" class="table-container"></div>
-                </section>
-            </div>
-
-            <!-- NHẬN XÉT NGÀY -->
-            <section id="daily-summary-section" class="section-card hidden">
-                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-bold text-gray-800 border-l-4 pl-3" style="border-color: var(--info-color);">3. Nhận xét ngày</h2>
-                    <button data-target="daily-summary-section" class="screenshot-btn text-sm py-2 px-4 styled-button" style="background-color: var(--secondary-accent);">📸 Chụp ảnh</button>
-                </div>
-                 <div id="daily-summary-container" class="mt-4"></div>
-            </section>
-        </div>
-    </div>
-
-    <!-- Toast Message -->
-    <div id="toast-message"></div>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-
-    // --- DOM ELEMENTS --- //
-    const excelUploadInput = document.getElementById('excel-upload');
-    const fileNameDisplay = document.getElementById('file-name-display');
-    const mainScheduleContainer = document.getElementById('main-schedule-container');
-    const dailySummaryContainer = document.getElementById('daily-summary-container');
-    const exportAuxBtn = document.getElementById('export-aux-btn');
-    const importAuxInput = document.getElementById('import-aux-input');
-    const exportJsonBtn = document.getElementById('export-json-btn');
-
-    const sections = [
-        document.getElementById('main-schedule-section'),
-        document.getElementById('daily-summary-section')
-    ];
-    
-    // --- GLOBAL STATE --- //
-    let scheduleState = null;
-    const LOCAL_STORAGE_KEY = 'dmxScheduleData_v12'; // Incremented version
-
-    // --- FUNCTIONS --- //
-    function showToast(message, isSuccess = true) {
-        const toast = document.getElementById('toast-message');
-        toast.textContent = message;
-        toast.className = 'show';
-        toast.style.backgroundColor = isSuccess ? 'var(--success-color)' : 'var(--danger-color)';
-        setTimeout(() => { toast.className = toast.className.replace('show', ''); }, 3000);
+{
+  "headerLine1": [
+    "",
+    "",
+    "",
+    "",
+    "T2 (25/08)",
+    "T2 (25/08)",
+    "T2 (25/08)",
+    "T2 (25/08)",
+    "T2 (25/08)",
+    "T3 (26/08)",
+    "T3 (26/08)",
+    "T3 (26/08)",
+    "T3 (26/08)",
+    "T3 (26/08)",
+    "T4 (27/08)",
+    "T4 (27/08)",
+    "T4 (27/08)",
+    "T4 (27/08)",
+    "T4 (27/08)",
+    "T5 (28/08)",
+    "T5 (28/08)",
+    "T5 (28/08)",
+    "T5 (28/08)",
+    "T5 (28/08)",
+    "T6 (29/08)",
+    "T6 (29/08)",
+    "T6 (29/08)",
+    "T6 (29/08)",
+    "T6 (29/08)",
+    "T7 (30/08)",
+    "T7 (30/08)",
+    "T7 (30/08)",
+    "T7 (30/08)",
+    "T7 (30/08)",
+    "CN (31/08)",
+    "CN (31/08)",
+    "CN (31/08)",
+    "CN (31/08)",
+    "CN (31/08)"
+  ],
+  "headerLine2": [
+    "Bộ phận",
+    "User",
+    "Họ tên",
+    "Tổng",
+    "Ca 2",
+    "Ca 3",
+    "Ca 4",
+    "Ca 5",
+    "Ca 6",
+    "Ca 2",
+    "Ca 3",
+    "Ca 4",
+    "Ca 5",
+    "Ca 6",
+    "Ca 2",
+    "Ca 3",
+    "Ca 4",
+    "Ca 5",
+    "Ca 6",
+    "Ca 2",
+    "Ca 3",
+    "Ca 4",
+    "Ca 5",
+    "Ca 6",
+    "Ca 2",
+    "Ca 3",
+    "Ca 4",
+    "Ca 5",
+    "Ca 6",
+    "Ca 2",
+    "Ca 3",
+    "Ca 4",
+    "Ca 5",
+    "Ca 6",
+    "Ca 2",
+    "Ca 3",
+    "Ca 4",
+    "Ca 5",
+    "Ca 6"
+  ],
+  "dateHeaders": [
+    {
+      "name": "T2 (25/08)",
+      "span": 5
+    },
+    {
+      "name": "T3 (26/08)",
+      "span": 5
+    },
+    {
+      "name": "T4 (27/08)",
+      "span": 5
+    },
+    {
+      "name": "T5 (28/08)",
+      "span": 5
+    },
+    {
+      "name": "T6 (29/08)",
+      "span": 5
+    },
+    {
+      "name": "T7 (30/08)",
+      "span": 5
+    },
+    {
+      "name": "CN (31/08)",
+      "span": 5
     }
-    
-    function getCurrentDayName() {
-        const now = new Date();
-        const dayOfWeek = now.getDay(); // 0 for Sunday, 1 for Monday, etc.
-        const weekdayMap = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-        return weekdayMap[dayOfWeek];
+  ],
+  "employees": [
+    {
+      "id": "250630",
+      "hoTen": "Nguyễn Khánh Linh",
+      "ten": "Linh",
+      "kpi": {
+        "erp": 5,
+        "gh1": 0,
+        "gh2": 0,
+        "gc": 59
+      },
+      "shifts": [
+        "",
+        "",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "1",
+        "1",
+        "1",
+        "3",
+        "3",
+        "3",
+        "3",
+        "1",
+        "1",
+        "1",
+        "3",
+        "3",
+        "1"
+      ]
+    },
+    {
+      "id": "97536",
+      "hoTen": "Nguyễn Thị Ngọc Khánh",
+      "ten": "Khánh",
+      "kpi": {
+        "erp": 5,
+        "gh1": 0,
+        "gh2": 0,
+        "gc": 45
+      },
+      "shifts": [
+        "1",
+        "1",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "3",
+        "3",
+        "1",
+        "1",
+        "1",
+        "",
+        "",
+        "",
+        "3",
+        "3",
+        "1",
+        "1",
+        "1"
+      ]
+    },
+    {
+      "id": "156494",
+      "hoTen": "Đinh Thị Phương Thảo",
+      "ten": "Thảo",
+      "kpi": {
+        "erp": 4,
+        "gh1": 0,
+        "gh2": 0,
+        "gc": 49
+      },
+      "shifts": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "1",
+        "1",
+        "1",
+        "3",
+        "3",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "",
+        "",
+        "",
+        "3",
+        "",
+        "1",
+        "1",
+        "1",
+        "3",
+        "3",
+        "3",
+        "3",
+        "1"
+      ]
+    },
+    {
+      "id": "162055",
+      "hoTen": "Dương Việt Huy",
+      "ten": "Huy",
+      "kpi": {
+        "erp": 0,
+        "gh1": 2,
+        "gh2": 2,
+        "gc": 55
+      },
+      "shifts": [
+        "",
+        "",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "1",
+        "1",
+        "1",
+        "3",
+        "3",
+        "",
+        "",
+        "",
+        "1",
+        "1",
+        "",
+        "",
+        "",
+        "3",
+        "3",
+        "3",
+        "3",
+        "1",
+        "3",
+        "",
+        "1",
+        "1",
+        "1"
+      ]
+    },
+    {
+      "id": "61169",
+      "hoTen": "Bùi Hồng Dương",
+      "ten": "Dương",
+      "kpi": {
+        "erp": 0,
+        "gh1": 2,
+        "gh2": 1,
+        "gc": 56
+      },
+      "shifts": [
+        "3",
+        "3",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "3",
+        "3",
+        "1",
+        "",
+        "",
+        "3",
+        "3",
+        "1",
+        "1",
+        "1",
+        "3",
+        "3",
+        "1",
+        "3",
+        "",
+        "3",
+        "3",
+        "1"
+      ]
+    },
+    {
+      "id": "30899",
+      "hoTen": "Nguyễn Ngọc Đức",
+      "ten": "Đức",
+      "kpi": {
+        "erp": 0,
+        "gh1": 2,
+        "gh2": 2,
+        "gc": 56
+      },
+      "shifts": [
+        "",
+        "",
+        "3",
+        "3",
+        "1",
+        "",
+        "",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "",
+        "",
+        "",
+        "3",
+        "3",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "1",
+        "1",
+        "1",
+        "3",
+        "3",
+        "1",
+        "1",
+        "1",
+        "3",
+        "",
+        "3",
+        "3",
+        "1"
+      ]
+    },
+    {
+      "id": "30249",
+      "hoTen": "Nguyễn Bình Minh",
+      "ten": "Minh",
+      "kpi": {
+        "erp": 0,
+        "gh1": 2,
+        "gh2": 1,
+        "gc": 52
+      },
+      "shifts": [
+        "",
+        "",
+        "3",
+        "3",
+        "1",
+        "1",
+        "1",
+        "",
+        "",
+        "",
+        "3",
+        "3",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "1",
+        "1",
+        "1",
+        "3",
+        "3",
+        "",
+        "",
+        "",
+        "3",
+        "",
+        "3",
+        "3",
+        "1",
+        "1",
+        "1",
+        "",
+        "3",
+        "1"
+      ]
+    },
+    {
+      "id": "98372",
+      "hoTen": "Nguyễn Mạnh Quân",
+      "ten": "Quân",
+      "kpi": {
+        "erp": 0,
+        "gh1": 2,
+        "gh2": 2,
+        "gc": 52
+      },
+      "shifts": [
+        "1",
+        "1",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "3",
+        "3",
+        "1",
+        "",
+        "",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "",
+        "",
+        "",
+        "3",
+        "3",
+        "3",
+        "3",
+        "1",
+        "1",
+        "1",
+        "3",
+        "3",
+        "1"
+      ]
+    },
+    {
+      "id": "199888",
+      "hoTen": "Trần Đức Anh",
+      "ten": "Anh",
+      "kpi": {
+        "erp": 0,
+        "gh1": 2,
+        "gh2": 2,
+        "gc": 56
+      },
+      "shifts": [
+        "3",
+        "3",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "3",
+        "3",
+        "1",
+        "",
+        "",
+        "1",
+        "1",
+        "1",
+        "1",
+        "1",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "1",
+        "1",
+        "1",
+        "3",
+        "",
+        "1",
+        "1",
+        "1",
+        "3",
+        "3",
+        "3",
+        "3",
+        "1"
+      ]
+    },
+    {
+      "id": "61271",
+      "hoTen": "Nguyễn Hữu Thắng",
+      "ten": "Thắng",
+      "kpi": {
+        "erp": 0,
+        "gh1": 1,
+        "gh2": 2,
+        "gc": 52
+      },
+      "shifts": [
+        "1",
+        "1",
+        "",
+        "",
+        "",
+        "1",
+        "1",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "3",
+        "3",
+        "1",
+        "",
+        "",
+        "3",
+        "3",
+        "1",
+        "",
+        "",
+        "3",
+        "3",
+        "1",
+        "3",
+        "3",
+        "",
+        "",
+        "",
+        "3",
+        "3",
+        "1",
+        "1",
+        "1"
+      ]
+    },
+    {
+      "id": "90509",
+      "hoTen": "Đỗ Xuân Long",
+      "ten": "Long",
+      "kpi": {
+        "erp": 0,
+        "gh1": 1,
+        "gh2": 2,
+        "gc": 55
+      },
+      "shifts": [
+        "",
+        "",
+        "1",
+        "1",
+        "1",
+        "3",
+        "3",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "3",
+        "3",
+        "1",
+        "1",
+        "1",
+        "",
+        "",
+        "",
+        "3",
+        "3",
+        "",
+        "",
+        "",
+        "1",
+        "1",
+        "3",
+        "3",
+        "1",
+        "3",
+        "3",
+        "",
+        "3",
+        "1"
+      ]
     }
-
-    function saveStateToLocalStorage() {
-        if (scheduleState) {
-            try {
-                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(scheduleState));
-            } catch (error) {
-                console.error("Lỗi khi lưu vào LocalStorage:", error);
-                showToast("Không thể lưu trạng thái vào bộ nhớ máy.", false);
-            }
-        }
+  ],
+  "staticHeaderCount": 4,
+  "singleCellTaskMap": {
+    "Dương": {
+      "T7 (30/08)": {
+        "Ca 2": "GH1",
+        "Ca 3": "GH1"
+      },
+      "T3 (26/08)": {
+        "Ca 4": "GH1",
+        "Ca 5": "GH1",
+        "Ca 6": "GH1"
+      },
+      "T4 (27/08)": {
+        "Ca 2": "GH2",
+        "Ca 3": "GH2"
+      }
+    },
+    "Đức": {
+      "T7 (30/08)": {
+        "Ca 4": "GH1",
+        "Ca 5": "GH1",
+        "Ca 6": "GH1"
+      },
+      "T3 (26/08)": {
+        "Ca 4": "GH2",
+        "Ca 5": "GH2",
+        "Ca 6": "GH2"
+      },
+      "T4 (27/08)": {
+        "Ca 2": "GH1",
+        "Ca 3": "GH1"
+      },
+      "T6 (29/08)": {
+        "Ca 4": "GH2",
+        "Ca 5": "GH2",
+        "Ca 6": "GH2"
+      }
+    },
+    "Quân": {
+      "CN (31/08)": {
+        "Ca 2": "GH1",
+        "Ca 3": "GH1"
+      },
+      "T2 (25/08)": {
+        "Ca 2": "GH2",
+        "Ca 3": "GH2"
+      },
+      "T5 (28/08)": {
+        "Ca 4": "GH2",
+        "Ca 5": "GH2",
+        "Ca 6": "GH2"
+      },
+      "T6 (29/08)": {
+        "Ca 2": "GH1",
+        "Ca 3": "GH1"
+      }
+    },
+    "Huy": {
+      "CN (31/08)": {
+        "Ca 4": "GH1",
+        "Ca 5": "GH1",
+        "Ca 6": "GH1"
+      },
+      "T2 (25/08)": {
+        "Ca 4": "GH1",
+        "Ca 5": "GH1",
+        "Ca 6": "GH1"
+      },
+      "T4 (27/08)": {
+        "Ca 4": "GH2",
+        "Ca 5": "GH2",
+        "Ca 6": "GH2"
+      },
+      "T6 (29/08)": {
+        "Ca 2": "GH2",
+        "Ca 3": "GH2"
+      },
+      "T3 (26/08)": {}
+    },
+    "Long": {
+      "T7 (30/08)": {
+        "Ca 2": "GH2",
+        "Ca 3": "GH2"
+      },
+      "T2 (25/08)": {
+        "Ca 4": "GH2",
+        "Ca 5": "GH2",
+        "Ca 6": "GH2"
+      },
+      "T5 (28/08)": {
+        "Ca 2": "GH1",
+        "Ca 3": "GH1"
+      }
+    },
+    "Anh": {
+      "T7 (30/08)": {
+        "Ca 4": "GH2",
+        "Ca 5": "GH2",
+        "Ca 6": "GH2"
+      },
+      "T4 (27/08)": {
+        "Ca 4": "GH1",
+        "Ca 5": "GH1",
+        "Ca 6": "GH1"
+      },
+      "T5 (28/08)": {
+        "Ca 2": "GH2",
+        "Ca 3": "GH2"
+      },
+      "T6 (29/08)": {
+        "Ca 4": "GH1",
+        "Ca 5": "GH1",
+        "Ca 6": "GH1"
+      }
+    },
+    "Minh": {
+      "CN (31/08)": {
+        "Ca 2": "GH2",
+        "Ca 3": "GH2"
+      },
+      "T3 (26/08)": {
+        "Ca 2": "GH1",
+        "Ca 3": "GH1"
+      },
+      "T5 (28/08)": {
+        "Ca 4": "GH1",
+        "Ca 5": "GH1",
+        "Ca 6": "GH1"
+      }
+    },
+    "Thắng": {
+      "CN (31/08)": {
+        "Ca 4": "GH2",
+        "Ca 5": "GH2",
+        "Ca 6": "GH2"
+      },
+      "T2 (25/08)": {
+        "Ca 2": "GH1",
+        "Ca 3": "GH1"
+      },
+      "T3 (26/08)": {
+        "Ca 2": "GH2",
+        "Ca 3": "GH2"
+      }
+    },
+    "Khánh": {
+      "T2 (25/08)": {
+        "Ca 2": "ERP",
+        "Ca 3": "ERP"
+      },
+      "T4 (27/08)": {
+        "Ca 4": "ERP",
+        "Ca 5": "ERP",
+        "Ca 6": "ERP"
+      },
+      "T5 (28/08)": {
+        "Ca 2": "ERP",
+        "Ca 3": "ERP"
+      },
+      "T7 (30/08)": {
+        "Ca 2": "ERP",
+        "Ca 3": "ERP"
+      },
+      "CN (31/08)": {
+        "Ca 4": "ERP",
+        "Ca 5": "ERP",
+        "Ca 6": "ERP"
+      }
+    },
+    "Linh": {
+      "T2 (25/08)": {
+        "Ca 4": "ERP",
+        "Ca 5": "ERP",
+        "Ca 6": "ERP"
+      },
+      "T3 (26/08)": {
+        "Ca 2": "ERP",
+        "Ca 3": "ERP"
+      },
+      "T4 (27/08)": {
+        "Ca 2": "ERP",
+        "Ca 3": "ERP"
+      },
+      "T6 (29/08)": {
+        "Ca 4": "ERP",
+        "Ca 5": "ERP",
+        "Ca 6": "ERP"
+      },
+      "CN (31/08)": {
+        "Ca 2": "ERP",
+        "Ca 3": "ERP"
+      }
+    },
+    "Thảo": {
+      "T3 (26/08)": {
+        "Ca 4": "ERP",
+        "Ca 5": "ERP",
+        "Ca 6": "ERP"
+      },
+      "T5 (28/08)": {
+        "Ca 4": "ERP",
+        "Ca 5": "ERP",
+        "Ca 6": "ERP"
+      },
+      "T6 (29/08)": {
+        "Ca 2": "ERP",
+        "Ca 3": "ERP"
+      },
+      "T7 (30/08)": {
+        "Ca 4": "ERP",
+        "Ca 5": "ERP",
+        "Ca 6": "ERP"
+      },
+      "T2 (25/08)": {}
     }
-
-    function loadStateFromLocalStorage() {
-        const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
-        if (savedData) {
-            try {
-                scheduleState = JSON.parse(savedData);
-                renderAllFromState(false); // Don't save again when loading
-                sections.forEach(s => s.classList.remove('hidden'));
-                document.querySelectorAll('.screenshot-btn').forEach(b => b.classList.remove('hidden'));
-                showToast("Đã tải lại phiên làm việc từ bộ nhớ máy.", true);
-            } catch (error) {
-                console.error("Lỗi khi tải dữ liệu từ LocalStorage:", error);
-                localStorage.removeItem(LOCAL_STORAGE_KEY);
-            }
-        }
-    }
-
-    async function initializeData() {
-        try {
-            // Cố gắng fetch file lichnv.json. Thêm cache-busting để luôn lấy file mới nhất.
-            const response = await fetch(`lichnv.json?v=${new Date().getTime()}`);
-            if (!response.ok) {
-                throw new Error('File lichnv.json không tìm thấy, thử tải từ bộ nhớ máy.');
-            }
-            const data = await response.json();
-            scheduleState = data;
-            renderAllFromState(false); // Don't save again when loading
-            sections.forEach(s => s.classList.remove('hidden'));
-            document.querySelectorAll('.screenshot-btn').forEach(b => b.classList.remove('hidden'));
-            showToast("Đã tải dữ liệu từ file lichnv.json thành công!", true);
-        } catch (error) {
-            console.log(error.message); // Log lỗi để debug
-            // Nếu fetch thất bại, quay lại dùng localStorage
-            loadStateFromLocalStorage();
-        }
-    }
-
-
-    function findStartColumn(headerRow) {
-        const dateRegex = /T\d{1,2}\s\(\d{1,2}\/\d{1,2}\)/;
-        return headerRow.findIndex(cell => typeof cell === 'string' && dateRegex.test(cell));
-    }
-
-    function processAndBuildState(lines) {
-        if (lines.length < 3) throw new Error("Dữ liệu không đủ dòng.");
-
-        const rawHeaderLine1 = lines[0];
-        const rawHeaderLine2 = lines[1];
-        
-        const staticHeaderCount = findStartColumn(rawHeaderLine1);
-        if (staticHeaderCount === -1) throw new Error("Không tìm thấy cột ngày tháng hợp lệ (ví dụ: T2 (11/08)).");
-
-        const hiddenColumnIndices = [];
-        for (let i = staticHeaderCount; i < rawHeaderLine2.length; i++) {
-            if (String(rawHeaderLine2[i]).trim() === 'Ca 1') {
-                hiddenColumnIndices.push(i);
-            }
-        }
-        
-        const filterByIndices = (arr, indices) => arr.filter((_, i) => !indices.includes(i));
-        
-        const headerLine1 = filterByIndices(rawHeaderLine1, hiddenColumnIndices);
-        const headerLine2 = filterByIndices(rawHeaderLine2, hiddenColumnIndices);
-
-        const CA_SANG = ['Ca 2', 'Ca 3'];
-        const CA_CHIEU = ['Ca 4', 'Ca 5', 'Ca 6'];
-
-        const dateHeaders = [];
-        let currentDayName = "";
-        for (let i = staticHeaderCount; i < headerLine1.length; i++) {
-            const dayName = String(headerLine1[i]).trim();
-            if (dayName && dayName !== currentDayName) {
-                currentDayName = dayName;
-                dateHeaders.push({ name: currentDayName, span: 0 });
-            }
-            if(dateHeaders.length > 0) {
-                dateHeaders[dateHeaders.length - 1].span++;
-            }
-        }
-
-        const employees = [];
-        const summaryRows = { 'GIAO HÀNG 1': [], 'GIAO HÀNG 2': [], 'ERP': [] };
-        
-        for (let i = 2; i < lines.length; i++) {
-            const cells = lines[i];
-            const department = String(cells[0]).trim().toUpperCase();
-            if (department === 'BP QUẢN LÝ SIÊU THỊ' || department === 'BP TRƯỞNG CA') {
-                continue;
-            }
-
-            const firstCell = String(cells[0]).trim().toUpperCase();
-
-            if (summaryRows.hasOwnProperty(firstCell)) {
-                summaryRows[firstCell] = filterByIndices(cells, hiddenColumnIndices);
-            } else if (!isNaN(parseInt(cells[1]))) {
-                employees.push({
-                    id: cells[1], 
-                    hoTen: cells[2], 
-                    ten: String(cells[2]).split(' ').pop(),
-                    kpi: { erp: 0, gh1: 0, gh2: 0, gc: 0 },
-                    shifts: filterByIndices(cells, hiddenColumnIndices).slice(staticHeaderCount)
-                });
-            }
-        }
-
-        const singleCellTaskMap = {};
-        Object.entries(summaryRows).forEach(([taskKey, taskDataRow]) => {
-            if (taskDataRow.length === 0) return;
-            const taskName = taskKey.replace('GIAO HÀNG ', 'GH');
-            
-            taskDataRow.slice(staticHeaderCount).forEach((workerName, index) => {
-                const trimmedWorkerName = String(workerName).trim();
-                if (trimmedWorkerName) {
-                    if (!singleCellTaskMap[trimmedWorkerName]) singleCellTaskMap[trimmedWorkerName] = {};
-                    
-                    let dayName = '', shiftName = '', cumulativeSpan = 0;
-                    for(const day of dateHeaders) {
-                        if (index < cumulativeSpan + day.span) {
-                            dayName = day.name;
-                            shiftName = headerLine2[staticHeaderCount + index];
-                            break;
-                        }
-                        cumulativeSpan += day.span;
-                    }
-
-                    if (dayName && shiftName) {
-                        if (!singleCellTaskMap[trimmedWorkerName][dayName]) singleCellTaskMap[trimmedWorkerName][dayName] = {};
-                        singleCellTaskMap[trimmedWorkerName][dayName][shiftName] = taskName;
-                    }
-                }
-            });
-        });
-        
-        return { headerLine1, headerLine2, dateHeaders, employees, staticHeaderCount, singleCellTaskMap, CA_SANG, CA_CHIEU };
-    }
-
-    function recalculateKpi(state) {
-        const { employees, singleCellTaskMap, headerLine2, staticHeaderCount, CA_SANG, CA_CHIEU } = state;
-        const SHIFT_DURATIONS = { 'Ca 2': 3, 'Ca 3': 3, 'Ca 4': 3, 'Ca 5': 3, 'Ca 6': 1 };
-
-        employees.forEach(emp => {
-            emp.kpi = { erp: 0, gh1: 0, gh2: 0, gc: 0 };
-
-            const tasksByHalfDay = {}; 
-            if (singleCellTaskMap[emp.ten]) {
-                Object.entries(singleCellTaskMap[emp.ten]).forEach(([dayKey, dayTasks]) => {
-                    tasksByHalfDay[dayKey] = {};
-                    Object.entries(dayTasks).forEach(([shiftName, task]) => {
-                        if (CA_SANG.includes(shiftName)) tasksByHalfDay[dayKey].Sang = task;
-                        if (CA_CHIEU.includes(shiftName)) tasksByHalfDay[dayKey].Chieu = task;
-                    });
-                });
-            }
-            
-            Object.values(tasksByHalfDay).forEach(day => {
-                if(day.Sang === 'ERP') emp.kpi.erp++;
-                if(day.Sang === 'GH1') emp.kpi.gh1++;
-                if(day.Sang === 'GH2') emp.kpi.gh2++;
-                if(day.Chieu === 'ERP') emp.kpi.erp++;
-                if(day.Chieu === 'GH1') emp.kpi.gh1++;
-                if(day.Chieu === 'GH2') emp.kpi.gh2++;
-            });
-
-            emp.shifts.forEach((shiftValue, index) => {
-                if (shiftValue?.trim()) {
-                    const shiftName = headerLine2[staticHeaderCount + index];
-                    emp.kpi.gc += SHIFT_DURATIONS[shiftName] || 0;
-                }
-            });
-        });
-        
-        // Sắp xếp nhân viên
-        state.employees.sort((a, b) => {
-            if (b.kpi.erp !== a.kpi.erp) {
-                return b.kpi.erp - a.kpi.erp;
-            }
-            return b.kpi.gh1 - a.kpi.gh1;
-        });
-    }
-
-    function renderAllFromState(shouldSave = true) {
-        if (!scheduleState) return;
-        recalculateKpi(scheduleState);
-        renderCombinedTable(scheduleState);
-        
-        const activeDayHeader = document.querySelector('.day-header.active');
-        let dayToRender;
-
-        // Find today's header based on the day of the week (e.g., "T3")
-        const currentDayName = getCurrentDayName(); // e.g., "T3"
-        const todayHeader = scheduleState.dateHeaders.find(header => header.name.trim().startsWith(currentDayName));
-
-        if (todayHeader) {
-            dayToRender = todayHeader.name;
-        } else {
-            // If not found, use the currently active day or the first day as a fallback
-            dayToRender = activeDayHeader ? activeDayHeader.dataset.daykey : scheduleState.dateHeaders[0]?.name;
-        }
-        
-        if(dayToRender) {
-            renderDailySummary(dayToRender);
-        }
-
-        if (shouldSave) {
-            saveStateToLocalStorage();
-        }
-    }
-    
-    function renderCombinedTable(data) {
-        const { headerLine2, dateHeaders, employees, staticHeaderCount, singleCellTaskMap, CA_SANG, CA_CHIEU } = data;
-        const kpiHeaders = [
-            { key: 'erp', text: '📦 Ca ERP', class: 'kpi-header-erp' },
-            { key: 'gh1', text: '🚚 Ca GH1', class: 'kpi-header-gh1' },
-            { key: 'gh2', text: '🚛 Ca GH2', class: 'kpi-header-gh2' },
-            { key: 'gc', text: '⏱️ Giờ công', class: 'kpi-header' }
-        ];
-
-        let html = '<table><thead class="header-sticky">';
-        // Dòng header 1
-        html += '<tr>';
-        html += `<th class="col-sticky p-2 border-r">Nhân viên</th>`;
-        html += `<th colspan="${kpiHeaders.length}" class="kpi-header day-separator">Tổng kết & KPI</th>`;
-        dateHeaders.forEach(day => {
-            const isWeekend = day.name.startsWith('T7') || day.name.startsWith('CN');
-            html += `<th colspan="${day.span}" data-daykey="${day.name}" class="day-header p-2 ${isWeekend ? 'weekend-header' : ''} day-separator">${day.name}</th>`;
-        });
-        html += '</tr>';
-        
-        // Dòng header 2
-        html += '<tr style="top: 41px;">';
-        html += `<th class="col-sticky p-2 border-r">Ca</th>`;
-        kpiHeaders.forEach(h => html += `<th class="${h.class} p-1 border-r">${h.text}</th>`);
-        let shiftCounter = 0;
-        dateHeaders.forEach(day => {
-            for(let i = 0; i < day.span; i++) {
-                const shiftName = headerLine2[staticHeaderCount + shiftCounter + i] || '';
-                let shiftClass = CA_SANG.includes(shiftName) ? 'ca-sang' : CA_CHIEU.includes(shiftName) ? 'ca-chieu' : '';
-                const isLastInDay = (i === day.span - 1);
-                html += `<th class="p-1 border-r ${shiftClass} ${isLastInDay ? 'day-separator' : ''}">${shiftName}</th>`;
-            }
-            shiftCounter += day.span;
-        });
-        html += '</tr>';
-
-        // Hàng đếm số lượng nhân viên
-        html += '<tr class="shift-count-row header-sticky" style="top: 82px;">';
-        html += '<th class="col-sticky p-1 border-r">Tổng NV</th>';
-        html += `<td colspan="${kpiHeaders.length}" class="kpi-header day-separator"></td>`;
-        for(let i = 0; i < headerLine2.length - staticHeaderCount; i++) {
-            const count = employees.filter(emp => emp.shifts[i]?.trim()).length;
-            let separatorClass = '';
-            let currentCount = 0;
-            for(const day of dateHeaders) {
-                currentCount += day.span;
-                if (i === currentCount - 1) {
-                    separatorClass = 'day-separator';
-                    break;
-                }
-            }
-            html += `<td class="p-1 border-r ${separatorClass}">${count}</td>`;
-        }
-        html += '</tr></thead><tbody>';
-
-        // Hàng nhân viên
-        employees.forEach(emp => {
-            html += `<tr data-empid="${emp.id}"><td class="col-sticky p-2 border-r font-semibold"><div>${emp.hoTen}</div></td>`;
-            
-            // KPI Cells
-            kpiHeaders.forEach((h, i) => {
-                const isLast = i === kpiHeaders.length - 1;
-                html += `<td class="${h.class} ${isLast ? 'day-separator' : ''}"><div>${emp.kpi[h.key]}</div></td>`;
-            });
-
-            let cumulativeSpan = 0;
-            dateHeaders.forEach(day => {
-                for (let i = 0; i < day.span; i++) {
-                    const shiftIndex = cumulativeSpan + i;
-                    const shiftValue = emp.shifts[shiftIndex];
-                    const shiftName = headerLine2[staticHeaderCount + shiftIndex] || '';
-                    
-                    const task = singleCellTaskMap[emp.ten]?.[day.name]?.[shiftName];
-                    
-                    let cellContent = '&nbsp;';
-                    let cellClass = 'ca-nghi';
-
-                    if (shiftValue?.trim()) {
-                        if (task) {
-                            cellContent = task;
-                            if (task === 'GH1') cellClass = 'task-gh1';
-                            else if (task === 'GH2') cellClass = 'task-gh2';
-                            else if (task === 'ERP') cellClass = 'task-erp';
-                        } else {
-                            cellContent = '✔️';
-                            cellClass = CA_SANG.includes(shiftName) ? 'ca-sang' : 'ca-chieu';
-                        }
-                    }
-                    
-                    const separatorClass = (i === day.span - 1) ? 'day-separator' : '';
-                    html += `<td class="${cellClass} ${separatorClass}" data-shift-index="${shiftIndex}" data-daykey="${day.name}" data-ca="${shiftName}"><div>${cellContent}</div></td>`;
-                }
-                cumulativeSpan += day.span;
-            });
-            html += '</tr>';
-        });
-        
-        // Hàng phụ trợ
-        ['GH1', 'GH2', 'ERP'].forEach(taskName => {
-            const taskClass = `task-${taskName.toLowerCase()}`;
-            const icon = taskName === 'ERP' ? '📦' : (taskName === 'GH1' ? '🚚' : '🚛');
-            html += `<tr class="border-b aux-row"><td colspan="${1 + kpiHeaders.length}" class="col-sticky p-2 border-r font-semibold ${taskClass} day-separator"><div>${icon} ${taskName === 'ERP' ? 'ERP (Nữ)' : `Giao Hàng ${taskName.slice(-1)}`}</div></td>`;
-            
-            dateHeaders.forEach(day => {
-                let workerSang = '', workerChieu = '';
-                
-                Object.entries(singleCellTaskMap).forEach(([worker, dayTasks]) => {
-                    if(dayTasks[day.name]) {
-                        Object.entries(dayTasks[day.name]).forEach(([shift, task]) => {
-                            if (task === taskName) {
-                                if (CA_SANG.includes(shift)) workerSang = worker;
-                                if (CA_CHIEU.includes(shift)) workerChieu = worker;
-                            }
-                        });
-                    }
-                });
-
-                const dayInfo = dateHeaders.find(d => d.name === day.name);
-                const dayStartIndex = dateHeaders.slice(0, dateHeaders.indexOf(dayInfo)).reduce((acc, d) => acc + d.span, 0);
-                
-                const availableWorkersSang = new Set();
-                const availableWorkersChieu = new Set();
-
-                employees.forEach(emp => {
-                    let worksSang = false, worksChieu = false;
-                    for(let i=0; i<dayInfo.span; i++) {
-                        const shiftIndex = dayStartIndex + i;
-                        const shiftName = headerLine2[staticHeaderCount + shiftIndex];
-                        if(emp.shifts[shiftIndex]?.trim()){
-                            if(CA_SANG.includes(shiftName)) worksSang = true;
-                            if(CA_CHIEU.includes(shiftName)) worksChieu = true;
-                        }
-                    }
-                    if(worksSang) availableWorkersSang.add(emp.ten);
-                    if(worksChieu) availableWorkersChieu.add(emp.ten);
-                });
-                
-                if(workerSang && !availableWorkersSang.has(workerSang)) availableWorkersSang.add(workerSang);
-                if(workerChieu && !availableWorkersChieu.has(workerChieu)) availableWorkersChieu.add(workerChieu);
-
-                const optionsSang = `<option value="">-- Trống --</option>` + [...availableWorkersSang].map(e => `<option value="${e}" ${e === workerSang ? 'selected' : ''}>${e}</option>`).join('');
-                const optionsChieu = `<option value="">-- Trống --</option>` + [...availableWorkersChieu].map(e => `<option value="${e}" ${e === workerChieu ? 'selected' : ''}>${e}</option>`).join('');
-
-                const selectSang = `<select data-daykey="${day.name}" data-period="Sang" data-task="${taskName}" class="aux-edit-select w-full h-full">${optionsSang}</select>`;
-                const selectChieu = `<select data-daykey="${day.name}" data-period="Chieu" data-task="${taskName}" class="aux-edit-select w-full h-full">${optionsChieu}</select>`;
-
-                html += `<td colspan="${CA_SANG.length}" class="p-0 aux-sang aux-${taskName.toLowerCase()}">${selectSang}</td>`;
-                html += `<td colspan="${CA_CHIEU.length}" class="p-0 aux-chieu aux-${taskName.toLowerCase()} day-separator">${selectChieu}</td>`;
-            });
-            html += '</tr>';
-        });
-
-        html += '</tbody></table>';
-        mainScheduleContainer.innerHTML = html;
-    }
-
-
-    function renderDailySummary(dayKey) {
-        if (!scheduleState) return;
-        const { employees, singleCellTaskMap, CA_SANG, CA_CHIEU, headerLine2, staticHeaderCount, dateHeaders } = scheduleState;
-        
-        document.querySelectorAll('.day-header.active').forEach(h => h.classList.remove('active'));
-        document.querySelector(`.day-header[data-daykey="${dayKey}"]`)?.classList.add('active');
-
-        const workersSang = new Set(), workersChieu = new Set(), workersOff = new Set(employees.map(e => e.ten));
-        let totalWorkers = 0;
-
-        const dayInfo = dateHeaders.find(d => d.name === dayKey);
-        if (!dayInfo) return;
-        const dayStartIndex = dateHeaders.slice(0, dateHeaders.indexOf(dayInfo)).reduce((acc, d) => acc + d.span, 0);
-
-        employees.forEach(emp => {
-            let worksSang = false, worksChieu = false;
-            let taskSang = new Set(), taskChieu = new Set();
-            
-            for(let i=0; i<dayInfo.span; i++) {
-                const shiftIndex = dayStartIndex + i;
-                const shiftName = headerLine2[staticHeaderCount + shiftIndex];
-                if(emp.shifts[shiftIndex]?.trim()){
-                    const task = singleCellTaskMap[emp.ten]?.[dayKey]?.[shiftName];
-                    if(CA_SANG.includes(shiftName)) {
-                        worksSang = true;
-                        if(task) taskSang.add(task);
-                    }
-                    if(CA_CHIEU.includes(shiftName)) {
-                        worksChieu = true;
-                        if(task) taskChieu.add(task);
-                    }
-                }
-            }
-
-            if(worksSang) {
-                const taskString = taskSang.size > 0 ? ` (${Array.from(taskSang).join(', ')})` : '';
-                workersSang.add(`${emp.ten}${taskString}`);
-            }
-            if(worksChieu) {
-                const taskString = taskChieu.size > 0 ? ` (${Array.from(taskChieu).join(', ')})` : '';
-                workersChieu.add(`${emp.ten}${taskString}`);
-            }
-            
-            if (worksSang || worksChieu) {
-                totalWorkers++;
-                workersOff.delete(emp.ten);
-            }
-        });
-
-        let html = `<div class="summary-card-3d">
-            <h3 class="font-bold mb-3 text-lg text-indigo-700 border-b pb-2">Nhận xét ngày: ${dayKey}</h3>
-            <p class="font-semibold text-gray-700 mb-4">Tổng NV làm: <span class="text-2xl font-bold text-blue-600">${totalWorkers}</span></p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-blue-50 p-3 rounded-lg"><strong>Ca Sáng (${workersSang.size} NV):</strong><br><span class="text-blue-700">${Array.from(workersSang).join(', ') || 'Không có'}</span></div>
-                <div class="bg-yellow-50 p-3 rounded-lg"><strong>Ca Chiều (${workersChieu.size} NV):</strong><br><span class="text-yellow-800">${Array.from(workersChieu).join(', ') || 'Không có'}</span></div>
-                <div class="bg-gray-100 p-3 rounded-lg"><strong>Nghỉ (${workersOff.size} NV):</strong><br><span class="text-gray-600">${Array.from(workersOff).join(', ') || 'Không có'}</span></div>
-            </div>
-        </div>`;
-        dailySummaryContainer.innerHTML = html;
-    }
-
-    function handleCellClick(e) {
-        const cell = e.target.closest('td');
-        if (!cell || !cell.dataset.ca || cell.querySelector('select')) return;
-
-        const empId = cell.parentElement.dataset.empid;
-        const emp = scheduleState.employees.find(e => e.id == empId);
-        if (!emp) return;
-
-        const currentContent = cell.querySelector('div').textContent.trim();
-        
-        let options = `
-            <option value="off" ${currentContent === '' ? 'selected' : ''}>Nghỉ</option>
-            <option value="work" ${currentContent === '✔️' ? 'selected' : ''}>✔️ Làm việc</option>
-            <option value="GH1" ${currentContent === 'GH1' ? 'selected' : ''}>GH1</option>
-            <option value="GH2" ${currentContent === 'GH2' ? 'selected' : ''}>GH2</option>
-            <option value="ERP" ${currentContent === 'ERP' ? 'selected' : ''}>ERP</option>
-        `;
-
-        cell.innerHTML = `<select class="w-full h-full border-2 border-sky-500">${options}</select>`;
-        const select = cell.querySelector('select');
-        select.focus();
-
-        select.addEventListener('change', (event) => handleManualEdit(event, emp));
-        select.addEventListener('blur', () => renderAllFromState(), { once: true });
-    }
-    
-    function updateStateForCell(emp, shiftIndex, value) {
-        const { dateHeaders, staticHeaderCount, headerLine2 } = scheduleState;
-        
-        let dayName = '', shiftName = '', cumulativeSpan = 0;
-        for(const day of dateHeaders) {
-            if (shiftIndex < cumulativeSpan + day.span) {
-                dayName = day.name;
-                shiftName = headerLine2[staticHeaderCount + shiftIndex];
-                break;
-            }
-            cumulativeSpan += day.span;
-        }
-
-        if (!dayName || !shiftName) return;
-
-        if (!scheduleState.singleCellTaskMap[emp.ten]) scheduleState.singleCellTaskMap[emp.ten] = {};
-        if (!scheduleState.singleCellTaskMap[emp.ten][dayName]) scheduleState.singleCellTaskMap[emp.ten][dayName] = {};
-        
-        if (['GH1', 'GH2', 'ERP'].includes(value)) {
-            scheduleState.singleCellTaskMap[emp.ten][dayName][shiftName] = value;
-        } else {
-            delete scheduleState.singleCellTaskMap[emp.ten][dayName][shiftName];
-        }
-        
-        emp.shifts[shiftIndex] = (value === 'off') ? '' : '1';
-    }
-
-
-    function handleManualEdit(e, emp) {
-        const select = e.target;
-        const cell = select.closest('td');
-        const dayKey = cell.dataset.daykey;
-        const ca = cell.dataset.ca;
-        const newValue = select.value;
-
-        const { dateHeaders, headerLine2, staticHeaderCount, CA_SANG, CA_CHIEU, employees } = scheduleState;
-        const period = CA_SANG.includes(ca) ? CA_SANG : (CA_CHIEU.includes(ca) ? CA_CHIEU : null);
-        if (!period) return;
-
-        const dayInfo = dateHeaders.find(d => d.name === dayKey);
-        const dayStartIndex = dateHeaders.slice(0, dateHeaders.indexOf(dayInfo)).reduce((acc, d) => acc + d.span, 0);
-
-        if (['GH1', 'GH2', 'ERP'].includes(newValue)) {
-            employees.forEach(anyEmp => {
-                if (scheduleState.singleCellTaskMap[anyEmp.ten]?.[dayKey]) {
-                    period.forEach(shiftName => {
-                        if (scheduleState.singleCellTaskMap[anyEmp.ten][dayKey][shiftName] === newValue) {
-                            const shiftIndex = headerLine2.indexOf(shiftName, staticHeaderCount);
-                            if(shiftIndex !== -1) updateStateForCell(anyEmp, shiftIndex - staticHeaderCount, 'work');
-                        }
-                    });
-                }
-            });
-
-            for (let i = 0; i < dayInfo.span; i++) {
-                const currentShiftIndex = dayStartIndex + i;
-                const currentShiftName = headerLine2[staticHeaderCount + currentShiftIndex];
-                if (period.includes(currentShiftName)) {
-                    updateStateForCell(emp, currentShiftIndex, newValue);
-                }
-            }
-        } else { 
-            const clickedShiftIndex = parseInt(cell.dataset.shiftIndex);
-            const taskInClickedCell = scheduleState.singleCellTaskMap[emp.ten]?.[dayKey]?.[ca];
-
-            if (taskInClickedCell) {
-                 for (let i = 0; i < dayInfo.span; i++) {
-                    const currentShiftIndex = dayStartIndex + i;
-                    const currentShiftName = headerLine2[staticHeaderCount + currentShiftIndex];
-                    if (period.includes(currentShiftName)) {
-                        updateStateForCell(emp, currentShiftIndex, 'work');
-                    }
-                }
-            }
-            updateStateForCell(emp, clickedShiftIndex, newValue);
-        }
-
-        renderAllFromState();
-    }
-    
-    function handleAuxEdit(e) {
-        const select = e.target;
-        const dayKey = select.dataset.daykey;
-        const periodName = select.dataset.period;
-        const task = select.dataset.task;
-        const newWorkerName = select.value;
-        
-        const { employees, dateHeaders, headerLine2, staticHeaderCount, CA_SANG, CA_CHIEU } = scheduleState;
-        const periodShifts = periodName === 'Sang' ? CA_SANG : CA_CHIEU;
-
-        Object.values(employees).forEach(emp => {
-            if(scheduleState.singleCellTaskMap[emp.ten]?.[dayKey]) {
-                 const dayTasks = scheduleState.singleCellTaskMap[emp.ten][dayKey];
-                 Object.entries(dayTasks).forEach(([shift, assignedTask]) => {
-                     if(assignedTask === task && periodShifts.includes(shift)) {
-                         const shiftIndex = headerLine2.indexOf(shift, staticHeaderCount);
-                         if(shiftIndex !== -1) updateStateForCell(emp, shiftIndex - staticHeaderCount, 'work');
-                     }
-                 });
-            }
-        });
-
-        if(newWorkerName) {
-            const newWorker = employees.find(e => e.ten === newWorkerName);
-            if (!newWorker) return;
-
-            const dayInfo = dateHeaders.find(d => d.name === dayKey);
-            const dayStartIndex = dateHeaders.slice(0, dateHeaders.indexOf(dayInfo)).reduce((acc, d) => acc + d.span, 0);
-            
-            for (let i = 0; i < dayInfo.span; i++) {
-                const currentShiftIndex = dayStartIndex + i;
-                const currentShiftName = headerLine2[staticHeaderCount + currentShiftIndex];
-                if (periodShifts.includes(currentShiftName)) {
-                    updateStateForCell(newWorker, currentShiftIndex, task);
-                }
-            }
-        }
-        
-        renderAllFromState();
-    }
-
-
-    // --- EVENT LISTENERS --- //
-    excelUploadInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        fileNameDisplay.textContent = file.name;
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            try {
-                const data = new Uint8Array(event.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                const csvData = XLSX.utils.sheet_to_csv(worksheet, { FS: '\t' });
-                
-                scheduleState = processAndBuildState(csvData.split('\n').map(row => row.split('\t')));
-                renderAllFromState();
-                sections.forEach(s => s.classList.remove('hidden'));
-                document.querySelectorAll('.screenshot-btn').forEach(b => b.classList.remove('hidden'));
-                showToast("Tải và hiển thị file thành công!", true);
-                sections[0].scrollIntoView({ behavior: 'smooth' });
-
-            } catch (error) {
-                console.error("Lỗi khi xử lý file:", error);
-                showToast(`Lỗi xử lý file: ${error.message}`, false);
-            }
-        };
-        reader.onerror = () => {
-             showToast("Không thể đọc file đã chọn.", false);
-        };
-        reader.readAsArrayBuffer(file);
-    });
-
-
-    mainScheduleContainer.addEventListener('click', (e) => {
-        const dayHeader = e.target.closest('.day-header');
-        if (dayHeader) {
-            renderDailySummary(dayHeader.dataset.daykey);
-        } else {
-            handleCellClick(e);
-        }
-    });
-    
-    mainScheduleContainer.addEventListener('change', (e) => {
-        if(e.target.classList.contains('aux-edit-select')) {
-            handleAuxEdit(e);
-        }
-    });
-
-    document.body.addEventListener('click', (e) => {
-        if (e.target.classList.contains('screenshot-btn')) {
-            const targetId = e.target.dataset.target;
-            const elementToCapture = document.getElementById(targetId);
-            if (elementToCapture) {
-                showToast("Đang chụp ảnh...", true);
-                html2canvas(elementToCapture, {
-                    scale: 1.5, useCORS: true,
-                    onclone: (doc) => {
-                        doc.getElementById('main-schedule-section')?.classList.remove('hidden');
-                        doc.getElementById('daily-summary-section')?.classList.remove('hidden');
-                    }
-                }).then(canvas => {
-                    const link = document.createElement('a');
-                    link.download = `LichPhanCa_${targetId}_${new Date().toISOString().slice(0,10)}.png`;
-                    link.href = canvas.toDataURL("image/png");
-                    link.click();
-                    showToast("Đã tải ảnh về thành công!", true);
-                }).catch(err => {
-                    console.error("Lỗi chụp ảnh:", err);
-                    showToast("Không thể chụp ảnh.", false);
-                });
-            }
-        }
-    });
-    
-    exportJsonBtn.addEventListener('click', () => {
-        if (!scheduleState) return showToast("Chưa có dữ liệu để xuất.", false);
-
-        try {
-            const jsonString = JSON.stringify(scheduleState, null, 2); // Định dạng JSON cho dễ đọc
-            const blob = new Blob([jsonString], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.setAttribute('href', url);
-            link.setAttribute('download', 'lichnv.json');
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            showToast("Đã xuất dữ liệu ra file lichnv.json thành công!", true);
-        } catch (error) {
-            console.error("Lỗi khi xuất JSON:", error);
-            showToast("Có lỗi xảy ra khi xuất file JSON.", false);
-        }
-    });
-
-    exportAuxBtn.addEventListener('click', () => {
-        if (!scheduleState) return showToast("Chưa có dữ liệu để xuất.", false);
-        const { singleCellTaskMap, CA_SANG, CA_CHIEU } = scheduleState;
-        let csvContent = "data:text/csv;charset=utf-8,Day,Period,Task,Worker\n";
-        
-        const halfDayTasksForExport = {}; 
-
-        Object.entries(singleCellTaskMap).forEach(([worker, dayTasks]) => {
-            Object.entries(dayTasks).forEach(([day, shiftTasks]) => {
-                const key = `${day}-${worker}`;
-                if (!halfDayTasksForExport[key]) {
-                    halfDayTasksForExport[key] = {};
-                }
-
-                Object.entries(shiftTasks).forEach(([shift, task]) => {
-                    if (CA_SANG.includes(shift)) {
-                        halfDayTasksForExport[key].Sang = task;
-                    } else if (CA_CHIEU.includes(shift)) {
-                        halfDayTasksForExport[key].Chieu = task;
-                    }
-                });
-            });
-        });
-
-        Object.entries(halfDayTasksForExport).forEach(([key, tasks]) => {
-            const [day, worker] = key.split('-');
-            if (tasks.Sang) {
-                csvContent += `${day},Sang,${tasks.Sang},${worker}\n`;
-            }
-            if (tasks.Chieu) {
-                csvContent += `${day},Chieu,${tasks.Chieu},${worker}\n`;
-            }
-        });
-
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "du_lieu_phu_tro.csv");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        showToast("Đã xuất dữ liệu phụ trợ (CSV) thành công!");
-    });
-
-    importAuxInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file || !scheduleState) return;
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            try {
-                const csv = event.target.result;
-                const lines = csv.split('\n').slice(1); // Bỏ qua header
-                lines.forEach(line => {
-                    const [day, period, task, worker] = line.split(',').map(s => s.trim());
-                    if(day && period && task && worker) {
-                        const emp = scheduleState.employees.find(e => e.ten === worker);
-                        if(emp) {
-                             handleAuxEdit({ target: { dataset: { daykey: day, period: period, task: task }, value: worker } });
-                        }
-                    }
-                });
-                renderAllFromState(); // Re-render sau khi import xong
-                showToast("Nhập dữ liệu phụ trợ (CSV) thành công!");
-            } catch (error) {
-                 showToast("Lỗi khi nhập file CSV. Vui lòng kiểm tra định dạng.", false);
-            }
-        };
-        reader.readAsText(file);
-    });
-
-    // Tải dữ liệu khi trang được mở
-    initializeData();
-});
-</script>
-
-</body>
-</html>
+  },
+  "CA_SANG": [
+    "Ca 2",
+    "Ca 3"
+  ],
+  "CA_CHIEU": [
+    "Ca 4",
+    "Ca 5",
+    "Ca 6"
+  ]
+}
