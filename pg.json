@@ -1,13 +1,13 @@
 {
   "meta": {
     "dates": [
-      "18/08",
-      "19/08",
-      "20/08",
-      "21/08",
-      "22/08",
-      "23/08",
-      "24/08"
+      "25/08",
+      "26/08",
+      "27/08",
+      "28/08",
+      "29/08",
+      "30/08",
+      "31/08"
     ]
   },
   "pgs": [
@@ -18,14 +18,14 @@
       "ten": "YẾN",
       "sdt": "362282223",
       "gt": "Nữ",
-      "veSinh": "THỨ 5",
+      "veSinh": "THỨ 2",
       "lich": [
-        "HỌP",
+        "SÁNG",
+        "CHIỀU",
         "SÁNG",
         "OFF",
         "SÁNG",
         "CHIỀU",
-        "SÁNG",
         "SÁNG"
       ],
       "note": "",
@@ -38,14 +38,14 @@
       "ten": "THẢO",
       "sdt": "0338096094",
       "gt": "Nữ",
-      "veSinh": "THỨ 2",
+      "veSinh": "THỨ 7",
       "lich": [
-        "SÁNG",
         "CHIỀU",
         "SÁNG",
         "OFF",
+        "CHIỀU",
+        "CHIỀU",
         "SÁNG",
-        "CA GÃY (23-5)",
         "CHIỀU"
       ],
       "note": "",
@@ -66,9 +66,9 @@
         "SÁNG",
         "SÁNG",
         "SÁNG",
-        "OFF"
+        "SÁNG"
       ],
-      "note": "Cn Nghỉ phép gd có việc",
+      "note": "",
       "diaChi": "390 Nguyễn Văn Cừ"
     },
     {
@@ -78,7 +78,7 @@
       "ten": "ĐỨC",
       "sdt": "393461656",
       "gt": "Nam",
-      "veSinh": "THỨ 4",
+      "veSinh": "THỨ 5",
       "lich": [
         "OFF",
         "ST KHÁC",
@@ -98,12 +98,12 @@
       "ten": "PHONG",
       "sdt": "837613906",
       "gt": "Nam",
-      "veSinh": "CHỦ NHẬT",
+      "veSinh": "THỨ 2",
       "lich": [
+        "SÁNG",
         "CHIỀU",
-        "HỌP",
+        "CHIỀU",
         "OFF",
-        "CHIỀU",
         "CHIỀU",
         "CHIỀU",
         "SÁNG"
@@ -118,15 +118,15 @@
       "ten": "THÚY",
       "sdt": "0862321997",
       "gt": "Nữ",
-      "veSinh": "CHỦ NHẬT",
+      "veSinh": "THỨ 3",
       "lich": [
-        "OFF",
-        "HỌP",
-        "ST KHÁC",
-        "ST KHÁC",
         "CHIỀU",
-        "CA GÃY (234)",
-        "SÁNG"
+        "SÁNG",
+        "SÁNG",
+        "OFF",
+        "ST KHÁC",
+        "ST KHÁC",
+        "ST KHÁC"
       ],
       "note": "",
       "diaChi": "564 Nguyễn Văn Cừ."
@@ -138,17 +138,17 @@
       "ten": "VÂN",
       "sdt": "973756696",
       "gt": "Nữ",
-      "veSinh": "THỨ 3",
+      "veSinh": "THỨ 5",
       "lich": [
         "HỌP",
-        "SÁNG",
         "OFF",
         "CHIỀU",
         "SÁNG",
         "SÁNG",
-        "CHIỀU"
+        "CHIỀU",
+        "SÁNG"
       ],
-      "note": "thứ 7 c có việc bận gđ nên c xin ko làm gãy ạ",
+      "note": "",
       "diaChi": "Kđt việt hưng, giang biên, long biên"
     },
     {
@@ -158,15 +158,15 @@
       "ten": "BẢO",
       "sdt": "352242281",
       "gt": "Nam",
-      "veSinh": "THỨ 2",
+      "veSinh": "CHỦ NHẬT",
       "lich": [
         "CHIỀU",
-        "ST KHÁC",
-        "CHIỀU",
-        "CHIỀU",
         "CHIỀU",
         "ST KHÁC",
-        "ST KHÁC"
+        "CHIỀU",
+        "ST KHÁC",
+        "ST KHÁC",
+        "CHIỀU"
       ],
       "note": "",
       "diaChi": "Chương dương độ, Hoàn Kiếm, Hà Nội"
@@ -178,15 +178,15 @@
       "ten": "HẰNG",
       "sdt": "0392946783",
       "gt": "Nữ",
-      "veSinh": "THỨ 4",
+      "veSinh": "THỨ 7",
       "lich": [
         "SÁNG",
         "ST KHÁC",
         "SÁNG",
         "OFF",
-        "ST KHÁC",
-        "CA GÃY (234)",
-        "SÁNG"
+        "SÁNG",
+        "SÁNG",
+        "CHIỀU"
       ],
       "note": "",
       "diaChi": "Bồ Đề- Long Biên"
@@ -202,10 +202,10 @@
       "lich": [
         "ST KHÁC",
         "ST KHÁC",
-        "OFF",
         "ST KHÁC",
+        "OFF",
         "SÁNG",
-        "CA GÃY (2-456)",
+        "CHIỀU",
         "SÁNG"
       ],
       "note": "",
@@ -213,46 +213,66 @@
     },
     {
       "stt": 11,
+      "nganhHang": "GIA DỤNG",
+      "hang": "JUNGER",
+      "ten": "LIÊN",
+      "sdt": "387563276",
+      "gt": "Nữ",
+      "veSinh": "THỨ 4",
+      "lich": [
+        "OFF",
+        "SÁNG",
+        "SÁNG",
+        "HỌP",
+        "CHIỀU",
+        "ST KHÁC",
+        "CHIỀU"
+      ],
+      "note": "",
+      "diaChi": "Đức Giang , long biên"
+    },
+    {
+      "stt": 12,
       "nganhHang": "ĐIỆN LẠNH",
       "hang": "TOSHIBA",
       "ten": "TÚ",
       "sdt": "383209079",
       "gt": "Nam",
-      "veSinh": "THỨ 7",
+      "veSinh": "CHỦ NHẬT",
       "lich": [
         "OFF",
         "HỌP",
         "SÁNG",
         "CHIỀU",
         "CHIỀU",
-        "CA GÃY (234)",
+        "CHIỀU",
         "SÁNG"
       ],
       "note": "",
       "diaChi": "Việt Hưng - LB"
     },
     {
-      "stt": 12,
+      "stt": 13,
       "nganhHang": "ĐIỆN LẠNH",
       "hang": "ELECTROLUX",
       "ten": "TÚ",
-      "sdt": "",
+      "sdt": "919352985",
       "gt": "Nam",
       "veSinh": "THỨ 3",
       "lich": [
         "HỌP",
+        "SÁNG",
         "CHIỀU",
         "OFF",
         "SÁNG",
         "SÁNG",
-        "CA GÃY (234)",
         "CHIỀU"
       ],
       "note": "",
-      "diaChi": ""
+      "diaChi": "55 ngõ 32 an dương"
     },
     {
-      "stt": 13,
+      "stt": 14,
       "nganhHang": "ĐIỆN LẠNH",
       "hang": "PANASONIC",
       "ten": "TUẤN",
@@ -262,50 +282,50 @@
       "lich": [
         "HỌP",
         "OFF",
-        "OFF",
+        "CHIỀU",
         "SÁNG",
+        "CHIỀU",
         "SÁNG",
-        "CA GÃY (2-456)",
-        "CHIỀU"
+        "SÁNG"
       ],
       "note": "",
       "diaChi": "Ngõ 2 Xuân Đỉnh"
     },
     {
-      "stt": 14,
+      "stt": 15,
       "nganhHang": "ĐIỆN LẠNH",
       "hang": "HITACHI",
       "ten": "LINH",
       "sdt": "326343998",
       "gt": "Nữ",
-      "veSinh": "THỨ 7",
+      "veSinh": "THỨ 6",
       "lich": [
-        "OFF",
-        "OFF",
-        "CHIỀU",
-        "CHIỀU",
-        "CHIỀU",
         "SÁNG",
+        "CHIỀU",
+        "OFF",
+        "HỌP",
+        "SÁNG",
+        "CHIỀU",
         "CHIỀU"
       ],
-      "note": "E xp k làm gãy tuần trước chị qly đã nc với a Dương ạ",
+      "note": "",
       "diaChi": "Số 17 tổ 8 Thượng Thanh Long Biên"
     },
     {
-      "stt": 15,
+      "stt": 16,
       "nganhHang": "ĐIỆN LẠNH",
       "hang": "SAMSUNG",
       "ten": "NHUNG",
       "sdt": "974528882",
       "gt": "Nữ",
-      "veSinh": "THỨ 2",
+      "veSinh": "CHỦ NHẬT",
       "lich": [
-        "SÁNG",
-        "HỌP",
+        "CHIỀU",
+        "CHIỀU",
         "OFF",
         "SÁNG",
+        "CHIỀU",
         "SÁNG",
-        "CA GÃY (2-456)",
         "SÁNG"
       ],
       "note": "",
