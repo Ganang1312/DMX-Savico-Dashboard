@@ -115,7 +115,7 @@
                 <p id="file-name-display" class="mt-4 text-sm text-gray-500">Chưa có file nào được chọn.</p>
             </div>
              <div class="mt-6 flex justify-center items-center gap-4">
-                <button data-target="capture-main-content" class="screenshot-btn styled-button hidden" style="background-color: var(--secondary-accent);">📸 Chụp ảnh tổng thể</button>
+                <button data-target="capture-all" class="screenshot-btn styled-button hidden" style="background-color: var(--secondary-accent);">📸 Chụp ảnh tổng thể</button>
             </div>
         </section>
 
@@ -139,9 +139,12 @@
 
             <!-- NHẬN XÉT NGÀY -->
             <section id="daily-summary-section" class="section-card hidden">
-                 <div class="flex justify-between items-center mb-4">
+                <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
                     <h2 class="text-xl font-bold text-gray-800 border-l-4 pl-3" style="border-color: var(--info-color);">3. Nhận xét ngày</h2>
-                    <button data-target="daily-summary-section" class="screenshot-btn text-sm py-2 px-4 styled-button" style="background-color: var(--secondary-accent);">📸 Chụp ảnh</button>
+                    <div class="flex items-center gap-2">
+                        <button id="export-weekly-review-btn" class="text-sm py-2 px-4 styled-button" style="background-color: var(--success-color);">📊 Xuất Excel Tuần</button>
+                        <button data-target="daily-summary-section" class="screenshot-btn text-sm py-2 px-4 styled-button" style="background-color: var(--secondary-accent);">📸 Chụp ảnh</button>
+                    </div>
                 </div>
                  <div id="daily-summary-container" class="mt-4"></div>
             </section>
@@ -162,6 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const exportAuxBtn = document.getElementById('export-aux-btn');
     const importAuxInput = document.getElementById('import-aux-input');
     const exportJsonBtn = document.getElementById('export-json-btn');
+    const exportWeeklyReviewBtn = document.getElementById('export-weekly-review-btn');
 
     const sections = [
         document.getElementById('main-schedule-section'),
@@ -181,6 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => { toast.className = toast.className.replace('show', ''); }, 3000);
     }
     
+    // Function to get the current day's key in the format "T2 (1/1)"
     function getCurrentDayKey() {
         const now = new Date();
         const dayOfWeek = now.getDay(); // 0 for Sunday, 1 for Monday, etc.
@@ -243,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     function findStartColumn(headerRow) {
-        const dateRegex = /T\d{1,2}\s\(\d{1,2}\/\d{1,2}\)/;
+        const dateRegex = /T\d{1,2}\s\(\d{1,2}\/\d{1,2}\)|CN\s\(\d{1,2}\/\d{1,2}\)/;
         return headerRow.findIndex(cell => typeof cell === 'string' && dateRegex.test(cell));
     }
 
@@ -254,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const rawHeaderLine2 = lines[1];
         
         const staticHeaderCount = findStartColumn(rawHeaderLine1);
-        if (staticHeaderCount === -1) throw new Error("Không tìm thấy cột ngày tháng hợp lệ (ví dụ: T2 (11/08)).");
+        if (staticHeaderCount === -1) throw new Error("Không tìm thấy cột ngày tháng hợp lệ (ví dụ: T2 (11/8)).");
 
         const hiddenColumnIndices = [];
         for (let i = staticHeaderCount; i < rawHeaderLine2.length; i++) {
@@ -298,7 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (summaryRows.hasOwnProperty(firstCell)) {
                 summaryRows[firstCell] = filterByIndices(cells, hiddenColumnIndices);
-            } else if (!isNaN(parseInt(cells[1]))) {
+            } else if (cells.length > 2 && !isNaN(parseInt(cells[1])) && String(cells[2]).trim()) {
                 employees.push({
                     id: cells[1], 
                     hoTen: cells[2], 
@@ -391,10 +396,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const currentDayKey = getCurrentDayKey();
         const activeDayHeader = document.querySelector('.day-header.active');
-        let dayToRender;
-
+        
         // Ưu tiên chọn ngày hiện tại nếu có trong lịch
         const currentDayExists = scheduleState.dateHeaders.some(header => header.name === currentDayKey);
+        let dayToRender;
 
         if (currentDayExists) {
             dayToRender = currentDayKey;
@@ -568,19 +573,17 @@ document.addEventListener('DOMContentLoaded', () => {
         mainScheduleContainer.innerHTML = html;
     }
 
-
-    function renderDailySummary(dayKey) {
-        if (!scheduleState) return;
+    // Function to get summary data for a specific day, used for both display and export
+    function getDailySummaryData(dayKey) {
+        if (!scheduleState) return null;
         const { employees, singleCellTaskMap, CA_SANG, CA_CHIEU, headerLine2, staticHeaderCount, dateHeaders } = scheduleState;
         
-        document.querySelectorAll('.day-header.active').forEach(h => h.classList.remove('active'));
-        document.querySelector(`.day-header[data-daykey="${dayKey}"]`)?.classList.add('active');
+        const dayInfo = dateHeaders.find(d => d.name === dayKey);
+        if (!dayInfo) return { totalWorkers: 0, workersSang: new Set(), workersChieu: new Set(), workersOff: new Set(employees.map(e => e.ten)) };
 
         const workersSang = new Set(), workersChieu = new Set(), workersOff = new Set(employees.map(e => e.ten));
         let totalWorkers = 0;
 
-        const dayInfo = dateHeaders.find(d => d.name === dayKey);
-        if (!dayInfo) return;
         const dayStartIndex = dateHeaders.slice(0, dateHeaders.indexOf(dayInfo)).reduce((acc, d) => acc + d.span, 0);
 
         employees.forEach(emp => {
@@ -617,6 +620,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 workersOff.delete(emp.ten);
             }
         });
+        
+        return { totalWorkers, workersSang, workersChieu, workersOff };
+    }
+
+    function renderDailySummary(dayKey) {
+        if (!scheduleState) return;
+        
+        document.querySelectorAll('.day-header.active').forEach(h => h.classList.remove('active'));
+        document.querySelector(`.day-header[data-daykey="${dayKey}"]`)?.classList.add('active');
+
+        const { totalWorkers, workersSang, workersChieu, workersOff } = getDailySummaryData(dayKey);
 
         let html = `<div class="summary-card-3d">
             <h3 class="font-bold mb-3 text-lg text-indigo-700 border-b pb-2">Nhận xét ngày: ${dayKey}</h3>
@@ -791,9 +805,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const workbook = XLSX.read(data, {type: 'array'});
                 const firstSheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[firstSheetName];
-                const csvData = XLSX.utils.sheet_to_csv(worksheet, { FS: '\t' });
+                // Using sheet_to_json to handle potential empty cells better
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
                 
-                scheduleState = processAndBuildState(csvData.split('\n').map(row => row.split('\t')));
+                scheduleState = processAndBuildState(jsonData);
                 renderAllFromState();
                 sections.forEach(s => s.classList.remove('hidden'));
                 document.querySelectorAll('.screenshot-btn').forEach(b => b.classList.remove('hidden'));
@@ -871,6 +886,42 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error("Lỗi khi xuất JSON:", error);
             showToast("Có lỗi xảy ra khi xuất file JSON.", false);
+        }
+    });
+    
+    // New Event Listener for Weekly Review Export
+    exportWeeklyReviewBtn.addEventListener('click', () => {
+        if (!scheduleState) {
+            showToast("Chưa có dữ liệu để xuất.", false);
+            return;
+        }
+
+        const dataForExcel = [['Thứ', 'Nhận xét']]; // Headers
+        
+        scheduleState.dateHeaders.forEach(dayHeader => {
+            const dayKey = dayHeader.name;
+            const summaryData = getDailySummaryData(dayKey);
+            if (summaryData) {
+                const { workersSang, workersChieu, workersOff } = summaryData;
+                const sangText = `Ca Sáng (${workersSang.size} NV): ${Array.from(workersSang).join(', ') || 'Không có'}`;
+                const chieuText = `Ca Chiều (${workersChieu.size} NV): ${Array.from(workersChieu).join(', ') || 'Không có'}`;
+                const nghiText = `Nghỉ (${workersOff.size} NV): ${Array.from(workersOff).join(', ') || 'Không có'}`;
+                const reviewString = `${sangText} ; ${chieuText} ; ${nghiText}`;
+                dataForExcel.push([dayKey, reviewString]);
+            }
+        });
+
+        try {
+            const worksheet = XLSX.utils.aoa_to_sheet(dataForExcel);
+            worksheet['!cols'] = [{ wch: 20 }, { wch: 150 }]; // Set column widths
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'NhanXetTuan');
+
+            XLSX.writeFile(workbook, 'LichNhanXetTuan.xlsx');
+            showToast("Xuất file nhận xét tuần thành công!", true);
+        } catch (error) {
+            console.error("Lỗi khi xuất Excel: ", error);
+            showToast("Có lỗi xảy ra khi tạo file Excel.", false);
         }
     });
 
