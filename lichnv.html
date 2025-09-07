@@ -37,6 +37,13 @@
         tr:last-child td { border-bottom: 0; }
         td > div, td > select { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 8px 4px; border: none; background: transparent;}
         td > div { cursor: pointer; }
+        .editable-cell > div {
+             border-radius: 4px;
+             transition: background-color 0.2s;
+        }
+        .editable-cell:hover > div {
+            background-color: rgba(0,0,0,0.05);
+        }
         .ca-sang { background-color: #e0f2fe; color: #0c4a6e; }
         .ca-chieu { background-color: #fff7ed; color: #9a3412; }
         .ca-nghi { background-color: #f9fafb; }
@@ -54,12 +61,14 @@
         .weekend-header { background-color: #eef2ff !important; color: #312e81; }
         .day-header { cursor: pointer; transition: background-color 0.2s; }
         .day-header.active { background-color: var(--info-color) !important; color: white; }
-        .styled-button {
+        .styled-button, label.styled-button {
             font-weight: 600; padding: 0.75rem 1.5rem; border-radius: 8px; transition: all 0.2s ease;
             cursor: pointer; color: var(--text-on-dark);
             box-shadow: -3px -3px 7px var(--shadow-light), 3px 3px 5px var(--shadow-dark);
+            display: inline-block; text-align: center;
         }
-        .styled-button:hover { transform: translateY(-2px); }
+        .styled-button:hover, label.styled-button:hover { transform: translateY(-2px); }
+        .styled-button:disabled { background-color: #9ca3af; cursor: not-allowed; transform: none; box-shadow: none; }
         #toast-message {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             padding: 12px 24px; border-radius: 8px; color: white; z-index: 100;
@@ -93,6 +102,7 @@
         td.col-sticky > div { justify-content: flex-start; padding-left: 1rem; }
         tr.aux-row > td.col-sticky { text-align: center; }
         tr.aux-row > td.col-sticky > div { justify-content: center; padding-left: 0; }
+        .inactive-row { background-color: #e5e7eb; text-decoration: line-through; color: #9ca3af; }
     </style>
 </head>
 <body class="p-2 md:p-6">
@@ -104,14 +114,29 @@
             <p class="text-md text-gray-500">Tải file Excel để tự động điền vào các bảng báo cáo</p>
         </div>
 
-        <!-- PHẦN NHẬP LIỆU -->
+        <!-- MỤC QUẢN LÝ DỮ LIỆU -->
         <section class="section-card">
-            <h2 class="text-xl font-bold text-gray-800 mb-4 border-l-4 pl-3" style="border-color: var(--primary-accent);">1. Nhập dữ liệu</h2>
+            <h2 class="text-xl font-bold text-gray-800 mb-4 border-l-4 pl-3" style="border-color: var(--primary-accent);">1. Quản lý Dữ liệu Toàn bộ</h2>
+            <div class="flex flex-col md:flex-row items-center justify-center gap-4 bg-gray-50 p-6 border-2 border-dashed border-gray-300 rounded-lg">
+                 <label for="import-all-data-input" class="styled-button w-full md:w-auto" style="background-color: var(--info-color);">
+                    📥 Nhập Toàn Bộ Dữ Liệu (.json)
+                </label>
+                <input type="file" id="import-all-data-input" class="hidden" accept=".json">
+                 <button id="export-all-data-btn" class="styled-button w-full md:w-auto" style="background-color: var(--secondary-accent);">
+                    📤 Xuất Toàn Bộ Dữ Liệu (.json)
+                </button>
+            </div>
+            <p class="mt-4 text-sm text-center text-gray-500">Lưu và tải lại toàn bộ trạng thái của ứng dụng (lịch làm việc, nhiệm vụ, danh sách NV...).</p>
+        </section>
+
+        <!-- PHẦN NHẬP LỊCH GỐC -->
+        <section class="section-card">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 border-l-4 pl-3" style="border-color: var(--success-color);">2. Nhập Lịch Gốc</h2>
             <div class="flex flex-col items-center justify-center bg-gray-50 p-6 border-2 border-dashed border-gray-300 rounded-lg">
                  <label for="excel-upload" class="styled-button" style="background-color: var(--success-color);">
-                    📁 Chọn File Excel
+                    📁 Chọn File Lịch Gốc (Excel)
                 </label>
-                <input type="file" id="excel-upload" class="hidden" accept=".xlsx, .xls, .csv">
+                <input type="file" id="excel-upload" class="hidden" accept=".xlsx, .xls">
                 <p id="file-name-display" class="mt-4 text-sm text-gray-500">Chưa có file nào được chọn.</p>
             </div>
              <div class="mt-6 flex justify-center items-center gap-4">
@@ -123,12 +148,17 @@
             <div id="capture-main-content" class="space-y-8">
                 <!-- BẢNG LỊCH TỔNG HỢP -->
                 <section id="main-schedule-section" class="section-card hidden">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-bold text-gray-800 border-l-4 pl-3" style="border-color: var(--success-color);">2. Bảng Lịch Tổng Hợp</h2>
+                    <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+                        <h2 class="text-xl font-bold text-gray-800 border-l-4 pl-3" style="border-color: var(--warning-color);">3. Bảng Lịch Tổng Hợp (Tuần)</h2>
                          <div class="flex gap-2 flex-wrap justify-end">
-                            <button id="export-json-btn" class="text-sm py-2 px-4 styled-button" style="background-color: #f59e0b;">Xuất JSON</button>
-                            <button id="export-aux-btn" class="text-sm py-2 px-4 styled-button" style="background-color: #2563eb;">Xuất CSV</button>
-                            <label for="import-aux-input" class="text-sm py-2 px-4 styled-button" style="background-color: #16a34a;">Nhập CSV</label>
+                            <button id="clear-tasks-btn" class="text-sm py-2 px-4 styled-button" style="background-color: var(--danger-color);">Xóa Nhiệm Vụ</button>
+                            <button id="auto-assign-btn" class="text-sm py-2 px-4 styled-button" style="background-color: #6366f1;">Tự động phân chia</button>
+                            <button id="update-stats-btn" class="text-sm py-2 px-4 styled-button" style="background-color: #84cc16;">Cộng dồn vào Bảng 4</button>
+                            <button id="export-schedule-csv-btn" class="text-sm py-2 px-4 styled-button" style="background-color: #2dd4bf;">Xuất Lịch CSV</button>
+                            <label for="import-schedule-csv-input" class="text-sm py-2 px-4 styled-button" style="background-color: #38bdf8;">Nhập Lịch CSV</label>
+                            <input type="file" id="import-schedule-csv-input" class="hidden" accept=".csv">
+                            <button id="export-task-csv-btn" class="text-sm py-2 px-4 styled-button" style="background-color: #a855f7;">Xuất Nhiệm Vụ CSV</button>
+                            <label for="import-aux-input" class="text-sm py-2 px-4 styled-button" style="background-color: #16a34a;">Nhập Nhiệm Vụ CSV</label>
                             <input type="file" id="import-aux-input" class="hidden" accept=".csv">
                             <button data-target="main-schedule-section" class="screenshot-btn text-sm py-2 px-4 styled-button" style="background-color: var(--secondary-accent);">📸</button>
                         </div>
@@ -136,11 +166,23 @@
                     <div id="main-schedule-container" class="table-container"></div>
                 </section>
             </div>
+             <!-- BẢNG 4: THỐNG KÊ NHIỆM VỤ -->
+            <section id="task-summary-section" class="section-card hidden">
+                 <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+                    <h2 class="text-xl font-bold text-gray-800 border-l-4 pl-3" style="border-color: var(--danger-color);">4. Bảng Thống Kê Nhiệm Vụ (Tháng)</h2>
+                    <div class="flex items-center gap-2">
+                        <button id="undo-history-btn" class="text-sm py-2 px-4 styled-button" style="background-color: var(--info-color);" disabled>↩️ Hoàn tác</button>
+                        <button id="clear-history-btn" class="text-sm py-2 px-4 styled-button" style="background-color: var(--danger-color);">Xóa Lịch Sử Đã Lưu</button>
+                        <button data-target="task-summary-section" class="screenshot-btn text-sm py-2 px-4 styled-button" style="background-color: var(--secondary-accent);">📸</button>
+                    </div>
+                </div>
+                 <div id="task-summary-container" class="table-container"></div>
+            </section>
 
-            <!-- NHẬN XÉT NGÀY -->
+            <!-- BẢNG 5: NHẬN XÉT NGÀY -->
             <section id="daily-summary-section" class="section-card hidden">
                 <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
-                    <h2 class="text-xl font-bold text-gray-800 border-l-4 pl-3" style="border-color: var(--info-color);">3. Nhận xét ngày</h2>
+                    <h2 class="text-xl font-bold text-gray-800 border-l-4 pl-3" style="border-color: var(--info-color);">5. Nhận xét ngày</h2>
                     <div class="flex items-center gap-2">
                         <button id="export-weekly-review-btn" class="text-sm py-2 px-4 styled-button" style="background-color: var(--success-color);">📊 Xuất Excel Tuần</button>
                         <button data-target="daily-summary-section" class="screenshot-btn text-sm py-2 px-4 styled-button" style="background-color: var(--secondary-accent);">📸 Chụp ảnh</button>
@@ -162,19 +204,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const fileNameDisplay = document.getElementById('file-name-display');
     const mainScheduleContainer = document.getElementById('main-schedule-container');
     const dailySummaryContainer = document.getElementById('daily-summary-container');
-    const exportAuxBtn = document.getElementById('export-aux-btn');
+    const taskSummaryContainer = document.getElementById('task-summary-container');
     const importAuxInput = document.getElementById('import-aux-input');
-    const exportJsonBtn = document.getElementById('export-json-btn');
     const exportWeeklyReviewBtn = document.getElementById('export-weekly-review-btn');
+    const updateStatsBtn = document.getElementById('update-stats-btn');
+    const clearHistoryBtn = document.getElementById('clear-history-btn');
+    const undoHistoryBtn = document.getElementById('undo-history-btn');
+    const autoAssignBtn = document.getElementById('auto-assign-btn');
+    const exportScheduleCsvBtn = document.getElementById('export-schedule-csv-btn');
+    const importScheduleCsvInput = document.getElementById('import-schedule-csv-input');
+    const exportAllDataBtn = document.getElementById('export-all-data-btn');
+    const importAllDataInput = document.getElementById('import-all-data-input');
+    const exportTaskCsvBtn = document.getElementById('export-task-csv-btn');
+    const clearTasksBtn = document.getElementById('clear-tasks-btn');
+
 
     const sections = [
         document.getElementById('main-schedule-section'),
+        document.getElementById('task-summary-section'),
         document.getElementById('daily-summary-section')
     ];
     
     // --- GLOBAL STATE --- //
     let scheduleState = null;
-    const LOCAL_STORAGE_KEY = 'dmxScheduleData_v11'; // Incremented version
+    let savedTaskCountsHistory = [];
+    const LOCAL_STORAGE_KEY = 'dmxScheduleData_v19'; // Incremented version for new logic
 
     // --- FUNCTIONS --- //
     function showToast(message, isSuccess = true) {
@@ -185,18 +239,13 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => { toast.className = toast.className.replace('show', ''); }, 3000);
     }
     
-    // Function to get the current day's key in the format "T2 (1/1)"
     function getCurrentDayKey() {
         const now = new Date();
-        const dayOfWeek = now.getDay(); // 0 for Sunday, 1 for Monday, etc.
+        const dayOfWeek = now.getDay();
         const date = now.getDate();
-        const month = now.getMonth() + 1; // getMonth() is zero-based
-
+        const month = now.getMonth() + 1;
         const weekdayMap = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-        const weekdayName = weekdayMap[dayOfWeek];
-
-        // Format: "T2 (12/8)"
-        return `${weekdayName} (${date}/${month})`;
+        return `${weekdayMap[dayOfWeek]} (${date}/${month})`;
     }
 
     function saveStateToLocalStorage() {
@@ -205,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(scheduleState));
             } catch (error) {
                 console.error("Lỗi khi lưu vào LocalStorage:", error);
-                showToast("Không thể lưu trạng thái vào bộ nhớ máy.", false);
+                showToast("Không thể lưu trạng thái.", false);
             }
         }
     }
@@ -215,10 +264,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (savedData) {
             try {
                 scheduleState = JSON.parse(savedData);
-                renderAllFromState(false); // Don't save again when loading
+                savedTaskCountsHistory = []; // Reset history on load
+                undoHistoryBtn.disabled = true;
+                renderAllFromState(false);
                 sections.forEach(s => s.classList.remove('hidden'));
                 document.querySelectorAll('.screenshot-btn').forEach(b => b.classList.remove('hidden'));
-                showToast("Đã tải lại phiên làm việc từ bộ nhớ máy.", true);
+                showToast("Đã tải lại phiên làm việc từ bộ nhớ đệm.", true);
             } catch (error) {
                 console.error("Lỗi khi tải dữ liệu từ LocalStorage:", error);
                 localStorage.removeItem(LOCAL_STORAGE_KEY);
@@ -228,20 +279,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function initializeData() {
         try {
-            // Cố gắng fetch file lichnv.json. Thêm cache-busting để luôn lấy file mới nhất.
-            const response = await fetch(`lichnv.json?v=${new Date().getTime()}`);
-            if (!response.ok) {
-                throw new Error('File lichnv.json không tìm thấy, thử tải từ bộ nhớ máy.');
+            // 1. Cố gắng tải từ file JSON trước. Thêm timestamp để tránh cache.
+            const response = await fetch(`dmx_schedule_backup.json?v=${new Date().getTime()}`);
+            if (!response.ok) throw new Error('File dmx_schedule_backup.json không tìm thấy, thử tải từ bộ nhớ máy.');
+
+            const fileState = await response.json();
+            if (fileState && fileState.employees && fileState.dateHeaders) {
+                scheduleState = fileState;
+                savedTaskCountsHistory = [];
+                undoHistoryBtn.disabled = true;
+                renderAllFromState(true); // Hiển thị và lưu vào localStorage
+                sections.forEach(s => s.classList.remove('hidden'));
+                document.querySelectorAll('.screenshot-btn').forEach(b => b.classList.remove('hidden'));
+                showToast("Đã tải dữ liệu từ file dmx_schedule_backup.json!", true);
+            } else {
+                throw new Error("Tệp JSON không hợp lệ.");
             }
-            const data = await response.json();
-            scheduleState = data;
-            renderAllFromState(false); // Don't save again when loading
-            sections.forEach(s => s.classList.remove('hidden'));
-            document.querySelectorAll('.screenshot-btn').forEach(b => b.classList.remove('hidden'));
-            showToast("Đã tải dữ liệu từ file lichnv.json thành công!", true);
         } catch (error) {
-            console.log(error.message); // Log lỗi để debug
-            // Nếu fetch thất bại, quay lại dùng localStorage
+            // 2. Nếu tải file thất bại, chuyển sang tải từ localStorage.
+            console.log(error.message);
             loadStateFromLocalStorage();
         }
     }
@@ -263,9 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const hiddenColumnIndices = [];
         for (let i = staticHeaderCount; i < rawHeaderLine2.length; i++) {
-            if (String(rawHeaderLine2[i]).trim() === 'Ca 1') {
-                hiddenColumnIndices.push(i);
-            }
+            if (String(rawHeaderLine2[i]).trim() === 'Ca 1') hiddenColumnIndices.push(i);
         }
         
         const filterByIndices = (arr, indices) => arr.filter((_, i) => !indices.includes(i));
@@ -284,9 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentDayName = dayName;
                 dateHeaders.push({ name: currentDayName, span: 0 });
             }
-            if(dateHeaders.length > 0) {
-                dateHeaders[dateHeaders.length - 1].span++;
-            }
+            if(dateHeaders.length > 0) dateHeaders[dateHeaders.length - 1].span++;
         }
 
         const employees = [];
@@ -295,9 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 2; i < lines.length; i++) {
             const cells = lines[i];
             const department = String(cells[0]).trim().toUpperCase();
-            if (department === 'BP QUẢN LÝ SIÊU THỊ' || department === 'BP TRƯỞNG CA') {
-                continue;
-            }
+            if (['BP QUẢN LÝ SIÊU THỊ', 'BP TRƯỞNG CA'].includes(department)) continue;
 
             const firstCell = String(cells[0]).trim().toUpperCase();
 
@@ -309,7 +359,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     hoTen: cells[2], 
                     ten: String(cells[2]).split(' ').pop(),
                     kpi: { erp: 0, gh1: 0, gh2: 0, gc: 0 },
-                    shifts: filterByIndices(cells, hiddenColumnIndices).slice(staticHeaderCount)
+                    shifts: filterByIndices(cells, hiddenColumnIndices).slice(staticHeaderCount),
+                    gender: 'nam', // Default, user can change
+                    isActive: true // Default
                 });
             }
         }
@@ -342,7 +394,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
         
-        return { headerLine1, headerLine2, dateHeaders, employees, staticHeaderCount, singleCellTaskMap, CA_SANG, CA_CHIEU };
+        return { headerLine1, headerLine2, dateHeaders, employees, staticHeaderCount, singleCellTaskMap, CA_SANG, CA_CHIEU, savedTaskCounts: {} };
     }
 
     function recalculateKpi(state) {
@@ -351,7 +403,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         employees.forEach(emp => {
             emp.kpi = { erp: 0, gh1: 0, gh2: 0, gc: 0 };
-
             const tasksByHalfDay = {}; 
             if (singleCellTaskMap[emp.ten]) {
                 Object.entries(singleCellTaskMap[emp.ten]).forEach(([dayKey, dayTasks]) => {
@@ -373,114 +424,76 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             emp.shifts.forEach((shiftValue, index) => {
-                if (shiftValue?.trim()) {
+                if (String(shiftValue || '').trim()) {
                     const shiftName = headerLine2[staticHeaderCount + index];
                     emp.kpi.gc += SHIFT_DURATIONS[shiftName] || 0;
                 }
             });
         });
         
-        // Sắp xếp nhân viên
-        state.employees.sort((a, b) => {
-            if (b.kpi.erp !== a.kpi.erp) {
-                return b.kpi.erp - a.kpi.erp;
-            }
-            return b.kpi.gh1 - a.kpi.gh1;
-        });
+        state.employees.sort((a, b) => b.kpi.erp - a.kpi.erp || b.kpi.gh1 - a.kpi.gh1);
     }
 
     function renderAllFromState(shouldSave = true) {
         if (!scheduleState) return;
         recalculateKpi(scheduleState);
         renderCombinedTable(scheduleState);
+        renderTaskSummaryTable();
         
         const currentDayKey = getCurrentDayKey();
         const activeDayHeader = document.querySelector('.day-header.active');
-        
-        // Ưu tiên chọn ngày hiện tại nếu có trong lịch
         const currentDayExists = scheduleState.dateHeaders.some(header => header.name === currentDayKey);
-        let dayToRender;
-
-        if (currentDayExists) {
-            dayToRender = currentDayKey;
-        } else {
-            // Nếu không, dùng ngày đang active hoặc ngày đầu tiên trong lịch
-            dayToRender = activeDayHeader ? activeDayHeader.dataset.daykey : scheduleState.dateHeaders[0]?.name;
-        }
+        let dayToRender = currentDayExists ? currentDayKey : (activeDayHeader ? activeDayHeader.dataset.daykey : scheduleState.dateHeaders[0]?.name);
         
-        if(dayToRender) {
-            renderDailySummary(dayToRender);
-        }
-
-        if (shouldSave) {
-            saveStateToLocalStorage();
-        }
+        if(dayToRender) renderDailySummary(dayToRender);
+        if (shouldSave) saveStateToLocalStorage();
     }
     
     function renderCombinedTable(data) {
         const { headerLine2, dateHeaders, employees, staticHeaderCount, singleCellTaskMap, CA_SANG, CA_CHIEU } = data;
-        const kpiHeaders = [
-            { key: 'erp', text: '📦 Ca ERP', class: 'kpi-header-erp' },
-            { key: 'gh1', text: '🚚 Ca GH1', class: 'kpi-header-gh1' },
-            { key: 'gh2', text: '🚛 Ca GH2', class: 'kpi-header-gh2' },
-            { key: 'gc', text: '⏱️ Giờ công', class: 'kpi-header' }
-        ];
-
         let html = '<table><thead class="header-sticky">';
-        // Dòng header 1
-        html += '<tr>';
-        html += `<th class="col-sticky p-2 border-r">Nhân viên</th>`;
-        html += `<th colspan="${kpiHeaders.length}" class="kpi-header day-separator">Tổng kết & KPI</th>`;
+        // Dòng header 1 & 2
+        html += `<tr><th class="col-sticky p-2 border-r">Nhân viên</th>
+            <th colspan="4" class="kpi-header day-separator">Tổng kết Tuần</th>`;
         dateHeaders.forEach(day => {
             const isWeekend = day.name.startsWith('T7') || day.name.startsWith('CN');
             html += `<th colspan="${day.span}" data-daykey="${day.name}" class="day-header p-2 ${isWeekend ? 'weekend-header' : ''} day-separator">${day.name}</th>`;
         });
         html += '</tr>';
-        
-        // Dòng header 2
-        html += '<tr style="top: 41px;">';
-        html += `<th class="col-sticky p-2 border-r">Ca</th>`;
-        kpiHeaders.forEach(h => html += `<th class="${h.class} p-1 border-r">${h.text}</th>`);
+        html += `<tr style="top: 41px;"><th class="col-sticky p-2 border-r">Ca</th>
+            <th class="kpi-header-erp p-1 border-r">📦 Ca ERP</th><th class="kpi-header-gh1 p-1 border-r">🚚 Ca GH1</th>
+            <th class="kpi-header-gh2 p-1 border-r">🚛 Ca GH2</th><th class="kpi-header p-1 border-r">⏱️ Giờ công</th>`;
         let shiftCounter = 0;
         dateHeaders.forEach(day => {
             for(let i = 0; i < day.span; i++) {
                 const shiftName = headerLine2[staticHeaderCount + shiftCounter + i] || '';
                 let shiftClass = CA_SANG.includes(shiftName) ? 'ca-sang' : CA_CHIEU.includes(shiftName) ? 'ca-chieu' : '';
-                const isLastInDay = (i === day.span - 1);
-                html += `<th class="p-1 border-r ${shiftClass} ${isLastInDay ? 'day-separator' : ''}">${shiftName}</th>`;
+                html += `<th class="p-1 border-r ${shiftClass} ${i === day.span - 1 ? 'day-separator' : ''}">${shiftName}</th>`;
             }
             shiftCounter += day.span;
         });
         html += '</tr>';
 
-        // Hàng đếm số lượng nhân viên
-        html += '<tr class="shift-count-row header-sticky" style="top: 82px;">';
-        html += '<th class="col-sticky p-1 border-r">Tổng NV</th>';
-        html += `<td colspan="${kpiHeaders.length}" class="kpi-header day-separator"></td>`;
+        // Dòng đếm NV
+        html += '<tr class="shift-count-row header-sticky" style="top: 82px;"><th class="col-sticky p-1 border-r">Tổng NV</th><td colspan="4" class="kpi-header day-separator"></td>';
         for(let i = 0; i < headerLine2.length - staticHeaderCount; i++) {
-            const count = employees.filter(emp => emp.shifts[i]?.trim()).length;
+            const count = employees.filter(emp => emp.isActive && String(emp.shifts[i] || '').trim()).length;
             let separatorClass = '';
             let currentCount = 0;
             for(const day of dateHeaders) {
                 currentCount += day.span;
-                if (i === currentCount - 1) {
-                    separatorClass = 'day-separator';
-                    break;
-                }
+                if (i === currentCount - 1) { separatorClass = 'day-separator'; break; }
             }
             html += `<td class="p-1 border-r ${separatorClass}">${count}</td>`;
         }
         html += '</tr></thead><tbody>';
 
-        // Hàng nhân viên
+        // Dòng nhân viên
         employees.forEach(emp => {
-            html += `<tr data-empid="${emp.id}"><td class="col-sticky p-2 border-r font-semibold"><div>${emp.hoTen}</div></td>`;
-            
-            // KPI Cells
-            kpiHeaders.forEach((h, i) => {
-                const isLast = i === kpiHeaders.length - 1;
-                html += `<td class="${h.class} ${isLast ? 'day-separator' : ''}"><div>${emp.kpi[h.key]}</div></td>`;
-            });
+            const inactiveClass = emp.isActive ? '' : 'inactive-row';
+            html += `<tr data-empid="${emp.id}" class="${inactiveClass}"><td class="col-sticky p-2 border-r font-semibold"><div>${emp.hoTen}</div></td>`;
+            html += `<td class="kpi-header-erp"><div>${emp.kpi.erp}</div></td><td class="kpi-header-gh1"><div>${emp.kpi.gh1}</div></td>
+                     <td class="kpi-header-gh2"><div>${emp.kpi.gh2}</div></td><td class="kpi-header day-separator"><div>${emp.kpi.gc}</div></td>`;
 
             let cumulativeSpan = 0;
             dateHeaders.forEach(day => {
@@ -488,26 +501,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     const shiftIndex = cumulativeSpan + i;
                     const shiftValue = emp.shifts[shiftIndex];
                     const shiftName = headerLine2[staticHeaderCount + shiftIndex] || '';
-                    
                     const task = singleCellTaskMap[emp.ten]?.[day.name]?.[shiftName];
-                    
-                    let cellContent = '&nbsp;';
-                    let cellClass = 'ca-nghi';
-
-                    if (shiftValue?.trim()) {
+                    let cellContent = '&nbsp;', cellClass = 'ca-nghi';
+                    if (String(shiftValue || '').trim()) {
                         if (task) {
                             cellContent = task;
-                            if (task === 'GH1') cellClass = 'task-gh1';
-                            else if (task === 'GH2') cellClass = 'task-gh2';
-                            else if (task === 'ERP') cellClass = 'task-erp';
+                            cellClass = `task-${task.toLowerCase()}`;
                         } else {
                             cellContent = '✔️';
                             cellClass = CA_SANG.includes(shiftName) ? 'ca-sang' : 'ca-chieu';
                         }
                     }
-                    
-                    const separatorClass = (i === day.span - 1) ? 'day-separator' : '';
-                    html += `<td class="${cellClass} ${separatorClass}" data-shift-index="${shiftIndex}" data-daykey="${day.name}" data-ca="${shiftName}"><div>${cellContent}</div></td>`;
+                    html += `<td class="editable-cell ${cellClass} ${i === day.span - 1 ? 'day-separator' : ''}" data-empid="${emp.id}" data-shift-index="${shiftIndex}" data-daykey="${day.name}" data-ca="${shiftName}"><div>${cellContent}</div></td>`;
                 }
                 cumulativeSpan += day.span;
             });
@@ -518,11 +523,9 @@ document.addEventListener('DOMContentLoaded', () => {
         ['GH1', 'GH2', 'ERP'].forEach(taskName => {
             const taskClass = `task-${taskName.toLowerCase()}`;
             const icon = taskName === 'ERP' ? '📦' : (taskName === 'GH1' ? '🚚' : '🚛');
-            html += `<tr class="border-b aux-row"><td colspan="${1 + kpiHeaders.length}" class="col-sticky p-2 border-r font-semibold ${taskClass} day-separator"><div>${icon} ${taskName === 'ERP' ? 'ERP (Nữ)' : `Giao Hàng ${taskName.slice(-1)}`}</div></td>`;
-            
+            html += `<tr class="border-b aux-row"><td colspan="5" class="col-sticky p-2 border-r font-semibold ${taskClass} day-separator"><div>${icon} ${taskName === 'ERP' ? 'ERP (Nữ)' : `Giao Hàng ${taskName.slice(-1)} (Nam)`}</div></td>`;
             dateHeaders.forEach(day => {
                 let workerSang = '', workerChieu = '';
-                
                 Object.entries(singleCellTaskMap).forEach(([worker, dayTasks]) => {
                     if(dayTasks[day.name]) {
                         Object.entries(dayTasks[day.name]).forEach(([shift, task]) => {
@@ -533,19 +536,21 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                     }
                 });
-
                 const dayInfo = dateHeaders.find(d => d.name === day.name);
                 const dayStartIndex = dateHeaders.slice(0, dateHeaders.indexOf(dayInfo)).reduce((acc, d) => acc + d.span, 0);
-                
-                const availableWorkersSang = new Set();
-                const availableWorkersChieu = new Set();
-
+                const availableWorkersSang = new Set(), availableWorkersChieu = new Set();
                 employees.forEach(emp => {
+                    if (!emp.isActive) return;
+                    // Check if employee matches task gender
+                    const empGender = emp.gender;
+                    const taskGender = taskName === 'ERP' ? 'nu' : 'nam';
+                    if (empGender !== taskGender) return;
+                    
                     let worksSang = false, worksChieu = false;
                     for(let i=0; i<dayInfo.span; i++) {
                         const shiftIndex = dayStartIndex + i;
-                        const shiftName = headerLine2[staticHeaderCount + shiftIndex];
-                        if(emp.shifts[shiftIndex]?.trim()){
+                        if(String(emp.shifts[shiftIndex] || '').trim()){
+                            const shiftName = headerLine2[staticHeaderCount + shiftIndex];
                             if(CA_SANG.includes(shiftName)) worksSang = true;
                             if(CA_CHIEU.includes(shiftName)) worksChieu = true;
                         }
@@ -556,24 +561,82 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if(workerSang && !availableWorkersSang.has(workerSang)) availableWorkersSang.add(workerSang);
                 if(workerChieu && !availableWorkersChieu.has(workerChieu)) availableWorkersChieu.add(workerChieu);
-
                 const optionsSang = `<option value="">-- Trống --</option>` + [...availableWorkersSang].map(e => `<option value="${e}" ${e === workerSang ? 'selected' : ''}>${e}</option>`).join('');
                 const optionsChieu = `<option value="">-- Trống --</option>` + [...availableWorkersChieu].map(e => `<option value="${e}" ${e === workerChieu ? 'selected' : ''}>${e}</option>`).join('');
-
-                const selectSang = `<select data-daykey="${day.name}" data-period="Sang" data-task="${taskName}" class="aux-edit-select w-full h-full">${optionsSang}</select>`;
-                const selectChieu = `<select data-daykey="${day.name}" data-period="Chieu" data-task="${taskName}" class="aux-edit-select w-full h-full">${optionsChieu}</select>`;
-
-                html += `<td colspan="${CA_SANG.length}" class="p-0 aux-sang aux-${taskName.toLowerCase()}">${selectSang}</td>`;
-                html += `<td colspan="${CA_CHIEU.length}" class="p-0 aux-chieu aux-${taskName.toLowerCase()} day-separator">${selectChieu}</td>`;
+                html += `<td colspan="${CA_SANG.length}" class="p-0 aux-sang aux-${taskName.toLowerCase()}"><select data-daykey="${day.name}" data-period="Sang" data-task="${taskName}" class="aux-edit-select w-full h-full">${optionsSang}</select></td>`;
+                html += `<td colspan="${CA_CHIEU.length}" class="p-0 aux-chieu aux-${taskName.toLowerCase()} day-separator"><select data-daykey="${day.name}" data-period="Chieu" data-task="${taskName}" class="aux-edit-select w-full h-full">${optionsChieu}</select></td>`;
             });
             html += '</tr>';
         });
-
         html += '</tbody></table>';
         mainScheduleContainer.innerHTML = html;
     }
+    
+    function renderTaskSummaryTable() {
+        if (!scheduleState || !scheduleState.employees) return;
+        const { employees, savedTaskCounts } = scheduleState;
 
-    // Function to get summary data for a specific day, used for both display and export
+        const now = new Date();
+        const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+
+        const totalGH1 = daysInMonth * 2, totalGH2 = daysInMonth * 2, totalERP = daysInMonth * 2;
+        
+        const activeMale = employees.filter(e => e.isActive && e.gender === 'nam').length;
+        const activeFemale = employees.filter(e => e.isActive && e.gender === 'nu').length;
+
+        const targetGH1 = activeMale > 0 ? totalGH1 / activeMale : 0;
+        const targetGH2 = activeMale > 0 ? totalGH2 / activeMale : 0;
+        const targetERP = activeFemale > 0 ? totalERP / activeFemale : 0;
+
+        let html = '<table><thead><tr class="header-sticky">';
+        const headers = ['NV', 'Giới tính', 'Trạng thái', 'GH1 Đã làm', 'GH2 Đã làm', 'ERP Đã làm', 'Mục tiêu GH1', 'Mục tiêu GH2', 'Mục tiêu ERP', 'Còn lại GH1', 'Còn lại GH2', 'Còn lại ERP'];
+        headers.forEach(h => html += `<th>${h}</th>`);
+        html += '</tr></thead><tbody>';
+
+        employees.forEach(emp => {
+            const savedCounts = savedTaskCounts[emp.id] || { gh1: 0, gh2: 0, erp: 0 };
+            const isMale = emp.gender === 'nam';
+            
+            const empTargetGH1 = emp.isActive && isMale ? targetGH1 : 0;
+            const empTargetGH2 = emp.isActive && isMale ? targetGH2 : 0;
+            const empTargetERP = emp.isActive && !isMale ? targetERP : 0;
+
+            const remainingGH1 = empTargetGH1 - savedCounts.gh1;
+            const remainingGH2 = empTargetGH2 - savedCounts.gh2;
+            const remainingERP = empTargetERP - savedCounts.erp;
+            
+            const inactiveClass = emp.isActive ? '' : 'inactive-row';
+
+            html += `<tr data-empid="${emp.id}" class="${inactiveClass}">
+                <td class="font-semibold">${emp.hoTen}</td>
+                <td>
+                    <select data-empid="${emp.id}" data-prop="gender" class="emp-prop-change">
+                        <option value="nam" ${isMale ? 'selected' : ''}>Nam</option>
+                        <option value="nu" ${!isMale ? 'selected' : ''}>Nữ</option>
+                    </select>
+                </td>
+                <td>
+                     <select data-empid="${emp.id}" data-prop="isActive" class="emp-prop-change">
+                        <option value="true" ${emp.isActive ? 'selected' : ''}>Đang làm</option>
+                        <option value="false" ${!emp.isActive ? 'selected' : ''}>Đã nghỉ</option>
+                    </select>
+                </td>
+                <td class="task-gh1">${savedCounts.gh1}</td>
+                <td class="task-gh2">${savedCounts.gh2}</td>
+                <td class="task-erp">${savedCounts.erp}</td>
+                <td>${empTargetGH1.toFixed(1)}</td>
+                <td>${empTargetGH2.toFixed(1)}</td>
+                <td>${empTargetERP.toFixed(1)}</td>
+                <td class="${remainingGH1 < 0 ? 'text-red-500 font-bold' : ''}">${remainingGH1.toFixed(1)}</td>
+                <td class="${remainingGH2 < 0 ? 'text-red-500 font-bold' : ''}">${remainingGH2.toFixed(1)}</td>
+                <td class="${remainingERP < 0 ? 'text-red-500 font-bold' : ''}">${remainingERP.toFixed(1)}</td>
+            </tr>`;
+        });
+
+        html += '</tbody></table>';
+        taskSummaryContainer.innerHTML = html;
+    }
+
     function getDailySummaryData(dayKey) {
         if (!scheduleState) return null;
         const { employees, singleCellTaskMap, CA_SANG, CA_CHIEU, headerLine2, staticHeaderCount, dateHeaders } = scheduleState;
@@ -587,13 +650,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const dayStartIndex = dateHeaders.slice(0, dateHeaders.indexOf(dayInfo)).reduce((acc, d) => acc + d.span, 0);
 
         employees.forEach(emp => {
+            if (!emp.isActive) {
+                workersOff.delete(emp.ten); // Remove inactive from off list if they weren't there
+                return;
+            }
             let worksSang = false, worksChieu = false;
             let taskSang = new Set(), taskChieu = new Set();
             
             for(let i=0; i<dayInfo.span; i++) {
                 const shiftIndex = dayStartIndex + i;
                 const shiftName = headerLine2[staticHeaderCount + shiftIndex];
-                if(emp.shifts[shiftIndex]?.trim()){
+                if(String(emp.shifts[shiftIndex] || '').trim()){
                     const task = singleCellTaskMap[emp.ten]?.[dayKey]?.[shiftName];
                     if(CA_SANG.includes(shiftName)) {
                         worksSang = true;
@@ -605,16 +672,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             }
-
-            if(worksSang) {
-                const taskString = taskSang.size > 0 ? ` (${Array.from(taskSang).join(', ')})` : '';
-                workersSang.add(`${emp.ten}${taskString}`);
-            }
-            if(worksChieu) {
-                const taskString = taskChieu.size > 0 ? ` (${Array.from(taskChieu).join(', ')})` : '';
-                workersChieu.add(`${emp.ten}${taskString}`);
-            }
-            
+            const formatWorker = (emp, tasks) => `${emp.ten}${tasks.size > 0 ? ` (${[...tasks].join(', ')})` : ''}`;
+            if(worksSang) workersSang.add(formatWorker(emp, taskSang));
+            if(worksChieu) workersChieu.add(formatWorker(emp, taskChieu));
             if (worksSang || worksChieu) {
                 totalWorkers++;
                 workersOff.delete(emp.ten);
@@ -636,43 +696,33 @@ document.addEventListener('DOMContentLoaded', () => {
             <h3 class="font-bold mb-3 text-lg text-indigo-700 border-b pb-2">Nhận xét ngày: ${dayKey}</h3>
             <p class="font-semibold text-gray-700 mb-4">Tổng NV làm: <span class="text-2xl font-bold text-blue-600">${totalWorkers}</span></p>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-blue-50 p-3 rounded-lg"><strong>Ca Sáng (${workersSang.size} NV):</strong><br><span class="text-blue-700">${Array.from(workersSang).join(', ') || 'Không có'}</span></div>
-                <div class="bg-yellow-50 p-3 rounded-lg"><strong>Ca Chiều (${workersChieu.size} NV):</strong><br><span class="text-yellow-800">${Array.from(workersChieu).join(', ') || 'Không có'}</span></div>
-                <div class="bg-gray-100 p-3 rounded-lg"><strong>Nghỉ (${workersOff.size} NV):</strong><br><span class="text-gray-600">${Array.from(workersOff).join(', ') || 'Không có'}</span></div>
+                <div class="bg-blue-50 p-3 rounded-lg"><strong>Ca Sáng (${workersSang.size} NV):</strong><br><span class="text-blue-700">${[...workersSang].join(', ') || 'Không có'}</span></div>
+                <div class="bg-yellow-50 p-3 rounded-lg"><strong>Ca Chiều (${workersChieu.size} NV):</strong><br><span class="text-yellow-800">${[...workersChieu].join(', ') || 'Không có'}</span></div>
+                <div class="bg-gray-100 p-3 rounded-lg"><strong>Nghỉ (${workersOff.size} NV):</strong><br><span class="text-gray-600">${[...workersOff].join(', ') || 'Không có'}</span></div>
             </div>
         </div>`;
         dailySummaryContainer.innerHTML = html;
     }
+    
+    // --- EVENT HANDLERS --- //
 
-    function handleCellClick(e) {
-        const cell = e.target.closest('td');
-        if (!cell || !cell.dataset.ca || cell.querySelector('select')) return;
+    function handleUpdateEmployeeProperty(e) {
+        const select = e.target;
+        const empId = select.dataset.empid;
+        const prop = select.dataset.prop;
+        let value = select.value;
 
-        const empId = cell.parentElement.dataset.empid;
-        const emp = scheduleState.employees.find(e => e.id == empId);
-        if (!emp) return;
-
-        const currentContent = cell.querySelector('div').textContent.trim();
+        const employee = scheduleState.employees.find(emp => emp.id == empId);
+        if (!employee) return;
         
-        let options = `
-            <option value="off" ${currentContent === '' ? 'selected' : ''}>Nghỉ</option>
-            <option value="work" ${currentContent === '✔️' ? 'selected' : ''}>✔️ Làm việc</option>
-            <option value="GH1" ${currentContent === 'GH1' ? 'selected' : ''}>GH1</option>
-            <option value="GH2" ${currentContent === 'GH2' ? 'selected' : ''}>GH2</option>
-            <option value="ERP" ${currentContent === 'ERP' ? 'selected' : ''}>ERP</option>
-        `;
-
-        cell.innerHTML = `<select class="w-full h-full border-2 border-sky-500">${options}</select>`;
-        const select = cell.querySelector('select');
-        select.focus();
-
-        select.addEventListener('change', (event) => handleManualEdit(event, emp));
-        select.addEventListener('blur', () => renderAllFromState(), { once: true });
+        if (prop === 'isActive') value = (value === 'true');
+        
+        employee[prop] = value;
+        renderAllFromState();
     }
     
     function updateStateForCell(emp, shiftIndex, value) {
         const { dateHeaders, staticHeaderCount, headerLine2 } = scheduleState;
-        
         let dayName = '', shiftName = '', cumulativeSpan = 0;
         for(const day of dateHeaders) {
             if (shiftIndex < cumulativeSpan + day.span) {
@@ -682,96 +732,109 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             cumulativeSpan += day.span;
         }
-
         if (!dayName || !shiftName) return;
 
         if (!scheduleState.singleCellTaskMap[emp.ten]) scheduleState.singleCellTaskMap[emp.ten] = {};
         if (!scheduleState.singleCellTaskMap[emp.ten][dayName]) scheduleState.singleCellTaskMap[emp.ten][dayName] = {};
         
+        // Clear any previous task in this specific shift slot
+        delete scheduleState.singleCellTaskMap[emp.ten][dayName][shiftName];
+
         if (['GH1', 'GH2', 'ERP'].includes(value)) {
             scheduleState.singleCellTaskMap[emp.ten][dayName][shiftName] = value;
-        } else {
-            delete scheduleState.singleCellTaskMap[emp.ten][dayName][shiftName];
         }
         
         emp.shifts[shiftIndex] = (value === 'off') ? '' : '1';
     }
 
+    function handleCellClick(e) {
+        const cell = e.target.closest('.editable-cell');
+        if (!cell) return;
 
-    function handleManualEdit(e, emp) {
-        const select = e.target;
-        const cell = select.closest('td');
-        const dayKey = cell.dataset.daykey;
-        const ca = cell.dataset.ca;
-        const newValue = select.value;
+        const empId = cell.dataset.empid;
+        const shiftIndex = parseInt(cell.dataset.shiftindex, 10);
+        const employee = scheduleState.employees.find(emp => emp.id == empId);
 
-        const { dateHeaders, headerLine2, staticHeaderCount, CA_SANG, CA_CHIEU, employees } = scheduleState;
-        const period = CA_SANG.includes(ca) ? CA_SANG : (CA_CHIEU.includes(ca) ? CA_CHIEU : null);
-        if (!period) return;
-
-        const dayInfo = dateHeaders.find(d => d.name === dayKey);
-        const dayStartIndex = dateHeaders.slice(0, dateHeaders.indexOf(dayInfo)).reduce((acc, d) => acc + d.span, 0);
-
-        if (['GH1', 'GH2', 'ERP'].includes(newValue)) {
-            employees.forEach(anyEmp => {
-                if (scheduleState.singleCellTaskMap[anyEmp.ten]?.[dayKey]) {
-                    period.forEach(shiftName => {
-                        if (scheduleState.singleCellTaskMap[anyEmp.ten][dayKey][shiftName] === newValue) {
-                            const shiftIndex = headerLine2.indexOf(shiftName, staticHeaderCount);
-                            if(shiftIndex !== -1) updateStateForCell(anyEmp, shiftIndex - staticHeaderCount, 'work');
-                        }
-                    });
-                }
-            });
-
-            for (let i = 0; i < dayInfo.span; i++) {
-                const currentShiftIndex = dayStartIndex + i;
-                const currentShiftName = headerLine2[staticHeaderCount + currentShiftIndex];
-                if (period.includes(currentShiftName)) {
-                    updateStateForCell(emp, currentShiftIndex, newValue);
-                }
-            }
-        } else { 
-            const clickedShiftIndex = parseInt(cell.dataset.shiftIndex);
-            const taskInClickedCell = scheduleState.singleCellTaskMap[emp.ten]?.[dayKey]?.[ca];
-
-            if (taskInClickedCell) {
-                 for (let i = 0; i < dayInfo.span; i++) {
-                    const currentShiftIndex = dayStartIndex + i;
-                    const currentShiftName = headerLine2[staticHeaderCount + currentShiftIndex];
-                    if (period.includes(currentShiftName)) {
-                        updateStateForCell(emp, currentShiftIndex, 'work');
-                    }
-                }
-            }
-            updateStateForCell(emp, clickedShiftIndex, newValue);
+        if (!employee || isNaN(shiftIndex)) return;
+        
+        if (!employee.isActive) {
+            showToast("Không thể chỉnh sửa lịch của nhân viên đã nghỉ.", false);
+            return;
         }
 
+        // Get current state directly from the data model, not the DOM
+        const shiftValue = employee.shifts[shiftIndex];
+        
+        const { dateHeaders, staticHeaderCount, headerLine2 } = scheduleState;
+        let dayName = '', shiftName = '', cumulativeSpan = 0;
+        for(const day of dateHeaders) {
+            if (shiftIndex < cumulativeSpan + day.span) {
+                dayName = day.name;
+                shiftName = headerLine2[staticHeaderCount + shiftIndex];
+                break;
+            }
+            cumulativeSpan += day.span;
+        }
+        
+        const currentTask = scheduleState.singleCellTaskMap[employee.ten]?.[dayName]?.[shiftName];
+        let currentState = 'off';
+        if (String(shiftValue || '').trim()) {
+            currentState = currentTask || 'work';
+        }
+        
+        const baseCycle = ['off', 'work', 'GH1', 'GH2', 'ERP'];
+        const currentIndex = baseCycle.indexOf(currentState);
+        
+        // Find the next valid state based on gender
+        let nextState = 'off'; // Default fallback
+        for (let i = 1; i <= baseCycle.length; i++) {
+            const potentialState = baseCycle[(currentIndex + i) % baseCycle.length];
+            
+            if (potentialState === 'ERP' && employee.gender !== 'nu') continue;
+            if ((potentialState === 'GH1' || potentialState === 'GH2') && employee.gender !== 'nam') continue;
+
+            nextState = potentialState;
+            break; 
+        }
+        
+        updateStateForCell(employee, shiftIndex, nextState);
         renderAllFromState();
     }
-    
+
+
     function handleAuxEdit(e) {
         const select = e.target;
-        const dayKey = select.dataset.daykey;
-        const periodName = select.dataset.period;
-        const task = select.dataset.task;
-        const newWorkerName = select.value;
-        
+        const dayKey = select.dataset.daykey, periodName = select.dataset.period;
+        const task = select.dataset.task, newWorkerName = select.value;
         const { employees, dateHeaders, headerLine2, staticHeaderCount, CA_SANG, CA_CHIEU } = scheduleState;
         const periodShifts = periodName === 'Sang' ? CA_SANG : CA_CHIEU;
-
+        
+        // Clear previous assignment for this task/period/day
         Object.values(employees).forEach(emp => {
             if(scheduleState.singleCellTaskMap[emp.ten]?.[dayKey]) {
-                 const dayTasks = scheduleState.singleCellTaskMap[emp.ten][dayKey];
-                 Object.entries(dayTasks).forEach(([shift, assignedTask]) => {
+                Object.entries(scheduleState.singleCellTaskMap[emp.ten][dayKey]).forEach(([shift, assignedTask]) => {
                      if(assignedTask === task && periodShifts.includes(shift)) {
-                         const shiftIndex = headerLine2.indexOf(shift, staticHeaderCount);
-                         if(shiftIndex !== -1) updateStateForCell(emp, shiftIndex - staticHeaderCount, 'work');
+                         const shiftIndexInHeader = headerLine2.findIndex((s, i) => i >= staticHeaderCount && s === shift);
+                         if (shiftIndexInHeader !== -1) {
+                            const actualShiftIndex = shiftIndexInHeader - staticHeaderCount;
+                            
+                            let cumulativeSpan = 0;
+                            let dayBelongs = false;
+                            for(const day of dateHeaders) {
+                                if (actualShiftIndex < cumulativeSpan + day.span) {
+                                    if(day.name === dayKey) dayBelongs = true;
+                                    break;
+                                }
+                                cumulativeSpan += day.span;
+                            }
+                            if(dayBelongs) updateStateForCell(emp, actualShiftIndex, 'work');
+                         }
                      }
-                 });
+                });
             }
         });
 
+        // Assign to new worker
         if(newWorkerName) {
             const newWorker = employees.find(e => e.ten === newWorkerName);
             if (!newWorker) return;
@@ -787,8 +850,187 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
-        
         renderAllFromState();
+    }
+
+    function autoAssignTasks() {
+        if (!scheduleState) return showToast("Chưa có dữ liệu.", false);
+
+        const { dateHeaders, employees, savedTaskCounts, headerLine2, staticHeaderCount, CA_SANG, CA_CHIEU, singleCellTaskMap } = scheduleState;
+        
+        let tempAssignedCounts = {};
+        employees.forEach(e => tempAssignedCounts[e.id] = { gh1: 0, gh2: 0, erp: 0 });
+
+        // Pre-populate with manually assigned tasks for the current week, counted by half-day
+        employees.forEach(emp => {
+            const tasksByHalfDay = {};
+            if (singleCellTaskMap[emp.ten]) {
+                dateHeaders.forEach(day => {
+                    const dayKey = day.name;
+                    if (singleCellTaskMap[emp.ten][dayKey]) {
+                        tasksByHalfDay[dayKey] = {};
+                        Object.entries(singleCellTaskMap[emp.ten][dayKey]).forEach(([shiftName, task]) => {
+                            if (CA_SANG.includes(shiftName)) tasksByHalfDay[dayKey].Sang = task;
+                            if (CA_CHIEU.includes(shiftName)) tasksByHalfDay[dayKey].Chieu = task;
+                        });
+                    }
+                });
+            }
+
+            Object.values(tasksByHalfDay).forEach(day => {
+                if(day.Sang === 'ERP') tempAssignedCounts[emp.id].erp++;
+                if(day.Sang === 'GH1') tempAssignedCounts[emp.id].gh1++;
+                if(day.Sang === 'GH2') tempAssignedCounts[emp.id].gh2++;
+                if(day.Chieu === 'ERP') tempAssignedCounts[emp.id].erp++;
+                if(day.Chieu === 'GH1') tempAssignedCounts[emp.id].gh1++;
+                if(day.Chieu === 'GH2') tempAssignedCounts[emp.id].gh2++;
+            });
+        });
+
+        const isEligibleForPeriod = (emp, dayKey, period) => {
+            const periodShifts = period === 'Sang' ? CA_SANG : CA_CHIEU;
+            const dayInfo = dateHeaders.find(d => d.name === dayKey);
+            if (!dayInfo) return false;
+            const dayStartIndex = dateHeaders.slice(0, dateHeaders.indexOf(dayInfo)).reduce((acc, d) => acc + d.span, 0);
+            for (const requiredShift of periodShifts) {
+                let foundShiftInDay = false;
+                for (let i = 0; i < dayInfo.span; i++) {
+                    if (headerLine2[staticHeaderCount + dayStartIndex + i] === requiredShift) {
+                        if (!String(emp.shifts[dayStartIndex + i] || '').trim()) return false;
+                        foundShiftInDay = true;
+                        break;
+                    }
+                }
+                 if (periodShifts.length > 1 && !foundShiftInDay) return false;
+            }
+            return true;
+        };
+
+        const isEligibleForPeriodFallback = (emp, dayKey, period) => {
+             const periodShifts = period === 'Sang' ? CA_SANG : CA_CHIEU;
+            const dayInfo = dateHeaders.find(d => d.name === dayKey);
+            if (!dayInfo) return false;
+            const dayStartIndex = dateHeaders.slice(0, dateHeaders.indexOf(dayInfo)).reduce((acc, d) => acc + d.span, 0);
+            for (let i = 0; i < dayInfo.span; i++) {
+                const currentShiftIndex = dayStartIndex + i;
+                const currentShiftName = headerLine2[staticHeaderCount + currentShiftIndex];
+                if (periodShifts.includes(currentShiftName) && String(emp.shifts[currentShiftIndex] || '').trim()) {
+                    return true;
+                }
+            }
+            return false;
+        };
+        
+        const getRemaining = (emp, task) => {
+            const now = new Date();
+            const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+            const totalTasks = daysInMonth * 2;
+            const activeMale = employees.filter(e => e.isActive && e.gender === 'nam').length;
+            const activeFemale = employees.filter(e => e.isActive && e.gender === 'nu').length;
+            let target = 0;
+            if (task === 'ERP' && emp.gender === 'nu' && activeFemale > 0) target = totalTasks / activeFemale;
+            else if (['GH1', 'GH2'].includes(task) && emp.gender === 'nam' && activeMale > 0) target = totalTasks / activeMale;
+            const saved = (savedTaskCounts[emp.id] && savedTaskCounts[emp.id][task.toLowerCase()]) || 0;
+            const temp = tempAssignedCounts[emp.id][task.toLowerCase()];
+            return target - (saved + temp);
+        };
+
+        const findAndAssign = (dayKey, period, task) => {
+            if (isSlotFilled(dayKey, period, task)) return;
+            const gender = task === 'ERP' ? 'nu' : 'nam';
+            const candidates = employees.filter(e => e.isActive && e.gender === gender);
+            
+            let eligible = candidates.filter(e => isEligibleForPeriod(e, dayKey, period));
+            if (eligible.length === 0) {
+                 eligible = candidates.filter(e => isEligibleForPeriodFallback(e, dayKey, period));
+            }
+            
+            if (eligible.length > 0) {
+                eligible.sort((a, b) => {
+                    const remainingDiff = getRemaining(b, task) - getRemaining(a, task);
+                    if (remainingDiff !== 0) return remainingDiff;
+
+                    const tempTasksThisTypeA = tempAssignedCounts[a.id][task.toLowerCase()];
+                    const tempTasksThisTypeB = tempAssignedCounts[b.id][task.toLowerCase()];
+                    const thisTypeDiff = tempTasksThisTypeA - tempTasksThisTypeB;
+                    if (thisTypeDiff !== 0) return thisTypeDiff;
+
+                    if (task === 'GH1' || task === 'GH2') {
+                        const tempTotalTasksA = tempAssignedCounts[a.id].gh1 + tempAssignedCounts[a.id].gh2;
+                        const tempTotalTasksB = tempAssignedCounts[b.id].gh1 + tempAssignedCounts[b.id].gh2;
+                        return tempTotalTasksA - tempTotalTasksB;
+                    }
+
+                    return 0;
+                });
+                const empToAssign = eligible[0];
+                assignTaskToPeriod(empToAssign, dayKey, period, task);
+                tempAssignedCounts[empToAssign.id][task.toLowerCase()]++;
+                return empToAssign.id;
+            }
+            return null;
+        };
+
+        const assignTaskToPeriod = (emp, dayKey, period, task) => {
+            const periodShifts = period === 'Sang' ? CA_SANG : CA_CHIEU;
+            const dayInfo = dateHeaders.find(d => d.name === dayKey);
+            if (!dayInfo) return;
+            const dayStartIndex = dateHeaders.slice(0, dateHeaders.indexOf(dayInfo)).reduce((acc, d) => acc + d.span, 0);
+            for (let i = 0; i < dayInfo.span; i++) {
+                const currentShiftIndex = dayStartIndex + i;
+                const currentShiftName = headerLine2[staticHeaderCount + currentShiftIndex];
+                if (periodShifts.includes(currentShiftName)) {
+                    updateStateForCell(emp, currentShiftIndex, task);
+                }
+            }
+        };
+
+        const isSlotFilled = (dayKey, period, task) => {
+             for (const emp of employees) {
+                if (scheduleState.singleCellTaskMap[emp.ten]?.[dayKey]) {
+                    const dayTasks = scheduleState.singleCellTaskMap[emp.ten][dayKey];
+                    const periodShifts = period === 'Sang' ? CA_SANG : CA_CHIEU;
+                    for (const shift of periodShifts) {
+                        if (dayTasks[shift] === task) return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        dateHeaders.forEach(day => {
+            ['Sang', 'Chieu'].forEach(period => findAndAssign(day.name, period, 'ERP'));
+        });
+
+        const weekendDays = dateHeaders.filter(d => d.name.startsWith('T7') || d.name.startsWith('CN'));
+        const weekDays = dateHeaders.filter(d => !weekendDays.includes(d));
+
+        let assignedOnWeekend = new Set();
+        weekendDays.forEach(day => {
+            ['Sang', 'Chieu'].forEach(period => {
+                ['GH1', 'GH2'].forEach(task => {
+                    const assignedId = findAndAssign(day.name, period, task);
+                    if(assignedId) assignedOnWeekend.add(assignedId);
+                });
+            });
+        });
+
+        weekDays.forEach(day => {
+            ['Sang', 'Chieu'].forEach(period => {
+                ['GH1', 'GH2'].forEach(task => findAndAssign(day.name, period, task));
+            });
+        });
+        
+        // Final pass for any remaining empty GH slots
+        dateHeaders.forEach(day => {
+             ['Sang', 'Chieu'].forEach(period => {
+                ['GH1', 'GH2'].forEach(task => findAndAssign(day.name, period, task));
+            });
+        });
+
+
+        renderAllFromState();
+        showToast("Đã tự động phân chia các nhiệm vụ còn trống!", true);
     }
 
 
@@ -796,49 +1038,119 @@ document.addEventListener('DOMContentLoaded', () => {
     excelUploadInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
-
         fileNameDisplay.textContent = file.name;
         const reader = new FileReader();
         reader.onload = (event) => {
             try {
-                const data = new Uint8Array(event.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                // Using sheet_to_json to handle potential empty cells better
+                const workbook = XLSX.read(new Uint8Array(event.target.result), {type: 'array'});
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
                 const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
                 
-                scheduleState = processAndBuildState(jsonData);
+                const oldState = scheduleState; 
+                const newState = processAndBuildState(jsonData); 
+
+                if (oldState && oldState.employees) {
+                    newState.savedTaskCounts = oldState.savedTaskCounts || {};
+                    newState.employees.forEach(newEmp => {
+                        const oldEmp = oldState.employees.find(e => e.id == newEmp.id);
+                        if (oldEmp) {
+                            newEmp.gender = oldEmp.gender;
+                            newEmp.isActive = oldEmp.isActive;
+                        }
+                    });
+                }
+                
+                scheduleState = newState;
+
                 renderAllFromState();
                 sections.forEach(s => s.classList.remove('hidden'));
                 document.querySelectorAll('.screenshot-btn').forEach(b => b.classList.remove('hidden'));
                 showToast("Tải và hiển thị file thành công!", true);
                 sections[0].scrollIntoView({ behavior: 'smooth' });
-
             } catch (error) {
                 console.error("Lỗi khi xử lý file:", error);
                 showToast(`Lỗi xử lý file: ${error.message}`, false);
             }
         };
-        reader.onerror = () => {
-             showToast("Không thể đọc file đã chọn.", false);
-        };
         reader.readAsArrayBuffer(file);
+        e.target.value = '';
     });
 
-
     mainScheduleContainer.addEventListener('click', (e) => {
-        const dayHeader = e.target.closest('.day-header');
-        if (dayHeader) {
-            renderDailySummary(dayHeader.dataset.daykey);
-        } else {
+        if (e.target.closest('.day-header')) {
+            renderDailySummary(e.target.closest('.day-header').dataset.daykey);
+        }
+        if (e.target.closest('.editable-cell')) {
             handleCellClick(e);
         }
     });
     
     mainScheduleContainer.addEventListener('change', (e) => {
-        if(e.target.classList.contains('aux-edit-select')) {
-            handleAuxEdit(e);
+        if(e.target.classList.contains('aux-edit-select')) handleAuxEdit(e);
+    });
+    
+    taskSummaryContainer.addEventListener('change', (e) => {
+        if (e.target.classList.contains('emp-prop-change')) handleUpdateEmployeeProperty(e);
+    });
+
+    autoAssignBtn.addEventListener('click', autoAssignTasks);
+    
+    clearTasksBtn.addEventListener('click', () => {
+        if (!scheduleState) return showToast("Chưa có dữ liệu.", false);
+
+        Object.values(scheduleState.employees).forEach(emp => {
+            if (scheduleState.singleCellTaskMap[emp.ten]) {
+                scheduleState.singleCellTaskMap[emp.ten] = {};
+            }
+        });
+
+        renderAllFromState();
+        showToast("Đã xóa tất cả nhiệm vụ trong tuần.", true);
+    });
+
+    updateStatsBtn.addEventListener('click', () => {
+        if (!scheduleState) return showToast("Chưa có dữ liệu.", false);
+        
+        savedTaskCountsHistory.push(JSON.parse(JSON.stringify(scheduleState.savedTaskCounts || {})));
+        recalculateKpi(scheduleState);
+
+        scheduleState.employees.forEach(emp => {
+            if (!scheduleState.savedTaskCounts) scheduleState.savedTaskCounts = {};
+            if (!scheduleState.savedTaskCounts[emp.id]) {
+                scheduleState.savedTaskCounts[emp.id] = { gh1: 0, gh2: 0, erp: 0 };
+            }
+            scheduleState.savedTaskCounts[emp.id].gh1 += emp.kpi.gh1;
+            scheduleState.savedTaskCounts[emp.id].gh2 += emp.kpi.gh2;
+            scheduleState.savedTaskCounts[emp.id].erp += emp.kpi.erp;
+        });
+        
+        undoHistoryBtn.disabled = false;
+        renderTaskSummaryTable();
+        saveStateToLocalStorage();
+        showToast("Đã cộng dồn lịch sử tuần và cập nhật Bảng 4!", true);
+    });
+
+    clearHistoryBtn.addEventListener('click', () => {
+        if (!scheduleState) return;
+        savedTaskCountsHistory.push(JSON.parse(JSON.stringify(scheduleState.savedTaskCounts || {})));
+        scheduleState.savedTaskCounts = {};
+        undoHistoryBtn.disabled = false;
+        renderTaskSummaryTable();
+        saveStateToLocalStorage();
+        showToast("Đã xóa lịch sử đã lưu.", true);
+    });
+
+    undoHistoryBtn.addEventListener('click', () => {
+        if (savedTaskCountsHistory.length === 0) {
+            showToast("Không có thao tác nào để hoàn tác.", false);
+            return;
+        }
+        scheduleState.savedTaskCounts = savedTaskCountsHistory.pop();
+        renderTaskSummaryTable();
+        saveStateToLocalStorage();
+        showToast("Đã hoàn tác thao tác cuối cùng.", true);
+        if (savedTaskCountsHistory.length === 0) {
+            undoHistoryBtn.disabled = true;
         }
     });
 
@@ -848,13 +1160,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const elementToCapture = document.getElementById(targetId);
             if (elementToCapture) {
                 showToast("Đang chụp ảnh...", true);
-                html2canvas(elementToCapture, {
-                    scale: 1.5, useCORS: true,
-                    onclone: (doc) => {
-                        doc.getElementById('main-schedule-section')?.classList.remove('hidden');
-                        doc.getElementById('daily-summary-section')?.classList.remove('hidden');
-                    }
-                }).then(canvas => {
+                html2canvas(elementToCapture, { scale: 1.5, useCORS: true }).then(canvas => {
                     const link = document.createElement('a');
                     link.download = `LichPhanCa_${targetId}_${new Date().toISOString().slice(0,10)}.png`;
                     link.href = canvas.toDataURL("image/png");
@@ -868,55 +1174,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    exportJsonBtn.addEventListener('click', () => {
-        if (!scheduleState) return showToast("Chưa có dữ liệu để xuất.", false);
-
-        try {
-            const jsonString = JSON.stringify(scheduleState, null, 2); // Định dạng JSON cho dễ đọc
-            const blob = new Blob([jsonString], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.setAttribute('href', url);
-            link.setAttribute('download', 'lichnv.json');
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            showToast("Đã xuất dữ liệu ra file lichnv.json thành công!", true);
-        } catch (error) {
-            console.error("Lỗi khi xuất JSON:", error);
-            showToast("Có lỗi xảy ra khi xuất file JSON.", false);
-        }
-    });
-    
-    // New Event Listener for Weekly Review Export
     exportWeeklyReviewBtn.addEventListener('click', () => {
-        if (!scheduleState) {
-            showToast("Chưa có dữ liệu để xuất.", false);
-            return;
-        }
-
-        const dataForExcel = [['Thứ', 'Nhận xét']]; // Headers
-        
+        if (!scheduleState) return showToast("Chưa có dữ liệu để xuất.", false);
+        const dataForExcel = [['Thứ', 'Nhận xét']];
         scheduleState.dateHeaders.forEach(dayHeader => {
-            const dayKey = dayHeader.name;
-            const summaryData = getDailySummaryData(dayKey);
+            const summaryData = getDailySummaryData(dayHeader.name);
             if (summaryData) {
                 const { workersSang, workersChieu, workersOff } = summaryData;
-                const sangText = `Ca Sáng (${workersSang.size} NV): ${Array.from(workersSang).join(', ') || 'Không có'}`;
-                const chieuText = `Ca Chiều (${workersChieu.size} NV): ${Array.from(workersChieu).join(', ') || 'Không có'}`;
-                const nghiText = `Nghỉ (${workersOff.size} NV): ${Array.from(workersOff).join(', ') || 'Không có'}`;
-                const reviewString = `${sangText} ; ${chieuText} ; ${nghiText}`;
-                dataForExcel.push([dayKey, reviewString]);
+                const reviewString = `Ca Sáng (${workersSang.size} NV): ${[...workersSang].join(', ') || 'Không có'} ; Ca Chiều (${workersChieu.size} NV): ${[...workersChieu].join(', ') || 'Không có'} ; Nghỉ (${workersOff.size} NV): ${[...workersOff].join(', ') || 'Không có'}`;
+                dataForExcel.push([dayHeader.name, reviewString]);
             }
         });
-
         try {
             const worksheet = XLSX.utils.aoa_to_sheet(dataForExcel);
-            worksheet['!cols'] = [{ wch: 20 }, { wch: 150 }]; // Set column widths
+            worksheet['!cols'] = [{ wch: 20 }, { wch: 150 }];
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, 'NhanXetTuan');
-
             XLSX.writeFile(workbook, 'LichNhanXetTuan.xlsx');
             showToast("Xuất file nhận xét tuần thành công!", true);
         } catch (error) {
@@ -925,81 +1198,182 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    exportAuxBtn.addEventListener('click', () => {
-        if (!scheduleState) return showToast("Chưa có dữ liệu để xuất.", false);
-        const { singleCellTaskMap, CA_SANG, CA_CHIEU } = scheduleState;
-        let csvContent = "data:text/csv;charset=utf-8,Day,Period,Task,Worker\n";
-        
-        const halfDayTasksForExport = {}; 
+    importAuxInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file || !scheduleState) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const lines = event.target.result.split('\n').slice(1);
+                lines.forEach(line => {
+                    const [day, period, task, worker] = line.split(',').map(s => s.trim());
+                    if(day && period && task && worker && scheduleState.employees.find(e => e.ten === worker)) {
+                         handleAuxEdit({ target: { dataset: { daykey: day, period: period, task: task }, value: worker } });
+                    }
+                });
+                renderAllFromState();
+                showToast("Nhập dữ liệu phụ trợ (CSV) thành công!");
+            } catch (error) {
+                 showToast("Lỗi khi nhập file CSV.", false);
+            }
+        };
+        reader.readAsText(file);
+        e.target.value = ''; // Reset input
+    });
 
-        Object.entries(singleCellTaskMap).forEach(([worker, dayTasks]) => {
-            Object.entries(dayTasks).forEach(([day, shiftTasks]) => {
-                const key = `${day}-${worker}`;
-                if (!halfDayTasksForExport[key]) {
-                    halfDayTasksForExport[key] = {};
+    exportScheduleCsvBtn.addEventListener('click', () => {
+        if (!scheduleState) return showToast("Chưa có dữ liệu.", false);
+        let csvContent = "empId,shiftIndex,value\n";
+        const { employees, dateHeaders, headerLine2, staticHeaderCount, singleCellTaskMap } = scheduleState;
+        employees.forEach(emp => {
+            emp.shifts.forEach((shiftValue, shiftIndex) => {
+                let dayName = '', shiftName = '', cumulativeSpan = 0;
+                for(const day of dateHeaders) {
+                    if (shiftIndex < cumulativeSpan + day.span) {
+                        dayName = day.name;
+                        shiftName = headerLine2[staticHeaderCount + shiftIndex];
+                        break;
+                    }
+                    cumulativeSpan += day.span;
                 }
+                const task = singleCellTaskMap[emp.ten]?.[dayName]?.[shiftName];
+                let value = 'off';
+                if (String(shiftValue || '').trim()) {
+                    value = task || 'work';
+                }
+                csvContent += `${emp.id},${shiftIndex},${value}\n`;
+            });
+        });
 
-                Object.entries(shiftTasks).forEach(([shift, task]) => {
-                    if (CA_SANG.includes(shift)) {
-                        halfDayTasksForExport[key].Sang = task;
-                    } else if (CA_CHIEU.includes(shift)) {
-                        halfDayTasksForExport[key].Chieu = task;
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8,' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", "schedule_data.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast("Đã xuất lịch ra CSV.", true);
+    });
+    
+    exportTaskCsvBtn.addEventListener('click', () => {
+        if (!scheduleState) return showToast("Chưa có dữ liệu.", false);
+        let csvContent = "day,period,task,worker\n";
+        const { singleCellTaskMap, CA_SANG, CA_CHIEU } = scheduleState;
+        
+        const tasksByPeriod = {}; 
+
+        Object.entries(singleCellTaskMap).forEach(([workerName, dayTasks]) => {
+            Object.entries(dayTasks).forEach(([dayKey, shiftTasks]) => {
+                Object.entries(shiftTasks).forEach(([shiftName, task]) => {
+                    if (['GH1', 'GH2', 'ERP'].includes(task)) {
+                        let period = '';
+                        if (CA_SANG.includes(shiftName)) period = 'Sang';
+                        if (CA_CHIEU.includes(shiftName)) period = 'Chieu';
+                        if (period) {
+                            const uniqueKey = `${dayKey}-${period}-${task}`;
+                            tasksByPeriod[uniqueKey] = workerName;
+                        }
                     }
                 });
             });
         });
-
-        Object.entries(halfDayTasksForExport).forEach(([key, tasks]) => {
-            const [day, worker] = key.split('-');
-            if (tasks.Sang) {
-                csvContent += `${day},Sang,${tasks.Sang},${worker}\n`;
-            }
-            if (tasks.Chieu) {
-                csvContent += `${day},Chieu,${tasks.Chieu},${worker}\n`;
-            }
+        
+        const sortedKeys = Object.keys(tasksByPeriod).sort();
+        sortedKeys.forEach(key => {
+             const [day, period, task] = key.split('-');
+             const worker = tasksByPeriod[key];
+             csvContent += `${day},${period},${task},${worker}\n`;
         });
-
-        const encodedUri = encodeURI(csvContent);
+        
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8,' });
+        const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "du_lieu_phu_tro.csv");
+        link.setAttribute("href", url);
+        link.setAttribute("download", "task_schedule.csv");
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        showToast("Đã xuất dữ liệu phụ trợ (CSV) thành công!");
+        showToast("Đã xuất lịch nhiệm vụ ra CSV.", true);
     });
 
-    importAuxInput.addEventListener('change', (e) => {
+    importScheduleCsvInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file || !scheduleState) return;
-
         const reader = new FileReader();
         reader.onload = (event) => {
             try {
-                const csv = event.target.result;
-                const lines = csv.split('\n').slice(1); // Bỏ qua header
+                const lines = event.target.result.split('\n').slice(1); // skip header
                 lines.forEach(line => {
-                    const [day, period, task, worker] = line.split(',').map(s => s.trim());
-                    if(day && period && task && worker) {
-                        const emp = scheduleState.employees.find(e => e.ten === worker);
-                        if(emp) {
-                             handleAuxEdit({ target: { dataset: { daykey: day, period: period, task: task }, value: worker } });
-                        }
+                    const parts = line.split(',');
+                    if (parts.length < 3) return;
+                    const empId = parts[0].trim();
+                    const shiftIndex = parseInt(parts[1].trim(), 10);
+                    const value = parts[2].trim();
+                    
+                    const employee = scheduleState.employees.find(emp => emp.id == empId);
+                    if (employee && !isNaN(shiftIndex)) {
+                        updateStateForCell(employee, shiftIndex, value);
                     }
                 });
-                renderAllFromState(); // Re-render sau khi import xong
-                showToast("Nhập dữ liệu phụ trợ (CSV) thành công!");
+                renderAllFromState();
+                showToast("Nhập lịch từ CSV thành công!", true);
             } catch (error) {
-                 showToast("Lỗi khi nhập file CSV. Vui lòng kiểm tra định dạng.", false);
+                 showToast("Lỗi khi nhập file CSV lịch.", false);
+                 console.error(error);
             }
         };
         reader.readAsText(file);
+        e.target.value = ''; // Reset input
     });
 
-    // Tải dữ liệu khi trang được mở
+    exportAllDataBtn.addEventListener('click', () => {
+        if (!scheduleState) return showToast("Chưa có dữ liệu để xuất.", false);
+        try {
+            const blob = new Blob([JSON.stringify(scheduleState, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'dmx_schedule_backup.json');
+            link.click();
+            URL.revokeObjectURL(url);
+            link.remove();
+            showToast("Đã xuất toàn bộ dữ liệu ra file JSON thành công!", true);
+        } catch (error) {
+            console.error("Lỗi khi xuất JSON:", error);
+            showToast("Có lỗi xảy ra khi xuất file JSON.", false);
+        }
+    });
+
+    importAllDataInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const importedState = JSON.parse(event.target.result);
+                if (importedState && importedState.employees && importedState.dateHeaders) {
+                    scheduleState = importedState;
+                    renderAllFromState(true); // Render and save to local storage
+                    sections.forEach(s => s.classList.remove('hidden'));
+                    document.querySelectorAll('.screenshot-btn').forEach(b => b.classList.remove('hidden'));
+                    showToast("Đã nhập toàn bộ dữ liệu thành công!", true);
+                } else {
+                    throw new Error("Tệp JSON không có cấu trúc hợp lệ.");
+                }
+            } catch (error) {
+                showToast(`Lỗi khi nhập tệp JSON: ${error.message}`, false);
+                console.error(error);
+            }
+        };
+        reader.readAsText(file);
+        e.target.value = ''; // Reset input
+    });
+
     initializeData();
 });
 </script>
 
 </body>
 </html>
+
