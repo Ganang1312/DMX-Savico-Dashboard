@@ -148,16 +148,20 @@
     </header>
 
     <div class="tab-bar">
-        <button class="tab-button active" onclick="openTab(event, 'biSieuThi')">📊 BI Siêu thị</button>
+        <button class="tab-button active" onclick="openTab(event, 'Rtst')">📊Realtime</button>
+		<button class="tab-button" onclick="openTab(event, 'Lkst')">🧑‍💻 BI Lũy Kế</button>
         <button class="tab-button" onclick="openTab(event, 'biNhanVien')">🧑‍💻 BI Nhân viên</button>
         <button class="tab-button" onclick="openTab(event, 'baoCaoYCX')">📈 Báo cáo YCX</button>
-	<button class="tab-button" onclick="openTab(event, 'lichpg')">🗓️ Lịch làm việc PG</button>
-	<button class="tab-button" onclick="openTab(event, 'lichnv')">🗓️ Lịch làm việc NV</button>    
+		<button class="tab-button" onclick="openTab(event, 'lichpg')">🗓️ Lịch làm việc PG</button>
+		<button class="tab-button" onclick="openTab(event, 'lichnv')">🗓️ Lịch làm việc NV</button>    
     </div>
 
     <main class="content-area">
-        <div id="biSieuThi" class="tab-content active">
-            <iframe class="content-iframe" src="./ST.html"></iframe>
+        <div id="Rtst" class="tab-content active">
+            <iframe class="content-iframe" src="./RT.html"></iframe>
+        </div>
+		<div id="Lkst" class="tab-content active">
+            <iframe class="content-iframe" src="./Lkst.html"></iframe>
         </div>
 
         <div id="biNhanVien" class="tab-content">
@@ -220,3 +224,4 @@
 
 </body>
 </html>
+
