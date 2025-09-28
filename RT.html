@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Real-time - v218.42 (Optimized)</title>
+    <title>Dashboard Real-time - v218.47 (Fixed)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -29,7 +29,8 @@
         }
         .capture-mode .card,
         .capture-mode .input-section,
-        .capture-mode .action-btn {
+        .capture-mode .action-btn,
+        .capture-mode .sub-kpi-card {
             box-shadow: none !important;
             transform: none !important;
             transition: none !important;
@@ -138,12 +139,41 @@
             font-weight: bold; 
             color: var(--text-primary);
         }
-        .kpi-panel { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-        .sub-kpi-card { text-align: center; display: flex; flex-direction: column; justify-content: space-between; padding: 15px 10px; min-height: 160px; }
+        .kpi-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+        }
+        .sub-kpi-card {
+            background: #ffffff;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 8px;
+            padding: 20px 10px;
+            min-height: 160px;
+            border-radius: 15px;
+            border: 1px solid var(--border-main);
+            box-shadow: var(--shadow-main);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.2s ease-in-out;
+        }
+        .sub-kpi-card:hover {
+            transform: translateY(-5px);
+        }
+        .sub-kpi-card:not(.kpi-installment-card):hover {
+            background-color: #f8f9fa;
+        }
         .sub-kpi-card h4 { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 1.2em; margin: 0; color: var(--text-primary); font-weight: 700; }
-        .sub-kpi-card h4 svg { width: 24px; height: 24px; flex-shrink: 0; }
+        .sub-kpi-card h4 svg { width: 24px; height: 24px; flex-shrink: 0; transition: transform 0.3s ease; }
+        .sub-kpi-card:hover h4 svg { transform: scale(1.1); }
         .sub-kpi-card .value { font-size: 4em; font-weight: 700; margin: 0; color: var(--primary-accent); line-height: 1; }
-        .sub-kpi-card .sub-text { font-size: 1em; color: var(--text-muted); margin: 0; }
+        .sub-kpi-card .sub-text {
+            font-size: 1em;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin: 0;
+        }
         .kpi-installment-card { justify-content: center; gap: 10px; }
         .kpi-installment-card .text-content { text-align: center; }
         .kpi-installment-card .chart-content { width: 100px; height: 100px; position: relative; margin: 0 auto; }
@@ -164,6 +194,12 @@
         .rt-styled-table {
             width: 100%;
             border-collapse: collapse;
+        }
+        .rt-styled-table tbody tr {
+            border-bottom: 1px solid var(--border-main);
+        }
+        .rt-styled-table tbody tr:last-of-type {
+            border-bottom: none;
         }
         .rt-styled-table th, .rt-styled-table td {
             text-align: center !important;
@@ -351,7 +387,7 @@
     /****************************************************************************
      * SHARED UTILITY & SETUP FUNCTIONS
      ****************************************************************************/
-    var VIBRANT_PALETTE = ['#108AB1', '#06D7A0', '#FFD167', '#F78C6A', '#F04770', '#073A4B'];
+    var VIBRANT_PALETTE = ['#108AB1', '#06D7A0', '#FFD167', '#F78C6A', '#F04770', '#073A4B', '#5A7A84', '#6654A2', '#D65E9A'];
     var formatNumber = (num, decimals = 0) => {
         const number = parseFloat(num);
         if (isNaN(number)) {
@@ -372,105 +408,6 @@
             toast.classList.remove('show');
             setTimeout(() => toast.parentNode && toast.parentNode.removeChild(toast), 500);
         }, 3000);
-    }
-    
-    /****************************************************************************
-     * EMPLOYEE COMMENT TEMPLATES
-     ****************************************************************************/
-    const employeeCommentTemplates = {
-        pre21: { // Bình luận trước 21h (mang tính động viên)
-            top3: [
-                "Thánh chốt đơn gọi tên @NAME@ với @REVENUE@ triệu! Quá đẳng cấp!",
-                "Phong độ là nhất thời, đẳng cấp là mãi mãi! @NAME@ đang dẫn đầu với @REVENUE@ triệu!",
-                "Không ai cản nổi @NAME@ hôm nay! Doanh thu đã là @REVENUE@ triệu!",
-                "Dẫn đầu đoàn đua với @REVENUE@ triệu, xin chúc mừng chiến thần @NAME@!",
-                "Tốc độ bán hàng của @NAME@ thật đáng kinh ngạc: @REVENUE@ triệu và vẫn đang tăng!"
-            ],
-            top3_second: [
-                "Á quân @NAME@ bám rất sát với @REVENUE@ triệu! Cuộc đua đang rất gay cấn!",
-                "Vị trí thứ 2 gọi tên @NAME@ - @REVENUE@ triệu! Chỉ một chút nữa thôi là lên đỉnh!",
-                "@NAME@ đang thể hiện tuyệt vời với @REVENUE@ triệu, phả hơi nóng vào người dẫn đầu!",
-                "Không thể xem thường @NAME@ với @REVENUE@ triệu! Ngôi vương vẫn trong tầm với!",
-                "Xuất sắc! @NAME@ đang ở vị trí thứ 2 với @REVENUE@ triệu!"
-            ],
-            top3_third: [
-                "Top 3 có mặt của @NAME@ với @REVENUE@ triệu! Giữ vững phong độ nhé!",
-                "@NAME@ chắc chân trong top 3 với @REVENUE@ triệu! Rất tuyệt vời!",
-                "Xin chúc mừng @NAME@ đã đạt @REVENUE@ triệu và lọt vào top 3!",
-                "Nỗ lực tuyệt vời của @NAME@ đã được đền đáp với @REVENUE@ triệu, tạm giữ vị trí thứ 3.",
-                "Hạng 3 tạm thời thuộc về @NAME@ với @REVENUE@ triệu. Cố lên!"
-            ],
-            middlePerformers: [
-                "Các chiến binh vẫn đang nỗ lực hết mình. Cố gắng bứt phá hơn nữa nhé!",
-                "Doanh thu đang tăng đều, hãy tạo ra một cú đột phá trong những giờ tới!",
-                "Giữ vững tay lái và tăng tốc nào các bạn ơi!",
-                "Mục tiêu vẫn ở phía trước, cùng nhau chinh phục nào!",
-                "Nỗ lực của các bạn đang được ghi nhận, hãy biến nó thành những con số ấn tượng hơn!"
-            ],
-            bottomPerformers: [
-                "Cơ hội vẫn còn rất nhiều! Cần một cú hích mạnh mẽ để thay đổi cục diện!",
-                "Khách hàng đang ở đâu đó ngoài kia, hãy tìm và chinh phục họ nào!",
-                "Tăng tốc lên nào các chiến binh, đừng để bị bỏ lại phía sau!",
-                "Một chút may mắn và nhiều nỗ lực hơn nữa sẽ tạo ra khác biệt!",
-                "Báo động nhẹ! Cần tập trung cao độ để cải thiện doanh thu ngay!"
-            ],
-            noRevenue: [
-                "Anh em ơi, cùng nhau phá băng, mở hàng cho ngày hôm nay nào!",
-                "Khách hàng đầu tiên đang chờ, ai sẽ là người khai hỏa đây? Cố lên!",
-                "Một ngày mới đã bắt đầu, hãy tìm kiếm những cơ hội đầu tiên!",
-                "Đừng lo lắng, hãy khởi động và chuẩn bị cho một ngày bùng nổ!",
-                "Tất cả vẫn đang ở vạch xuất phát. Ai sẽ là người vươn lên đầu tiên? Cố lên nào!"
-            ]
-        },
-        post21: { // Bình luận sau 21h (mang tính tổng kết)
-            top3: [
-                "Xin chúc mừng @NAME@ đã trở thành nhà vô địch hôm nay với thành tích @REVENUE@ triệu!",
-                "Ngôi vương doanh thu ngày hôm nay đã thuộc về @NAME@ với @REVENUE@ triệu! Một ngày làm việc quá hiệu quả!",
-                "Kết quả thật ấn tượng! @NAME@ dẫn đầu với @REVENUE@ triệu. Xin chúc mừng!",
-                "Hôm nay là một ngày của @NAME@! Thành quả @REVENUE@ triệu là hoàn toàn xứng đáng.",
-                "Nhà vua của ngày hôm nay là @NAME@ với @REVENUE@ triệu! Tuyệt vời!"
-            ],
-            top3_second: [
-                "Về nhì với thành tích @REVENUE@ triệu, @NAME@ đã có một ngày thi đấu xuất sắc!",
-                "Á quân @NAME@ với @REVENUE@ triệu! Một kết quả rất đáng tự hào!",
-                "Chúc mừng @NAME@ đã có một ngày làm việc hiệu quả và về đích ở vị trí thứ 2 với @REVENUE@ triệu!",
-                "Thành tích @REVENUE@ triệu của @NAME@ là rất đáng nể. Chúc mừng vị trí á quân!",
-                "Suýt chút nữa là ngôi vương! @NAME@ về nhì với @REVENUE@ triệu, quá giỏi!"
-            ],
-            top3_third: [
-                "Top 3 gọi tên @NAME@ với @REVENUE@ triệu! Chúc mừng bạn đã có một ngày làm việc thành công!",
-                "Hoàn thành top 3 với @REVENUE@ triệu, một nỗ lực tuyệt vời từ @NAME@!",
-                "Xin chúc mừng @NAME@ đã về đích trong top 3 với doanh thu @REVENUE@ triệu!",
-                "Một vị trí trong top 3 là phần thưởng xứng đáng cho nỗ lực của @NAME@ với @REVENUE@ triệu.",
-                "Chúc mừng @NAME@ và thành tích @REVENUE@ triệu, góp mặt trong top 3 của ngày!"
-            ],
-            middlePerformers: [
-                "Cảm ơn sự nỗ lực của các bạn hôm nay. Ngày mai chúng ta sẽ làm tốt hơn nữa!",
-                "Mỗi một đơn hàng đều đáng quý. Hãy nghỉ ngơi và chuẩn bị cho một ngày mai bùng nổ hơn!",
-                "Kết quả hôm nay là nền tảng cho ngày mai. Cùng nhau cố gắng nhé!",
-                "Một ngày làm việc đã kết thúc. Cảm ơn sự cống hiến của các bạn!",
-                "Ghi nhận sự cố gắng của các bạn. Ngày mai sẽ là một cơ hội mới để bứt phá."
-            ],
-            bottomPerformers: [
-                "Hôm nay có thể chưa phải ngày may mắn. Hãy rút kinh nghiệm và chuẩn bị cho ngày mai tốt hơn.",
-                "Đừng nản lòng! Ngày mai là một trang mới, một cơ hội mới. Cố lên!",
-                "Hãy xem lại những gì chúng ta có thể làm tốt hơn và quay lại mạnh mẽ vào ngày mai.",
-                "Nghỉ ngơi để tái tạo năng lượng. Ngày mai chúng ta sẽ phục thù!",
-                "Kết quả hôm nay chưa như ý, nhưng tinh thần chiến đấu thì không được tắt. Cố lên cho ngày mai!"
-            ],
-            noRevenue: [
-                "Không sao cả, ai cũng có những ngày không may mắn. Ngày mai sẽ khác!",
-                "Hôm nay chưa có duyên với khách, ngày mai lộc sẽ về. Cố gắng lên nhé!",
-                "Hãy quên ngày hôm nay đi và tập trung cho một khởi đầu mới vào ngày mai.",
-                "Một ngày không có doanh thu không nói lên tất cả. Quan trọng là không bỏ cuộc!",
-                "Sau cơn mưa trời lại sáng. Ngày mai sẽ là ngày của bạn, cố lên!"
-            ]
-        }
-    };
-
-    function getRandomComment(templateArray) {
-        if (!templateArray || templateArray.length === 0) return "";
-        return templateArray[Math.floor(Math.random() * templateArray.length)];
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -659,11 +596,11 @@
 
             let timeIcon = '';
             if (currentHour < 12) {
-                timeIcon = '☀️ '; // Sáng
+                timeIcon = '☀️ ';
             } else if (currentHour < 18) {
-                timeIcon = '🌇 '; // Chiều
+                timeIcon = '🌇 ';
             } else {
-                timeIcon = '🌙 '; // Tối
+                timeIcon = '🌙 ';
             }
             document.getElementById('reportTitleRt').textContent = `${timeIcon}Báo cáo doanh thu siêu thị đến ${timeString}`;
             
@@ -756,18 +693,19 @@
             };
 
             const kpis = [
-                { id: 'kpi-target', title: 'Target Ngày', value: formatNumber(totalRow['Target Ngày (QĐ)']), subtext: 'Mục tiêu hôm nay', icon: '<path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6Z"/>' },
-                { id: 'kpi-realtime', title: 'DT Realtime', value: formatNumber(totalRow['DT Realtime (QĐ)']), subtext: `${formatNumber(ht,1)}% HT`, color: getColor(ht), icon: '<path fill="currentColor" d="M9 14.5A2.5 2.5 0 0 1 6.5 12A2.5 2.5 0 0 1 9 9.5V14.5M9 16.5A4.5 4.5 0 0 0 13.5 12A4.5 4.5 0 0 0 9 7.5V16.5M22 12l-4-4v3H3v2h15v3l4-4Z"/>' },
-                { id: 'kpi-remaining', title: 'DT Còn lại', value: remainingRevenue <= 0 ? '🏆' : formatNumber(remainingRevenue), subtext: remainingRevenue <= 0 ? 'Đã hoàn thành!' : 'Cần đạt thêm', color: remainingRevenue <= 0 ? '#06D7A0' : '#F04770', icon: '<path fill="currentColor" d="M12,6A6,6 0 0,1 18,12C18,14.21 16.84,16.21 15,17.2V19A1,1 0 0,1 14,20H10A1,1 0 0,1 9,19V17.2C7.16,16.21 6,14.21 6,12A6,6 0 0,1 12,6M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z"/>' },
-                { id: 'kpi-projected', title: 'Dự kiến đạt', value: formatNumber(projectedSales), subtext: `${formatNumber(projectedHt, 1)}%`, color: getColor(projectedHt), icon: '<path fill="currentColor" d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6h-6z"/>' },
-                { id: 'kpi-contest', title: 'Thi đua đạt', value: `${onTrackCount}/${totalCount}`, subtext: 'Chương trình Về Đích', icon: '<path fill="currentColor" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>' },
-                { id: 'kpi-installment', title: 'Tỷ trọng Trả góp', value: `${formatNumber(installmentPercent, 2)}%`, subtext: "DT: " + formatNumber(totalRow['DT Trả Góp']), icon: '<path fill="currentColor" d="M21,11H12.42A3,3 0 0,1 12,11.58V13.42A3,3 0 0,1 12.42,14H21V16H12.42A3,3 0 0,1 10,18.42V20H8V18.42A3,3 0 0,1 5.58,16H3V14H5.58A3,3 0 0,1 8,11.58V10H10V11.58A3,3 0 0,1 12.42,14H15V12H12.42A3,3 0 0,1 10,9.58V8H8V9.58A3,3 0 0,1 5.58,12H3V10H5.58A3,3 0 0,1 8,7.58V6H10V7.58A3,3 0 0,1 12.42,10H21V11Z"/>' },
+                { id: 'kpi-target', title: 'Target Ngày', value: formatNumber(totalRow['Target Ngày (QĐ)']), subtext: 'Mục tiêu hôm nay', icon: '<path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6Z"/>', iconColor: 'var(--primary-accent)' },
+                { id: 'kpi-realtime', title: 'DT Realtime', value: formatNumber(totalRow['DT Realtime (QĐ)']), subtext: `${formatNumber(ht,1)}% HT`, color: getColor(ht), icon: '<path fill="currentColor" d="M9 14.5A2.5 2.5 0 0 1 6.5 12A2.5 2.5 0 0 1 9 9.5V14.5M9 16.5A4.5 4.5 0 0 0 13.5 12A4.5 4.5 0 0 0 9 7.5V16.5M22 12l-4-4v3H3v2h15v3l4-4Z"/>', iconColor: 'var(--success-color)' },
+                { id: 'kpi-remaining', title: 'DT Còn lại', value: remainingRevenue <= 0 ? '🏆' : formatNumber(remainingRevenue), subtext: remainingRevenue <= 0 ? 'Đã hoàn thành!' : 'Cần đạt thêm', color: remainingRevenue <= 0 ? '#06D7A0' : '#F04770', icon: '<path fill="currentColor" d="M12,6A6,6 0 0,1 18,12C18,14.21 16.84,16.21 15,17.2V19A1,1 0 0,1 14,20H10A1,1 0 0,1 9,19V17.2C7.16,16.21 6,14.21 6,12A6,6 0 0,1 12,6M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z"/>', iconColor: remainingRevenue <= 0 ? 'var(--warning-color)' : 'var(--danger-color)' },
+                { id: 'kpi-projected', title: 'Dự kiến đạt', value: formatNumber(projectedSales), subtext: `${formatNumber(projectedHt, 1)}%`, color: getColor(projectedHt), icon: '<path fill="currentColor" d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6h-6z"/>', iconColor: 'var(--secondary-accent)' },
+                { id: 'kpi-contest', title: 'Thi đua đạt', value: `${onTrackCount}/${totalCount}`, subtext: 'Chương trình Về Đích', icon: '<path fill="currentColor" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>', iconColor: '#6654A2' },
+                { id: 'kpi-installment', title: 'Tỷ trọng Trả góp', value: `${formatNumber(installmentPercent, 2)}%`, subtext: "DT: " + formatNumber(totalRow['DT Trả Góp']), icon: '<path fill="currentColor" d="M21,11H12.42A3,3 0 0,1 12,11.58V13.42A3,3 0 0,1 12.42,14H21V16H12.42A3,3 0 0,1 10,18.42V20H8V18.42A3,3 0 0,1 5.58,16H3V14H5.58A3,3 0 0,1 8,11.58V10H10V11.58A3,3 0 0,1 12.42,14H15V12H12.42A3,3 0 0,1 10,9.58V8H8V9.58A3,3 0 0,1 5.58,12H3V10H5.58A3,3 0 0,1 8,7.58V6H10V7.58A3,3 0 0,1 12.42,10H21V11Z"/>', iconColor: '#D65E9A' },
             ];
+            
             kpiPanel.innerHTML = kpis.map(kpi => {
-                if(kpi.id === 'kpi-installment') {
-                    return `<div class="sub-kpi-card card kpi-installment-card">
+                if (kpi.id === 'kpi-installment') {
+                    return `<div class="sub-kpi-card kpi-installment-card">
                                 <div class="text-content">
-                                    <h4><svg class="title-icon" viewBox="0 0 24 24">${kpi.icon}</svg>${kpi.title}</h4>
+                                    <h4><svg class="title-icon" viewBox="0 0 24 24" style="color:${kpi.iconColor};">${kpi.icon}</svg>${kpi.title}</h4>
                                     <p class="sub-text">${kpi.subtext}</p>
                                 </div>
                                 <div class="chart-content">
@@ -776,8 +714,13 @@
                                 </div>
                             </div>`;
                 }
-                return `<div class="sub-kpi-card card">
-                            <h4><svg class="title-icon" viewBox="0 0 24 24">${kpi.icon}</svg>${kpi.title}</h4>
+                
+                if (kpi.id === 'kpi-remaining' && remainingRevenue <= 0) {
+                     kpi.icon = '<path fill="currentColor" d="M20.5,11H19V7A1,1 0 0,0 18,6H16A1,1 0 0,0 15,7V11H9V7A1,1 0 0,0 8,6H6A1,1 0 0,0 5,7V11H3.5A1.5,1.5 0 0,0 2,12.5A1.5,1.5 0 0,0 3.5,14H5V18A3,3 0 0,0 8,21H16A3,3 0 0,0 19,18V14H20.5A1.5,1.5 0 0,0 22,12.5A1.5,1.5 0 0,0 20.5,11M17,11H16V8H17V11M7,11H8V8H7V11Z"/>';
+                }
+
+                return `<div class="sub-kpi-card">
+                            <h4><svg class="title-icon" viewBox="0 0 24 24" style="color: ${kpi.iconColor};">${kpi.icon}</svg>${kpi.title}</h4>
                             <p class="value" style="color: ${kpi.color || 'var(--primary-accent)'}">${kpi.value}</p>
                             <p class="sub-text">${kpi.subtext}</p>
                         </div>`;
@@ -816,25 +759,29 @@
                 return;
             }
             wrapper.style.display = 'block';
-            wrapper.innerHTML = `<h2><svg class="title-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" /></svg>Xếp hạng Doanh thu Nhân viên</h2><div class="chart-container" style="min-height: 300px; height: ${data.length * 45}px;"><canvas id="employeeSalesChart"></canvas></div>`;
+            wrapper.innerHTML = `<h2><svg class="title-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" /></svg>Xếp hạng Doanh thu Nhân viên</h2><div class="chart-container" style="min-height: 450px;"><canvas id="employeeSalesChart"></canvas></div>`;
 
             const canvas = document.getElementById('employeeSalesChart');
             const ctx = canvas.getContext('2d');
             
             const sortedData = data.sort((a, b) => b.revenue - a.revenue);
+            const positiveData = sortedData.filter(d => d.revenue > 0);
+            const totalRevenue = positiveData.reduce((sum, item) => sum + item.revenue, 0);
 
-            const labels = sortedData.map(d => d.name);
+            const labels = sortedData.map(d => {
+                const percentage = totalRevenue > 0 && d.revenue > 0 ? (d.revenue / totalRevenue * 100).toFixed(1) : 0;
+                return d.revenue > 0 ? [d.name, `(${percentage}% đóng góp)`] : [d.name, ''];
+            });
+            
             const revenues = sortedData.map(d => d.revenue);
 
-            // --- START: NEW DYNAMIC COLOR LOGIC ---
             const positiveRevenues = revenues.filter(r => r > 0);
             const maxRevenue = positiveRevenues.length > 0 ? Math.max(...positiveRevenues) : 0;
             const minRevenue = positiveRevenues.length > 0 ? Math.min(...positiveRevenues) : 0;
-
-            // Define colors for the gradient: Green (high) -> Yellow (mid) -> Red (low)
-            const highColor = { r: 6, g: 215, b: 160 };   // From --success-color
-            const midColor = { r: 255, g: 209, b: 103 };  // From --warning-color
-            const lowColor = { r: 240, g: 71, b: 112 };   // From --danger-color
+            
+            const highColor = { r: 6, g: 215, b: 160 };
+            const midColor = { r: 255, g: 209, b: 103 };
+            const lowColor = { r: 240, g: 71, b: 112 };
 
             function interpolateColor(color1, color2, factor) {
                 let result = { ...color1 };
@@ -845,27 +792,11 @@
             }
 
             function getRevenueColor(value) {
-                // Use solid red for negative or zero revenue
-                if (value <= 0) {
-                    return `rgb(${lowColor.r}, ${lowColor.g}, ${lowColor.b})`;
-                }
-                // If there's only one positive value or all are the same, use solid green
-                if (maxRevenue === minRevenue) {
-                     return `rgb(${highColor.r}, ${highColor.g}, ${highColor.b})`;
-                }
-                
-                // Calculate where the current value stands as a percentage
+                if (value <= 0) return `rgb(${lowColor.r}, ${lowColor.g}, ${lowColor.b})`;
+                if (maxRevenue === minRevenue) return `rgb(${highColor.r}, ${highColor.g}, ${highColor.b})`;
                 const percentage = (value - minRevenue) / (maxRevenue - minRevenue);
-
-                if (percentage >= 0.5) {
-                    // From Mid (Yellow) to High (Green)
-                    return interpolateColor(midColor, highColor, (percentage - 0.5) * 2);
-                } else {
-                    // From Low (Red) to Mid (Yellow)
-                    return interpolateColor(lowColor, midColor, percentage * 2);
-                }
+                return percentage >= 0.5 ? interpolateColor(midColor, highColor, (percentage - 0.5) * 2) : interpolateColor(lowColor, midColor, percentage * 2);
             }
-            // --- END: NEW DYNAMIC COLOR LOGIC ---
 
             employeeChart = new Chart(ctx, {
                 type: 'bar',
@@ -874,7 +805,7 @@
                     datasets: [{
                         label: 'Doanh thu',
                         data: revenues,
-                        backgroundColor: (context) => getRevenueColor(context.raw), // Apply the dynamic color
+                        backgroundColor: (context) => getRevenueColor(context.raw),
                         borderColor: 'rgba(7, 58, 75, 0.4)',
                         borderWidth: 1,
                         borderRadius: 8,
@@ -882,31 +813,19 @@
                     }]
                 },
                 options: {
-                    indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
-                    layout: {
-                        padding: {
-                            right: 35 
-                        }
-                    },
                     scales: {
-                        x: {
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)',
-                                borderDash: [2, 4],
-                            },
-                            ticks: {
-                                callback: (value) => formatNumber(value / 1000000, 2) + 'tr'
-                            },
-                            position: 'top'
-                        },
                         y: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                font: { size: 14, weight: '600' }
+                            grid: { color: 'rgba(0, 0, 0, 0.05)', borderDash: [2, 4] },
+                            ticks: { callback: (value) => formatNumber(value / 1000000, 1) + 'tr' },
+                            suggestedMax: maxRevenue > 0 ? maxRevenue * 1.2 : 1000000
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { 
+                                font: { size: 12, weight: '600' },
+                                color: '#073A4B'
                             }
                         }
                     },
@@ -915,24 +834,18 @@
                         tooltip: {
                              enabled: true,
                              backgroundColor: 'rgba(7, 58, 75, 0.9)',
-                             titleFont: { size: 14, weight: 'bold' },
-                             bodyFont: { size: 12 },
                              callbacks: {
-                                 label: function(context) {
-                                     return ` Doanh thu: ${formatNumber(context.raw)} VNĐ`;
-                                 }
+                                 label: (context) => ` Doanh thu: ${formatNumber(context.raw)} VNĐ`
                              }
                         },
                         datalabels: {
                             anchor: 'end',
                             align: 'end',
-                            offset: 4,
+                            rotation: 0,
                             color: 'var(--text-primary)',
-                            font: { weight: 'bold', size: 13 },
-                            formatter: (value) => {
-                                if (value === 0) return 'Chưa có DT';
-                                return formatNumber(value / 1000000, 2) + 'tr';
-                            },
+                            font: { weight: 'bold', size: 12 },
+                            formatter: (value) => value > 0 ? formatNumber(value / 1000000, 1) + 'tr' : '',
+                            offset: 4
                         }
                     }
                 }
@@ -1151,7 +1064,62 @@ ${contestSummarySections.join('\n\n')}`.trim();
             });
         }
         
-        function renderEmployeeSummary(data) {
+        async function generateEmployeeComment(employeeData) {
+            const apiKey = "AIzaSyAZjf8J81puHXTJypnLvzw9PtBjIVvT4eg"; // API key will be injected by the environment
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            const systemPrompt = "Bạn là một quản lý siêu thị vui tính, hài hước và giỏi động viên. Nhiệm vụ của bạn là viết một đoạn nhận xét NGẮN GỌN và HÀI HƯỚC về hiệu suất bán hàng trong ngày của đội ngũ nhân viên. Tuyệt đối không viết dài dòng. Hãy đi thẳng vào vấn đề, sử dụng ngôn từ dí dỏm, trend và các emoji vui nhộn để không khí thêm phần sôi động.";
+
+            const dataString = employeeData.map(e => `- ${e.name} (${e.id}): ${formatNumber(e.revenue / 1000000, 2)} triệu`).join('\n');
+            const userQuery = `Đây là data doanh thu nhân viên hôm nay:
+${dataString}
+
+Dựa vào data trên, hãy viết một bài nhận xét thật NGẮN GỌN (khoảng 3-5 câu), hài hước và súc tích theo các tiêu chí sau:
+1.  **Tiêu đề:** Một câu thật "kêu" và hài hước.
+2.  **Nội dung chính:**
+    * Vinh danh NGẮN GỌN người top 1, có thể gọi vui là "out trình", "gánh team".
+    * Động viên chung những người còn lại một cách hài hước, ví dụ như "vẫn đang núp lùm chờ thời" hoặc "cần bấm nút tăng tốc".
+    * Nếu có người chưa có doanh thu, kêu gọi nhẹ nhàng kiểu "phá băng kiếm ly cafe" hay "mở bát nào anh em ơi".
+3.  **Quan trọng:** Tách biệt rõ ràng các phần (Tiêu đề, vinh danh, động viên) bằng cách XUỐNG DÒNG để dễ đọc trên app chat.
+4.  **Phong cách:** Vui vẻ, dí dỏm, sử dụng emoji hợp lý. Tuyệt đối không viết thành các mục I, II, III. Chỉ cần một đoạn văn ngắn là đủ.`;            
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            let retries = 3;
+            while (retries > 0) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const candidate = result.candidates?.[0];
+
+                    if (candidate && candidate.content?.parts?.[0]?.text) {
+                        return candidate.content.parts[0].text;
+                    } else {
+                         throw new Error("Không nhận được nội dung hợp lệ từ API.");
+                    }
+                } catch (error) {
+                    console.error('Lỗi gọi API Gemini:', error);
+                    retries--;
+                    if (retries === 0) {
+                        return "Rất tiếc, AI tạm thời không thể đưa ra nhận xét. Vui lòng thử lại sau.";
+                    }
+                    await new Promise(res => setTimeout(res, 1000 * (3 - retries))); // Exponential backoff
+                }
+            }
+        }
+
+        async function renderEmployeeSummary(data) {
             const container = document.getElementById('summary-report-wrapper-rt-employee');
             if (!data || data.length === 0) {
                 container.style.display = 'none';
@@ -1159,65 +1127,27 @@ ${contestSummarySections.join('\n\n')}`.trim();
             }
             container.style.display = 'block';
 
-            const sortedData = [...data].sort((a, b) => b.revenue - a.revenue);
-            const currentHour = new Date().getHours();
-            const templates = currentHour < 21 ? employeeCommentTemplates.pre21 : employeeCommentTemplates.post21;
-
-            let summaryLines = [];
-            summaryLines.push(`🚀 BẢNG PHONG THẦN - ĐUA TOP DOANH THU 🚀`);
-            summaryLines.push(`-------------------`);
-
-            const hasPositiveRevenue = sortedData.some(e => e.revenue > 0);
-
-            if (!hasPositiveRevenue) {
-                summaryLines.push(getRandomComment(templates.noRevenue));
-            } else {
-                const topPerformers = sortedData.slice(0, 3).filter(e => e.revenue > 0);
-                if (topPerformers.length > 0) {
-                    summaryLines.push(`👑 TOP 3 CHIẾN THẦN HÔM NAY:`);
-                    const topTemplates = [templates.top3, templates.top3_second, templates.top3_third];
-                    topPerformers.forEach((emp, index) => {
-                        const comment = getRandomComment(topTemplates[index])
-                            .replace('@NAME@', `@${emp.id}`)
-                            .replace('@REVENUE@', formatNumber(emp.revenue / 1000000, 2));
-                        const icon = ['🥇', '🥈', '🥉'][index];
-                        summaryLines.push(`${icon} ${comment}`);
-                    });
-                }
-
-                const remainingEmployees = sortedData.slice(topPerformers.length);
-                const middlePerformers = remainingEmployees.filter(e => e.revenue > 0);
-                const bottomPerformers = remainingEmployees.filter(e => e.revenue <= 0);
-
-                if (middlePerformers.length > 0) {
-                    summaryLines.push(`\n🌟 CÁC CHIẾN BINH ĐANG TĂNG TỐC:`);
-                    middlePerformers.forEach((emp, index) => {
-                        summaryLines.push(`- Hạng ${topPerformers.length + index + 1}: @${emp.id} (${formatNumber(emp.revenue / 1000000, 2)} triệu)`);
-                    });
-                    summaryLines.push(getRandomComment(templates.middlePerformers));
-                }
-
-                if (bottomPerformers.length > 0) {
-                    summaryLines.push(`\n⚠️ NHÓM CẦN BỨT PHÁ:`);
-                    bottomPerformers.forEach(emp => {
-                        summaryLines.push(`- @${emp.id}`);
-                    });
-                     summaryLines.push(getRandomComment(templates.bottomPerformers));
-                }
-            }
-
-            const summaryText = summaryLines.join('\n');
-            const html = `
-                <h2><svg class="title-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" /></svg>Nhận xét Doanh thu Nhân viên</h2>
-                <textarea id="employeeSummaryTextarea" class="summary-textarea" readonly>${summaryText}</textarea>
+             const html = `
+                <h2><svg class="title-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" /></svg>Nhận xét Doanh thu Nhân viên (AI)</h2>
+                <textarea id="employeeSummaryTextarea" class="summary-textarea" readonly>AI đang viết nhận xét... Vui lòng chờ trong giây lát ✨</textarea>
                 <button class="action-btn copySummaryBtn" style="width: 100%; max-width: 400px; margin: 15px auto 0 auto;">
                     <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" /></svg>
                     Sao chép Nhận xét
                 </button>`;
             container.innerHTML = html;
+            
+            const textarea = document.getElementById('employeeSummaryTextarea');
+
+            try {
+                const sortedData = [...data].sort((a, b) => b.revenue - a.revenue);
+                const comment = await generateEmployeeComment(sortedData);
+                textarea.value = comment;
+            } catch (error) {
+                textarea.value = "Đã có lỗi xảy ra khi tạo nhận xét. Vui lòng thử lại.";
+                console.error("Lỗi khi render nhận xét của nhân viên:", error);
+            }
 
             container.querySelector('.copySummaryBtn').addEventListener('click', (e) => {
-                const textarea = document.getElementById('employeeSummaryTextarea');
                 textarea.select();
                 document.execCommand('copy');
                 showToast('Đã sao chép nhận xét nhân viên!');
