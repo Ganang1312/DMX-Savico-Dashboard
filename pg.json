@@ -1,13 +1,13 @@
 {
   "meta": {
     "dates": [
-      "22/09",
-      "23/09",
-      "24/09",
-      "25/09",
-      "26/09",
-      "27/09",
-      "28/09"
+      "29/09",
+      "30/09",
+      "01/10",
+      "02/10",
+      "03/10",
+      "04/10",
+      "05/10"
     ]
   },
   "pgs": [
@@ -18,14 +18,14 @@
       "ten": "YẾN",
       "sdt": "362282223",
       "gt": "Nữ",
-      "veSinh": "THỨ 3",
+      "veSinh": "THỨ 7",
       "lich": [
         "CHIỀU",
         "SÁNG",
         "OFF",
         "SÁNG",
         "CHIỀU",
-        "CHIỀU",
+        "SÁNG",
         "SÁNG"
       ],
       "note": "",
@@ -38,17 +38,17 @@
       "ten": "THẢO",
       "sdt": "0338096094",
       "gt": "Nữ",
-      "veSinh": "THỨ 2",
+      "veSinh": "THỨ 6",
       "lich": [
-        "SÁNG",
-        "CHIỀU",
+        "OFF",
+        "OFF",
         "OFF",
         "CHIỀU",
         "SÁNG",
         "CHIỀU",
         "CHIỀU"
       ],
-      "note": "",
+      "note": "T3,T4 xin nghỉ phép",
       "diaChi": "Vĩnh Hưng , Hoàng Mai .HN"
     },
     {
@@ -58,7 +58,7 @@
       "ten": "HÀ",
       "sdt": "090 4808424",
       "gt": "Nam",
-      "veSinh": "THỨ 5",
+      "veSinh": "THỨ 4",
       "lich": [
         "HỌP",
         "OFF",
@@ -86,7 +86,7 @@
         "CHIỀU",
         "CHIỀU",
         "ST KHÁC",
-        "CHIỀU"
+        "ST KHÁC"
       ],
       "note": "",
       "diaChi": "17 Đào Nguyên B - Trâu Quỳ - Gia Lâm - Hà Nội"
@@ -98,15 +98,15 @@
       "ten": "THÚY",
       "sdt": "0862321997",
       "gt": "Nữ",
-      "veSinh": "CHỦ NHẬT",
+      "veSinh": "THỨ 5",
       "lich": [
         "ST KHÁC",
-        "ST KHÁC",
         "OFF",
-        "ST KHÁC",
-        "CHIỀU",
         "SÁNG",
-        "SÁNG"
+        "SÁNG",
+        "ST KHÁC",
+        "SÁNG",
+        "ST KHÁC"
       ],
       "note": "",
       "diaChi": "564 Nguyễn Văn Cừ."
@@ -118,17 +118,17 @@
       "ten": "VÂN",
       "sdt": "973756696",
       "gt": "Nữ",
-      "veSinh": "THỨ 6",
+      "veSinh": "THỨ 3",
       "lich": [
-        "OFF",
-        "SÁNG",
-        "CHIỀU",
         "HỌP",
         "SÁNG",
+        "CHIỀU",
         "SÁNG",
+        "OFF",
+        "OFF",
         "CHIỀU"
       ],
-      "note": "",
+      "note": "Thứ 7 c xin off do gia đình có việc bận",
       "diaChi": "KDT Vệt Hưng, Giang Biên, Long Biên"
     },
     {
@@ -138,13 +138,13 @@
       "ten": "BẢO",
       "sdt": "352242281",
       "gt": "Nam",
-      "veSinh": "THỨ 7",
+      "veSinh": "THỨ 2",
       "lich": [
+        "CHIỀU",
         "ST KHÁC",
+        "ST KHÁC",
+        "CHIỀU",
         "OFF",
-        "ST KHÁC",
-        "CHIỀU",
-        "CHIỀU",
         "CHIỀU",
         "ST KHÁC"
       ],
@@ -158,15 +158,15 @@
       "ten": "HẰNG",
       "sdt": "0392946783",
       "gt": "Nữ",
-      "veSinh": "THỨ 6",
+      "veSinh": "THỨ 7",
       "lich": [
-        "SÁNG",
-        "ST KHÁC",
         "OFF",
+        "OFF",
+        "OFF",
+        "OFF",
+        "ST KHÁC",
         "SÁNG",
-        "SÁNG",
-        "CHIỀU",
-        "SÁNG"
+        "CHIỀU"
       ],
       "note": "",
       "diaChi": "Bồ Đề- Long Biên"
@@ -174,19 +174,19 @@
     {
       "stt": 9,
       "nganhHang": "GIA DỤNG",
-      "hang": "MUTOSHI",
+      "hang": "MUTOSI",
       "ten": "TRANG",
       "sdt": "0967841092",
       "gt": "Nữ",
-      "veSinh": "THỨ 7",
+      "veSinh": "THỨ 2",
       "lich": [
+        "SÁNG",
         "ST KHÁC",
-        "CHIỀU",
         "OFF",
         "ST KHÁC",
         "ST KHÁC",
         "SÁNG",
-        "SÁNG"
+        "CHIỀU"
       ],
       "note": "",
       "diaChi": "Phù Lỗ , Sóc Sơn"
@@ -203,10 +203,10 @@
         "ST KHÁC",
         "OFF",
         "SÁNG",
-        "ST KHÁC",
-        "SÁNG",
         "CHIỀU",
-        "CHIỀU"
+        "ST KHÁC",
+        "CHIỀU",
+        "SÁNG"
       ],
       "note": "",
       "diaChi": "Đức Giang ,Long Biên"
@@ -218,11 +218,11 @@
       "ten": "TÚ",
       "sdt": "383209079",
       "gt": "Nam",
-      "veSinh": "THỨ 4",
+      "veSinh": "CHỦ NHẬT",
       "lich": [
-        "OFF",
         "CHIỀU",
-        "SÁNG",
+        "CHIỀU",
+        "OFF",
         "CHIỀU",
         "CHIỀU",
         "CHIỀU",
@@ -243,10 +243,10 @@
         "HỌP",
         "SÁNG",
         "OFF",
-        "SÁNG",
         "CHIỀU",
         "SÁNG",
-        "CHIỀU"
+        "CHIỀU",
+        "SÁNG"
       ],
       "note": "",
       "diaChi": "55 ngõ 32 An Dương"
@@ -258,15 +258,15 @@
       "ten": "TUẤN",
       "sdt": "0987093298",
       "gt": "Nam",
-      "veSinh": "CHỦ NHẬT",
+      "veSinh": "THỨ 5",
       "lich": [
         "OFF",
-        "OFF",
         "HỌP",
-        "CHIỀU",
-        "CHIỀU",
+        "OFF",
         "SÁNG",
-        "SÁNG"
+        "SÁNG",
+        "SÁNG",
+        "CHIỀU"
       ],
       "note": "",
       "diaChi": "Ngõ 2 Xuân Đỉnh"
@@ -281,14 +281,14 @@
       "veSinh": "THỨ 2",
       "lich": [
         "SÁNG",
+        "OFF",
+        "CHIỀU",
         "HỌP",
         "CHIỀU",
-        "CHIỀU",
         "SÁNG",
-        "OFF",
         "CHIỀU"
       ],
-      "note": "Thứ 7 em có giỗ ạ",
+      "note": "",
       "diaChi": "Số 17 tổ 8 Thượng Thanh Long Biên"
     },
     {
@@ -298,15 +298,15 @@
       "ten": "NHUNG",
       "sdt": "974528882",
       "gt": "Nữ",
-      "veSinh": "THỨ 5",
+      "veSinh": "THỨ 6",
       "lich": [
-        "CHIỀU",
         "SÁNG",
+        "CHIỀU",
         "OFF",
         "SÁNG",
         "SÁNG",
-        "SÁNG",
-        "CHIỀU"
+        "CHIỀU",
+        "SÁNG"
       ],
       "note": "",
       "diaChi": "Ngõ 455 Hà Huy Tập, Yên Viên , Gia Lâm Hà Nội"
