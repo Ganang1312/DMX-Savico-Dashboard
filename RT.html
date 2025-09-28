@@ -1119,6 +1119,44 @@ Dựa vào data trên, hãy viết một bài nhận xét thật NGẮN GỌN (k
             }
         }
 
+        async function updateEmployeeComment(data) {
+            const textarea = document.getElementById('employeeSummaryTextarea');
+            const regenerateBtn = document.getElementById('regenerateEmployeeCommentBtn');
+            
+            if (!textarea) return; 
+
+            const originalBtnHTML = regenerateBtn ? regenerateBtn.innerHTML : '';
+            
+            textarea.value = 'AI đang viết nhận xét mới... 🤖';
+            if(regenerateBtn) {
+                regenerateBtn.disabled = true;
+                regenerateBtn.innerHTML = `
+                    <svg class="animate-spin" style="width:20px; height:20px;" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg> Đang tạo...`;
+                regenerateBtn.style.opacity = 0.7;
+                regenerateBtn.style.cursor = 'not-allowed';
+            }
+            
+            try {
+                const sortedData = [...data].sort((a, b) => b.revenue - a.revenue);
+                const comment = await generateEmployeeComment(sortedData);
+                textarea.value = comment;
+            } catch (error) {
+                textarea.value = "Đã có lỗi xảy ra khi tạo nhận xét. Vui lòng thử lại.";
+                console.error("Lỗi khi tạo nhận xét nhân viên:", error);
+            } finally {
+                if(regenerateBtn) {
+                    regenerateBtn.disabled = false;
+                    regenerateBtn.innerHTML = originalBtnHTML;
+                    regenerateBtn.style.opacity = 1;
+                    regenerateBtn.style.cursor = 'pointer';
+                }
+            }
+        }
+
+
         async function renderEmployeeSummary(data) {
             const container = document.getElementById('summary-report-wrapper-rt-employee');
             if (!data || data.length === 0) {
@@ -1127,27 +1165,29 @@ Dựa vào data trên, hãy viết một bài nhận xét thật NGẮN GỌN (k
             }
             container.style.display = 'block';
 
-             const html = `
+            const html = `
                 <h2><svg class="title-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" /></svg>Nhận xét Doanh thu Nhân viên (AI)</h2>
                 <textarea id="employeeSummaryTextarea" class="summary-textarea" readonly>AI đang viết nhận xét... Vui lòng chờ trong giây lát ✨</textarea>
-                <button class="action-btn copySummaryBtn" style="width: 100%; max-width: 400px; margin: 15px auto 0 auto;">
-                    <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" /></svg>
-                    Sao chép Nhận xét
-                </button>`;
+                <div class="button-container" style="flex-wrap: nowrap; max-width: 500px; margin: 15px auto 0 auto;">
+                    <button id="regenerateEmployeeCommentBtn" class="action-btn" style="background-color: var(--secondary-accent); flex-grow: 1;">
+                        <svg fill="currentColor" viewBox="0 0 24 24" style="width:20px; height:20px;"><path d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z"></path></svg>
+                        Tạo lại
+                    </button>
+                    <button class="action-btn copySummaryBtn" style="flex-grow: 1;">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" /></svg>
+                        Sao chép Nhận xét
+                    </button>
+                </div>`;
             container.innerHTML = html;
             
-            const textarea = document.getElementById('employeeSummaryTextarea');
+            updateEmployeeComment(data);
 
-            try {
-                const sortedData = [...data].sort((a, b) => b.revenue - a.revenue);
-                const comment = await generateEmployeeComment(sortedData);
-                textarea.value = comment;
-            } catch (error) {
-                textarea.value = "Đã có lỗi xảy ra khi tạo nhận xét. Vui lòng thử lại.";
-                console.error("Lỗi khi render nhận xét của nhân viên:", error);
-            }
+            document.getElementById('regenerateEmployeeCommentBtn').addEventListener('click', () => {
+                updateEmployeeComment(lastEmployeeData);
+            });
 
             container.querySelector('.copySummaryBtn').addEventListener('click', (e) => {
+                const textarea = document.getElementById('employeeSummaryTextarea');
                 textarea.select();
                 document.execCommand('copy');
                 showToast('Đã sao chép nhận xét nhân viên!');
@@ -1157,4 +1197,3 @@ Dựa vào data trên, hãy viết một bài nhận xét thật NGẮN GỌN (k
 	</script>
 </body>
 </html>
-
