@@ -819,7 +819,9 @@
                         y: {
                             grid: { color: 'rgba(0, 0, 0, 0.05)', borderDash: [2, 4] },
                             ticks: { callback: (value) => formatNumber(value / 1000000, 1) + 'tr' },
-                            suggestedMax: maxRevenue > 0 ? maxRevenue * 1.2 : 1000000
+                            // FIX: Changed suggestedMax from 1000000 to 0 for cases with only negative revenue
+                            // This prevents the chart from creating a huge empty positive scale, making negative bars visible.
+                            suggestedMax: maxRevenue > 0 ? maxRevenue * 1.2 : 0
                         },
                         x: {
                             grid: { display: false },
@@ -838,13 +840,14 @@
                                  label: (context) => ` Doanh thu: ${formatNumber(context.raw)} VNĐ`
                              }
                         },
+                        // FIX: Improved datalabels to show on negative values as well
                         datalabels: {
-                            anchor: 'end',
-                            align: 'end',
+                            anchor: (context) => context.dataset.data[context.dataIndex] >= 0 ? 'end' : 'start',
+                            align: (context) => context.dataset.data[context.dataIndex] >= 0 ? 'end' : 'start',
                             rotation: 0,
                             color: 'var(--text-primary)',
                             font: { weight: 'bold', size: 12 },
-                            formatter: (value) => value > 0 ? formatNumber(value / 1000000, 1) + 'tr' : '',
+                            formatter: (value) => value !== 0 ? formatNumber(value / 1000000, 1) + 'tr' : '',
                             offset: 4
                         }
                     }
