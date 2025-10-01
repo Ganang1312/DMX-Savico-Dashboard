@@ -309,7 +309,7 @@
                 <div id="capture-content-rt">
                     <div id="reportTitleRt" class="report-title"></div>
                     <div class="progress-bar-container card">
-                        <div class="progress-labels"><span>Tiến độ Thời gian làm việc (9h-22h)</span><span id="progress-summary-time">0%</span></div>
+                        <div class="progress-labels"><span>Tiến độ Thời gian làm việc (8h-22h)</span><span id="progress-summary-time">0%</span></div>
                         <div class="progress-track"><div class="progress-fill" id="progress-fill-time"></div></div>
                         <div class="progress-text-wrapper"><span id="progress-text-time"></span></div>
                     </div>
@@ -616,7 +616,7 @@
 
         function getTimePassedFraction() {
             const now = new Date();
-            const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9, 0, 0);
+            const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0);
             const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 22, 0, 0);
             if (now <= start) return 0.001; 
             if (now >= end) return 1;
@@ -819,8 +819,6 @@
                         y: {
                             grid: { color: 'rgba(0, 0, 0, 0.05)', borderDash: [2, 4] },
                             ticks: { callback: (value) => formatNumber(value / 1000000, 1) + 'tr' },
-                            // FIX: Changed suggestedMax from 1000000 to 0 for cases with only negative revenue
-                            // This prevents the chart from creating a huge empty positive scale, making negative bars visible.
                             suggestedMax: maxRevenue > 0 ? maxRevenue * 1.2 : 0
                         },
                         x: {
@@ -840,7 +838,6 @@
                                  label: (context) => ` Doanh thu: ${formatNumber(context.raw)} VNĐ`
                              }
                         },
-                        // FIX: Improved datalabels to show on negative values as well
                         datalabels: {
                             anchor: (context) => context.dataset.data[context.dataIndex] >= 0 ? 'end' : 'start',
                             align: (context) => context.dataset.data[context.dataIndex] >= 0 ? 'end' : 'start',
@@ -1071,20 +1068,54 @@ ${contestSummarySections.join('\n\n')}`.trim();
             const apiKey = "AIzaSyAZjf8J81puHXTJypnLvzw9PtBjIVvT4eg"; // API key will be injected by the environment
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
-            const systemPrompt = "Bạn là một quản lý siêu thị vui tính, hài hước và giỏi động viên. Nhiệm vụ của bạn là viết một đoạn nhận xét NGẮN GỌN và HÀI HƯỚC về hiệu suất bán hàng trong ngày của đội ngũ nhân viên. Tuyệt đối không viết dài dòng. Hãy đi thẳng vào vấn đề, sử dụng ngôn từ dí dỏm, trend và các emoji vui nhộn để không khí thêm phần sôi động.";
+            const systemPrompt = "Bạn là một quản lý siêu thị kinh nghiệm, chuyên nghiệp và có khả năng thúc đẩy tinh thần nhân viên. Nhiệm vụ của bạn là viết nhận xét về hiệu suất bán hàng dựa trên dữ liệu và thời gian thực tế. Lời văn cần rõ ràng, mang tính xây dựng, tập trung vào kết quả kinh doanh và mục tiêu chung của cửa hàng.";
 
-            const dataString = employeeData.map(e => `- ${e.name} (${e.id}): ${formatNumber(e.revenue / 1000000, 2)} triệu`).join('\n');
-            const userQuery = `Đây là data doanh thu nhân viên hôm nay:
+            // --- Time-based logic ---
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMinute = now.getMinutes();
+            const isEndOfDay = currentHour > 21 || (currentHour === 21 && currentMinute >= 30);
+            
+            let userQuery = '';
+            const dataString = employeeData
+                .map(e => {
+                    const firstName = e.name.split(' ').pop(); // Get first name
+                    return `- ${firstName}: ${formatNumber(e.revenue / 1000000, 2)} triệu`;
+                })
+                .join('\n');
+
+            if (isEndOfDay) {
+                // End-of-day summary prompt
+                userQuery = `Bây giờ là ${now.toLocaleTimeString('vi-VN')}, đã kết thúc giờ làm việc.
+Dữ liệu doanh thu tổng kết của nhân viên ngày hôm nay:
 ${dataString}
 
-Dựa vào data trên, hãy viết một bài nhận xét thật NGẮN GỌN (khoảng 3-5 câu), hài hước và súc tích theo các tiêu chí sau:
-1.  **Tiêu đề:** Một câu thật "kêu" và hài hước.
+Với vai trò là quản lý, hãy viết một nhận xét tổng kết NGẮN GỌN về hiệu suất làm việc của cả đội:
+1.  **Mở đầu:** Cảm ơn cả đội đã nỗ lực trong ngày làm việc.
 2.  **Nội dung chính:**
-    * Vinh danh NGẮN GỌN người top 1, có thể gọi vui là "out trình", "gánh team".
-    * Động viên chung những người còn lại một cách hài hước, ví dụ như "vẫn đang núp lùm chờ thời" hoặc "cần bấm nút tăng tốc".
-    * Nếu có người chưa có doanh thu, kêu gọi nhẹ nhàng kiểu "phá băng kiếm ly cafe" hay "mở bát nào anh em ơi".
-3.  **Quan trọng:** Tách biệt rõ ràng các phần (Tiêu đề, vinh danh, động viên) bằng cách XUỐNG DÒNG để dễ đọc trên app chat.
-4.  **Phong cách:** Vui vẻ, dí dỏm, sử dụng emoji hợp lý. Tuyệt đối không viết thành các mục I, II, III. Chỉ cần một đoạn văn ngắn là đủ.`;            
+    * Vinh danh những cá nhân xuất sắc nhất ngày (top 1-3).
+    * Đưa ra nhận xét chung về kết quả của cả đội.
+    * Nhắc nhở những bạn cần cố gắng hơn vào ngày mai.
+3.  **Kết luận:** Chúc cả đội nghỉ ngơi và chuẩn bị tốt cho ngày làm việc tiếp theo.
+4.  **Lưu ý:** Chỉ sử dụng TÊN của nhân viên. Lời văn chuyên nghiệp, súc tích, mang tính tổng kết.`;
+
+            } else {
+                // Mid-day motivational prompt
+                const shift = currentHour < 15 ? "sáng" : "chiều";
+                userQuery = `Bây giờ là ${now.toLocaleTimeString('vi-VN')}. Ca làm việc ${shift} đang diễn ra.
+Dữ liệu doanh thu nhân viên đến thời điểm hiện tại:
+${dataString}
+
+Với vai trò là quản lý, hãy viết một nhận xét NGẮN GỌN để thúc đẩy tinh thần nhân viên:
+1.  **Mở đầu:** Nhắc nhở chung về việc tập trung, chắt chiu từng lượt khách trong thời gian còn lại của ca ${shift}.
+2.  **Nội dung:**
+    * Tuyên dương các bạn đang làm tốt, dẫn đầu về doanh số để tạo động lực.
+    * Động viên các bạn còn lại cần nỗ lực hơn để bứt phá.
+    * Nhắc nhở nhẹ nhàng những bạn chưa có doanh số cần khẩn trương hơn.
+3.  **Kết luận:** Kêu gọi cả team cùng nhau đoàn kết, cố gắng hoàn thành mục tiêu ngày.
+4.  **Lưu ý:** Chỉ sử dụng TÊN của nhân viên. Lời văn quản lý, chuyên nghiệp, không đùa cợt quá trớn.`;
+            }
+            
             const payload = {
                 contents: [{ parts: [{ text: userQuery }] }],
                 systemInstruction: { parts: [{ text: systemPrompt }] },
