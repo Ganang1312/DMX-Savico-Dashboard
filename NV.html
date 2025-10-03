@@ -54,22 +54,40 @@
             font-size: 14px;
             font-weight: bold;
             color: var(--text-on-dark);
-            background-color: var(--primary-color);
+            background-color: var(--primary-accent);
             border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.2s;
             align-self: flex-start;
         }
-        .btn-paste:hover { filter: brightness(90%); }
 
         input[type="text"], input[type="number"], textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; box-sizing: border-box; }
         input:disabled { background-color: #e9ecef; cursor: not-allowed; }
         textarea { height: 120px; font-family: 'Courier New', Courier, monospace; }
         .btn-group { display: flex; gap: 15px; margin-top: 20px;}
         .btn { display: block; width: 100%; padding: 15px; color: var(--text-on-dark); border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
-        #processBtn { background: linear-gradient(45deg, var(--primary-accent), var(--success-color)); }
-        #captureReportBtnMain { background: linear-gradient(45deg, var(--primary-accent), var(--secondary-accent)); }
+        
+        .btn:hover, .btn-paste:hover {
+            filter: brightness(90%);
+        }
+        .btn.btn-inline {
+            display: inline-block;
+            width: auto;
+            font-size: 16px;
+            padding: 12px 20px;
+        }
+        .btn.btn-small {
+            width: auto;
+            font-size: 14px;
+            padding: 8px 15px;
+        }
+        #processBtn { background-color: var(--primary-accent); }
+        #captureReportBtnMain { background-color: var(--primary-accent); }
+        #editDataBtn { background-color: var(--text-muted); margin-right: 10px; }
+        #captureCardsBtn { background-color: var(--secondary-accent); }
+        #captureAllCardsBtn { background-color: var(--success-color); margin-left: 15px; }
+        #copyCommentsBtn { background-color: var(--primary-accent); }
         
         .slider-group { margin-top: 15px; }
         .slider-container { display: flex; align-items: center; gap: 15px; }
@@ -82,6 +100,11 @@
         .data-table thead { background-color: #F9FAFB; font-weight: 600; }
         .data-table tbody td:nth-child(2) { text-align: left; font-weight: 500; }
         
+        .data-table th:nth-child(2), .data-table td:nth-child(2) {
+            width: 1%;
+            white-space: nowrap;
+        }
+
         .employee-name-link {
             font-weight: 500;
             color: var(--primary-color);
@@ -140,14 +163,23 @@
             border-bottom: 2px solid var(--primary-color);
             margin-bottom: 15px;
         }
+        
         #contestSummaryContainer .data-table {
             border-collapse: collapse;
             width: 100%;
-            table-layout: fixed; /* Căn chỉnh độ rộng cột bằng nhau */
+            table-layout: fixed; 
         }
+        #contestSummaryContainer .data-table th:nth-child(1) { width: 8%; }
+        #contestSummaryContainer .data-table td:nth-child(1) { width: 8%; }
+        #contestSummaryContainer .data-table th:nth-child(2) { width: 14%; }
+        #contestSummaryContainer .data-table td:nth-child(2) { width: 14%; }
+        #contestSummaryContainer .data-table th:nth-child(3) { width: 8%; }
+        #contestSummaryContainer .data-table td:nth-child(3) { width: 8%; }
+
+
         #contestSummaryContainer .data-table th,
         #contestSummaryContainer .data-table td {
-            font-size: 13px; /* Tăng kích thước chữ */
+            font-size: 13px;
             border: none; 
             text-align: center;
             vertical-align: middle;
@@ -160,14 +192,7 @@
             border-right: 1px solid var(--border-main);
             padding: 10px 8px;
         }
-        /* Thiết lập độ rộng cho các cột đầu tiên */
-        #contestSummaryContainer .data-table th:nth-child(1),
-        #contestSummaryContainer .data-table td:nth-child(1) { width: 7%; }
-        #contestSummaryContainer .data-table th:nth-child(2),
-        #contestSummaryContainer .data-table td:nth-child(2) { width: 20%; }
-        #contestSummaryContainer .data-table th:nth-child(3),
-        #contestSummaryContainer .data-table td:nth-child(3) { width: 11%; }
-
+        
         #contestSummaryContainer .data-table thead th:last-child { border-right: none; }
         #contestSummaryContainer .data-table thead th:has(.th-flex-wrapper) { padding: 0; }
         #contestSummaryContainer .data-table tbody tr { border-bottom: 1px solid var(--border-main); }
@@ -175,16 +200,15 @@
         #contestSummaryContainer .data-table tbody td {
             border-right: 1px solid var(--border-main);
             font-weight: 600;
-            padding: 0; /* Remove padding for data bar cells */
+            padding: 0;
         }
         #contestSummaryContainer .data-table tbody td:nth-child(-n+3) {
-             padding: 10px 8px; /* Re-apply padding for non-data bar cells */
+             padding: 10px 8px;
         }
         #contestSummaryContainer .data-table tbody td:last-child { border-right: none; }
         #contestSummaryContainer .data-table tbody td:nth-child(2) {
             text-align: left;
-            font-weight: 600; /* Tăng độ đậm chữ */
-            white-space: nowrap;
+            font-weight: 600;
         }
         .th-flex-wrapper {
             display: flex;
@@ -195,7 +219,7 @@
             min-height: 60px;
         }
         #contestSummaryContainer .data-table th .header-main-text {
-            font-weight: 600; 
+            font-weight: 700; 
             word-wrap: break-word;
             text-align: center;
             font-size: 10px;
@@ -215,11 +239,10 @@
             margin-top: 4px;
         }
 
-        /* CSS cho Data Bar */
         .data-cell {
             position: relative;
             vertical-align: middle;
-            height: 45px; /* Ensure consistent cell height */
+            height: 45px;
         }
         .data-bar {
             position: absolute;
@@ -261,7 +284,6 @@
             width: 100%; margin: 0; padding: 0; overflow-x: hidden;
         }
         
-        /* CSS cho Thẻ KPI */
         #allCardsContainer { 
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -281,9 +303,18 @@
         .perf-header { display: grid; grid-template-columns: 80px 1fr auto; background: var(--text-primary); color: var(--text-on-dark); padding: 15px; align-items: center; gap: 15px;}
         .perf-header .perf-avatar { width: 60px; height: 60px; }
         .perf-header .name-block h2 { margin: 0; font-size: 1.4em; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .perf-quote {
+            font-size: 13px;
+            opacity: 0.9;
+            margin: 4px 0 0 0;
+            font-style: italic;
+            border-top: 1px solid rgba(255, 255, 255, 0.4);
+            padding-top: 6px;
+            font-weight: 500;
+        }
         .perf-header .rank-block { text-align: right; }
         .perf-header .rank-block h3 { margin: 0; font-size: 1.5em; color: var(--warning-color); }
-        .perf-revenue-bar { background: var(--primary-color); color: var(--text-on-dark); text-align: center; padding: 12px; font-size: 1.3em; font-weight: bold; }
+        
         .perf-body { padding: 20px; flex-grow: 1; }
         .progress-bar-group { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; text-align: center; font-size: 12px; margin-top:20px; }
         .progress-bar-group > div {
@@ -330,12 +361,14 @@
         .contest-table tbody tr:nth-child(even) {
             background-color: #f8f9fa;
         }
-        /* Cập nhật CSS cho thẻ KPI */
         .progress-bar-wrapper { margin-top: 15px; }
         .progress-bar-label { display: flex; justify-content: space-between; align-items: center; font-size: 14px; margin-bottom: 5px; font-weight: 500;}
         .progress-bar-label .progress-data { font-weight: 600; color: var(--text-muted); }
         .progress-bar-bg { background-color: #e9ecef; border-radius: 50px; height: 22px; overflow: hidden;}
         .progress-bar-fill { background-color: var(--primary-color); height: 100%; border-radius: 50px; transition: width 0.5s ease-in-out; }
+        .progress-bar-fill.success {
+             background-color: var(--success-color);
+        }
         .progress-bar-sub-label { display: none; }
 
     </style>
@@ -347,8 +380,8 @@
             <div id="report-header" style="display: none; align-items: center; justify-content: space-between; margin-bottom: 25px;">
                 <h1 style="margin: 0; text-align: left;">Báo cáo Phân tích Hiệu suất</h1>
                 <div>
-                     <button id="editDataBtn" class="btn" style="display: inline-block; width: auto; background-color: var(--text-muted); margin-right: 10px; font-size: 16px; padding: 12px 20px;">Chỉnh sửa Dữ liệu</button>
-                     <button id="captureReportBtnMain" class="btn" style="display: inline-block; width: auto; font-size: 16px; padding: 12px 20px;">Chụp Báo cáo</button>
+                     <button id="editDataBtn" class="btn btn-inline">Chỉnh sửa Dữ liệu</button>
+                     <button id="captureReportBtnMain" class="btn btn-inline">Chụp Báo cáo</button>
                 </div>
             </div>
 
@@ -426,20 +459,19 @@
                     <div class="section-header">
                         <h2 style="color:var(--primary-color); margin-bottom: 0;">🧑‍💻 Phân tích Chi tiết Hiệu suất Cá nhân</h2>
                         <div style="display: flex;">
-                            <button id="captureCardsBtn" class="btn" style="background-color: var(--secondary-accent);">Chụp Thẻ KPI</button>
-                            <button id="captureAllCardsBtn" class="btn" style="margin-left: 15px; background-color: var(--success-color);">Chụp Tất Cả KPI</button>
+                            <button id="captureCardsBtn" class="btn">Chụp Thẻ KPI</button>
+                            <button id="captureAllCardsBtn" class="btn">Chụp Tất Cả KPI</button>
                         </div>
                     </div>
                     <div id="allCardsContainer"></div>
                 </div>
             </div>
 
-            <!-- Phần nhận xét được tách ra để không bị chụp màn hình -->
             <div class="card" id="comments-card" style="display: none;">
                 <div id="comments-section">
                      <div class="section-header" style="padding-bottom: 10px; border-bottom: 1px solid var(--border-main); margin-bottom: 15px;">
                         <h3 style="margin:0; font-size: 1.2em;">📋 Nhận xét (Dạng văn bản)</h3>
-                        <button id="copyCommentsBtn" class="btn" style="width: auto; background-color: var(--primary-color); font-size: 14px; padding: 8px 15px;">Sao chép Nhận xét</button>
+                        <button id="copyCommentsBtn" class="btn btn-small">Sao chép Nhận xét</button>
                      </div>
                      <textarea id="comments-textarea" readonly style="width: 100%; height: 200px; font-family: 'Courier New', Courier, monospace; background-color: #f8f9fa; border: 1px solid #ccc; border-radius: 5px; padding: 10px; resize: vertical;"></textarea>
                 </div>
@@ -671,7 +703,6 @@
     }
 
     function captureAndDownload(element, filename) {
-        // Tạm thời ẩn phần nhận xét trước khi chụp
         const commentsCard = document.getElementById('comments-card');
         const originalDisplay = commentsCard.style.display;
         commentsCard.style.display = 'none';
@@ -692,7 +723,6 @@
             showToast("Lỗi khi chụp ảnh màn hình.");
             console.error(err);
         }).finally(() => {
-            // Hiện lại phần nhận xét sau khi chụp xong
             reportTitleEl.style.display = 'none'; 
             commentsCard.style.display = originalDisplay;
         });
@@ -829,8 +859,13 @@
             // 2. Phân tích dữ liệu
             const lines7 = inputs.data7.split('\n').filter(line => line.trim());
             const subHeaderIndex7 = lines7.findIndex(line => line.trim().startsWith('SLLK'));
-            const contestHeaders = lines7.slice(1, subHeaderIndex7).map(h => h.trim()).filter(Boolean);
+            let contestHeaders = lines7.slice(1, subHeaderIndex7).map(h => h.trim()).filter(Boolean);
             
+            const invalidHeaderKeywords = ['DTLK', 'SLLK', 'Tổng', 'BP All In One', 'Nguyễn', 'Bùi', 'Dương', 'Đỗ', 'Trần', 'Lê', 'Phạm', 'Hoàng', 'Phan', 'Vũ', 'Đặng', 'Thị'];
+            contestHeaders = contestHeaders.filter(header => {
+                return !invalidHeaderKeywords.some(keyword => header.includes(keyword));
+            });
+
             const employeeMap = new Map();
             let currentDept = '';
             const group1Depts = ["BP Tư Vấn - ĐM", "BP Trang Trí kiêm Thu ngân - Sim Số - ĐM"];
@@ -841,6 +876,12 @@
                     currentDept = nameId;
                 } else if (nameId.includes(' - ')) {
                     const nameOnly = nameId.split(' - ')[0].trim();
+                    
+                    const invalidNames = ['PHỤ KIỆN', 'TỔNG', 'TỔNG CỘNG'];
+                    if (invalidNames.includes(nameOnly.toUpperCase())) {
+                        return; 
+                    }
+                    
                     const group = group1Depts.includes(currentDept) ? 'group1' : 'group2';
                     const sales = {};
                     contestHeaders.forEach((header, i) => { sales[header.trim()] = parseFloat(String(cells[i + 1] || '0').replace(/,/g, '')) || 0; });
@@ -924,7 +965,6 @@
                 finalData.push(employee);
             });
             
-            // 4. Sắp xếp dữ liệu để hiển thị
             finalData.sort((a,b) => b.totalScore - a.totalScore);
             finalData.forEach((employee, index) => { employee.rank = index + 1; });
             
@@ -945,10 +985,8 @@
                 contestProjectedTotals[header] = stat && stat.target > 0 ? (stat.actual / timeframe.passedDays * timeframe.totalDays) / stat.target * 100 : 0;
             });
 
-            // 5. Hiển thị tất cả các thành phần
             renderUI(finalData, sortedContestHeaders, contestProjectedTotals, currentMonthTimeframe);
             
-            // 6. Lưu đầu vào vào localStorage
             Object.keys(inputs).forEach(key => {
                 const el = document.getElementById({data7: 'dataInput7', data6: 'dataInput6', data2: 'dataInput2', storeTarget: 'storeTargetInput', isAllInOne: 'allInOneCheckbox', totalStaff: 'totalEmployeeCountInput', group1Count: 'group1CountInput', group2Count: 'group2CountInput', slider1Ratio: 'slider1', slider2Ratio: 'slider2'}[key]);
                 if(el) localStorage.setItem(el.id, el.type === 'checkbox' ? el.checked : el.value);
@@ -1017,18 +1055,21 @@
     function renderContestSummaryTables(data, headers, projectedTotals) {
         const container = document.getElementById('contestSummaryContainer');
         container.innerHTML = '';
-        const numTables = 2;
         const totalHeaders = headers.length;
         if (totalHeaders === 0) return;
 
-        const chunkSize = Math.ceil(totalHeaders / numTables);
+        const midPoint = Math.ceil(totalHeaders / 2);
+        const headerChunks = [
+            headers.slice(0, midPoint),
+            headers.slice(midPoint)
+        ].filter(chunk => chunk.length > 0);
 
-        for (let i = 0; i < totalHeaders; i += chunkSize) {
-            const headerChunk = headers.slice(i, i + chunkSize);
-            const tableIndex = (i / chunkSize) + 1;
+        headerChunks.forEach((headerChunk, tableIndex) => {
+            const startIndex = (tableIndex === 0) ? 0 : midPoint;
+            const tableNum = tableIndex + 1;
             
             let tableHtml = `<div class="contest-group">
-                <h3>Bảng Thi đua ${tableIndex} (Nhóm ${i + 1} - ${Math.min(i + chunkSize, totalHeaders)})</h3>
+                <h3>Bảng Thi đua ${tableNum} (Nhóm ${startIndex + 1} - ${startIndex + headerChunk.length})</h3>
                 <table class="data-table"><thead><tr>
                 <th>Hạng</th>
                 <th>Nhân viên</th>
@@ -1042,7 +1083,7 @@
                 tableHtml += `<th style="background-color: ${getIndustryGroupColor(h)};">
                     <div class="th-flex-wrapper">
                         <a href="#" class="employee-name-link" onclick="showContestGroupPopup('${encodedContestName}', event)">
-                            <span class="header-main-text">${i + index + 1}. ${h}</span>
+                            <span class="header-main-text">${startIndex + index + 1}. ${h}</span>
                         </a>
                         <div class="header-sub-text" style="color: ${percentColor};">${projectedPercent.toFixed(1)}%</div>
                     </div>
@@ -1066,11 +1107,18 @@
 
             tableHtml += '</tbody></table></div>';
             container.innerHTML += tableHtml;
-        }
+        });
     }
     
     function renderAllEmployeeCards(data) {
         document.getElementById('allCardsContainer').innerHTML = data.map(employee => getEmployeeCardHtml(employee, data.length)).join('');
+    }
+
+    function getMotivationalQuote(rank, total) {
+        if (rank === 1) return "Dẫn đầu cuộc đua, tuyệt vời!";
+        if (rank <= 3) return "Vị trí top đầu, giữ vững phong độ!";
+        if (rank <= Math.ceil(total * 0.6)) return "Cố gắng bứt phá top đầu nào!";
+        return "Nỗ lực hơn để cải thiện thứ hạng!";
     }
 
     function getEmployeeCardHtml(employee, total) {
@@ -1103,21 +1151,18 @@
                         <div class="perf-avatar">${avatarSvg}</div>
                         <div class="name-block">
                             <h2>${employee.name}</h2>
-                            <p style="font-size: 12px; opacity: 0.8; margin: 0;">${employee.id}</p>
+                            <p class="perf-quote">${getMotivationalQuote(employee.rank, total)}</p>
                         </div>
                         <div class="rank-block">
                             <h3>${rankIcon}HẠNG ${employee.rank}</h3>
                             <p style="margin: 0; font-size: 13px;">Điểm: ${employee.totalScore.toFixed(1)}</p>
                         </div>
                     </div>
-                    <div class="perf-revenue-bar" style="background-color: ${deptColorsJs[employee.group] || 'var(--primary-color)'};">
-                        Luỹ kế DTQĐ: ${formatNumberFull(revenueActual, 0)}
-                    </div>
                     <div class="perf-body">
-                        <div class="progress-bar-wrapper">
+                         <div class="progress-bar-wrapper" style="margin-top: 0;">
                             <div class="progress-bar-label">
                                 <span>Tiến độ Doanh thu</span>
-                                <span class="progress-data">${formatNumberFull(revenueActual)} / ${formatNumberFull(revenueTarget)}</span>
+                                <span class="progress-data">${formatNumberFull(revenueActual, 0)} / ${formatNumberFull(revenueTarget, 0)}</span>
                                 <span class="${employee.revenueCompletion >= 100 ? 'kpi-green' : ''}">${employee.revenueCompletion.toFixed(1)}%</span>
                             </div>
                             <div class="progress-bar-bg"><div class="progress-bar-fill ${employee.revenueCompletion >= 100 ? 'success' : ''}" style="width: ${revenueCompletionCapped}%;"></div></div>
@@ -1183,3 +1228,4 @@
 </script>
 </body>
 </html>
+
