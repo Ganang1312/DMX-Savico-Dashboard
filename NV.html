@@ -214,7 +214,7 @@
             box-shadow: var(--shadow-main);
             position: relative;
         }
-        .perf-header { display: grid; grid-template-columns: 80px 1fr auto; background: var(--text-primary); color: var(--text-on-dark); padding: 15px; align-items: center; gap: 15px;}
+        .perf-header { display: grid; grid-template-columns: 80px minmax(0, 1fr) auto; background: var(--text-primary); color: var(--text-on-dark); padding: 15px; align-items: center; gap: 15px;}
         .perf-header .perf-avatar { width: 60px; height: 60px; }
         .perf-header .name-block h2 { margin: 0; font-size: 1.4em; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         .perf-quote {
@@ -1037,7 +1037,7 @@
                     <div class="perf-header">
                         <div class="perf-avatar">${avatarSvg}</div>
                         <div class="name-block">
-                            <h2>${employee.name}</h2>
+                            <h2>${abbreviateName(employee.name)}</h2>
                             <p class="perf-quote">${getMotivationalQuote(employee.rank, total)}</p>
                         </div>
                         <div class="rank-block">
@@ -1107,7 +1107,7 @@
             else if (e.rank === 2) icon = '🥈 ';
             else if (e.rank === 3) icon = '🥉 ';
             else if (total > 3 && e.rank >= total - 2) icon = '🔴 ';
-            return `${icon}Top ${e.rank} - ${e.name}: ${e.totalScore.toFixed(1)} điểm. DT: ${formatNumberFull(e.actual_DTQD, 0)}. HT ${e.projectedCompletedContests}/${Object.keys(e.contestTargets).length} nhóm.`;
+            return `${icon}Top ${e.rank} - ${abbreviateName(e.name)}: ⭐ ${e.totalScore.toFixed(1)} điểm | 💰 DT: ${formatNumberFull(e.actual_DTQD, 0)} | ✅ HT ${e.projectedCompletedContests}/${Object.keys(e.contestTargets).length} nhóm.`;
         }).join('\n');
         document.getElementById('comments-textarea').value = comments;
         document.getElementById('comments-section').style.display = 'block';
