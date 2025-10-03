@@ -25,7 +25,6 @@
             /* Ánh xạ các biến cũ sang biến mới để tương thích */
             --primary-color: var(--primary-accent);
             --card-bg: #FFFFFF;
-            --contest-header-bg: #F4F7F9;
         }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; padding: 20px; background-color: var(--bg-main); color: var(--text-primary); }
         .container { max-width: 100%; padding: 15px; box-sizing: border-box; }
@@ -84,6 +83,7 @@
         }
         #processBtn { background-color: var(--primary-accent); }
         #captureReportBtnMain { background-color: var(--primary-accent); }
+        #captureComprehensiveBtn { background-color: var(--primary-accent); }
         #editDataBtn { background-color: var(--text-muted); margin-right: 10px; }
         #captureCardsBtn { background-color: var(--secondary-accent); }
         #captureAllCardsBtn { background-color: var(--success-color); margin-left: 15px; }
@@ -95,51 +95,6 @@
         .slider-value { font-weight: bold; font-size: 16px; min-width: 50px; text-align: right; }
 
         .table-container { overflow-x: auto; margin-top: 25px;}
-        .data-table { width: 100%; border-collapse: collapse; font-size: 14px; text-align: center; }
-        .data-table th, .data-table td { border: 1px solid var(--border-main); padding: 12px 10px; vertical-align: middle; }
-        .data-table thead { background-color: #F9FAFB; font-weight: 600; }
-        .data-table tbody td:nth-child(2) { text-align: left; font-weight: 500; }
-        
-        .data-table th:nth-child(2), .data-table td:nth-child(2) {
-            width: 1%;
-            white-space: nowrap;
-        }
-
-        .employee-name-link {
-            font-weight: 500;
-            color: var(--primary-color);
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .employee-name-link:hover { text-decoration: underline; }
-
-        .table-progress-container {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 5px;
-            min-width: 150px;
-        }
-        .table-progress-bar-bg {
-            flex-grow: 1;
-            background-color: #e9ecef;
-            border-radius: 4px;
-            height: 18px;
-            overflow: hidden;
-        }
-        .table-progress-bar-fill {
-            background-color: var(--primary-color);
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.5s ease-in-out;
-        }
-        .table-progress-bar-fill.success { background-color: var(--success-color); }
-        .table-progress-label-outside { font-weight: bold; font-size: 12px; color: var(--text-primary); flex-shrink: 0; }
-
-        .kpi-percent { font-weight: bold; text-align: center; }
-        .kpi-green { color: var(--success-color); }
-        .kpi-red { color: var(--danger-color); }
-
         .toast {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             background-color: var(--danger-color); color: var(--text-on-dark); padding: 15px 25px;
@@ -149,121 +104,73 @@
         }
         .toast.show { opacity: 1; visibility: visible; }
         
-        .rank-cell { text-align: center !important; font-weight: bold; font-size: 1.2em; }
-        .rank-cell .rank-icon { font-size: 1.5em; vertical-align: middle; }
-
         #reportTitle { text-align: center; margin: 20px 0 0 0; display: none;}
         .section-header { display: flex; justify-content: space-between; align-items: center; }
         
-        #contestSummaryContainer .contest-group { margin-bottom: 30px; }
-        #contestSummaryContainer .contest-group h3 {
-            font-size: 1.2em;
-            color: var(--text-primary);
-            padding-bottom: 8px;
-            border-bottom: 2px solid var(--primary-color);
-            margin-bottom: 15px;
-        }
-        
-        #contestSummaryContainer .data-table {
-            border-collapse: collapse;
-            width: 100%;
-            table-layout: fixed; 
-        }
-        #contestSummaryContainer .data-table th:nth-child(1) { width: 8%; }
-        #contestSummaryContainer .data-table td:nth-child(1) { width: 8%; }
-        #contestSummaryContainer .data-table th:nth-child(2) { width: 14%; }
-        #contestSummaryContainer .data-table td:nth-child(2) { width: 14%; }
-        #contestSummaryContainer .data-table th:nth-child(3) { width: 8%; }
-        #contestSummaryContainer .data-table td:nth-child(3) { width: 8%; }
-
-
-        #contestSummaryContainer .data-table th,
-        #contestSummaryContainer .data-table td {
-            font-size: 13px;
-            border: none; 
-            text-align: center;
-            vertical-align: middle;
-        }
-        #contestSummaryContainer .data-table thead th {
-            border-bottom: 2px solid #D1D5DB;
-            font-size: 11px;
-            vertical-align: middle;
-            background-color: transparent;
-            border-right: 1px solid var(--border-main);
+        /* --- GIAO DIỆN BẢNG TỔNG HỢP MỚI --- */
+        .comprehensive-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .comprehensive-table th, .comprehensive-table td {
+            border: 1px solid var(--border-main);
             padding: 10px 8px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .comprehensive-table thead th {
+            background-color: #F9FAFB;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .comprehensive-table th:first-child, .comprehensive-table td:first-child,
+        .comprehensive-table th:nth-child(2), .comprehensive-table td:nth-child(2) {
+            position: sticky;
+            left: 0;
+            background-color: #fff;
+            z-index: 2;
+        }
+         .comprehensive-table th:nth-child(2), .comprehensive-table td:nth-child(2) {
+            left: 50px; /* Bằng độ rộng của cột đầu tiên */
         }
         
-        #contestSummaryContainer .data-table thead th:last-child { border-right: none; }
-        #contestSummaryContainer .data-table thead th:has(.th-flex-wrapper) { padding: 0; }
-        #contestSummaryContainer .data-table tbody tr { border-bottom: 1px solid var(--border-main); }
-        #contestSummaryContainer .data-table tbody tr:last-child { border-bottom: none; }
-        #contestSummaryContainer .data-table tbody td {
-            border-right: 1px solid var(--border-main);
-            font-weight: 600;
-            padding: 0;
+        .comprehensive-table td:nth-child(2) { text-align: left; font-weight: 600; }
+        .clickable-name, .clickable-header {
+            color: var(--primary-accent);
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
         }
-        #contestSummaryContainer .data-table tbody td:nth-child(-n+3) {
-             padding: 10px 8px;
-        }
-        #contestSummaryContainer .data-table tbody td:last-child { border-right: none; }
-        #contestSummaryContainer .data-table tbody td:nth-child(2) {
-            text-align: left;
-            font-weight: 600;
-        }
-        .th-flex-wrapper {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            height: 100%;
-            padding: 8px 4px;
-            min-height: 60px;
-        }
-        #contestSummaryContainer .data-table th .header-main-text {
-            font-weight: 700; 
-            word-wrap: break-word;
-            text-align: center;
-            font-size: 10px;
-            line-height: 1.2;
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        #contestSummaryContainer .th-flex-wrapper .employee-name-link {
+        .clickable-name:hover, .clickable-header:hover { text-decoration: underline; }
+
+
+        .rank-cell { font-weight: 700; font-size: 1.2em; width: 50px;}
+        .rank-icon { font-size: 1.5em; }
+
+        .heatmap-cell {
+            font-weight: 700;
             color: var(--text-primary);
         }
-        #contestSummaryContainer .data-table th .header-sub-text {
-            font-weight: 700;
+        .heatmap-green { background-color: rgba(6, 215, 160, 0.2); }
+        .heatmap-orange { background-color: rgba(255, 209, 103, 0.3); }
+        .heatmap-red { background-color: rgba(240, 71, 112, 0.15); }
+        
+        .progress-bar-wrapper { min-width: 150px; }
+        .progress-bar-label { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-bottom: 4px; font-weight: 500; color: var(--text-muted);}
+        .progress-bar-bg { background-color: #e9ecef; border-radius: 50px; height: 8px; overflow: hidden;}
+        .progress-bar-fill { background-color: var(--primary-color); height: 100%; border-radius: 50px; transition: width 0.5s ease-in-out; }
+        .progress-bar-fill.success { background-color: var(--success-color); }
+
+        .contest-header-cell {
+            max-width: 100px;
+            white-space: normal;
             font-size: 12px;
-            text-align: center;
-            margin-top: 4px;
+            vertical-align: top;
+        }
+        .contest-header-cell > div {
+             margin-top: 5px; font-size: 1.1em; font-weight: 700;
         }
 
-        .data-cell {
-            position: relative;
-            vertical-align: middle;
-            height: 45px;
-        }
-        .data-bar {
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            opacity: 0.2;
-            z-index: 1;
-            transition: width 0.5s ease-in-out;
-        }
-        .cell-content {
-            position: relative;
-            z-index: 2;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            padding: 0 8px;
-        }
-
+        /* Modal Styles */
         .modal {
             display: none; position: fixed; z-index: 1001; left: 0; top: 0;
             width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6);
@@ -271,7 +178,7 @@
         }
         .modal-content {
             background-color: var(--bg-main); margin: auto; padding: 20px;
-            border: 1px solid #888; width: 90%; max-width: 1000px; border-radius: 12px;
+            border: 1px solid #888; width: 95%; max-width: 1400px; border-radius: 12px;
             position: relative; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
         }
         .modal-close-btn {
@@ -279,11 +186,18 @@
             font-size: 35px; font-weight: bold; cursor: pointer; z-index: 1002;
         }
         .modal-close-btn:hover, .modal-close-btn:focus { color: black; text-decoration: none; }
-
-        html, body {
-            width: 100%; margin: 0; padding: 0; overflow-x: hidden;
+        .modal .data-table { font-size: 14px; width: 100%; border-collapse: collapse; }
+        .modal .data-table th, .modal .data-table td {
+            padding: 12px 10px;
+            border: 1px solid var(--border-main);
+            text-align: center;
         }
-        
+        .modal .data-table thead th {
+            background-color: #F9FAFB;
+        }
+
+
+        /* --- Giao diện Thẻ KPI --- */
         #allCardsContainer { 
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -340,6 +254,7 @@
         .progress-bar-group > div:nth-child(3) { background-color: var(--danger-color); }
         .progress-bar-group > div:nth-child(4) { background-color: var(--success-color); }
         .progress-bar-group > div:nth-child(5) { background-color: var(--text-muted); }
+        
         .contest-table {
             width: 100%;
             border-collapse: collapse;
@@ -361,15 +276,6 @@
         .contest-table tbody tr:nth-child(even) {
             background-color: #f8f9fa;
         }
-        .progress-bar-wrapper { margin-top: 15px; }
-        .progress-bar-label { display: flex; justify-content: space-between; align-items: center; font-size: 14px; margin-bottom: 5px; font-weight: 500;}
-        .progress-bar-label .progress-data { font-weight: 600; color: var(--text-muted); }
-        .progress-bar-bg { background-color: #e9ecef; border-radius: 50px; height: 22px; overflow: hidden;}
-        .progress-bar-fill { background-color: var(--primary-color); height: 100%; border-radius: 50px; transition: width 0.5s ease-in-out; }
-        .progress-bar-fill.success {
-             background-color: var(--success-color);
-        }
-        .progress-bar-sub-label { display: none; }
 
     </style>
 </head>
@@ -381,7 +287,6 @@
                 <h1 style="margin: 0; text-align: left;">Báo cáo Phân tích Hiệu suất</h1>
                 <div>
                      <button id="editDataBtn" class="btn btn-inline">Chỉnh sửa Dữ liệu</button>
-                     <button id="captureReportBtnMain" class="btn btn-inline">Chụp Báo cáo</button>
                 </div>
             </div>
 
@@ -443,13 +348,11 @@
 
                 <div id="results-wrapper" style="display: none;">
                     <div class="card">
-                        <h2 style="color:var(--primary-color); margin-bottom: 20px;">💹 Bảng Xếp hạng Nhân viên</h2>
-                        <div id="revenueTableContainer" class="table-container" style="margin-top:0;"></div>
-                    </div>
-                    
-                    <div class="card" id="contest-summary-card">
-                        <h2 style="margin-bottom: 20px;">📊 Bảng Theo dõi Thi đua</h2>
-                        <div id="contestSummaryContainer" class="table-container"></div>
+                        <div class="section-header">
+                            <h2 style="color:var(--primary-color); margin-bottom: 0; border: none;"> Bảng Xếp Hạng Tổng Hợp</h2>
+                            <button id="captureComprehensiveBtn" class="btn btn-small">Chụp Toàn Bảng</button>
+                        </div>
+                        <div id="comprehensiveLeaderboardContainer" class="table-container" style="margin-top:15px; max-height: 70vh;"></div>
                     </div>
                 </div>
             </div>
@@ -481,7 +384,7 @@
     </div>
     
     <div id="toast-notification" class="toast"></div>
-
+    
     <div id="kpi-modal" class="modal">
         <div class="modal-content">
             <span class="modal-close-btn">&times;</span>
@@ -494,6 +397,7 @@
     var finalData = [];
     var sortedContestHeadersGlobal = [];
     const modal = document.getElementById('kpi-modal');
+
 
     // Register Chart.js plugins
     Chart.register(ChartDataLabels);
@@ -525,13 +429,14 @@
         document.getElementById('processBtn').addEventListener('click', processData);
         document.getElementById('editDataBtn').addEventListener('click', showInputCard);
         document.getElementById('data-input-card').addEventListener('click', handlePaste);
-        document.getElementById('captureReportBtnMain').addEventListener('click', () => captureAndDownload(document.getElementById('report-capture-area'), 'BaoCaoTongQuan.png'));
+        document.getElementById('captureComprehensiveBtn').addEventListener('click', captureFullTable);
         document.getElementById('captureCardsBtn').addEventListener('click', captureAllIndividualCards);
         document.getElementById('captureAllCardsBtn').addEventListener('click', () => captureAndDownload(document.getElementById('kpi-cards-section'), 'TatCa_KPI_NhanVien.png'));
         document.getElementById('copyCommentsBtn').addEventListener('click', copyComments);
+        
         document.querySelector('.modal-close-btn').onclick = () => { modal.style.display = "none"; };
         window.onclick = (event) => { if (event.target == modal) { modal.style.display = "none"; } };
-        
+
         toggleAllocationInputs(); 
     }
     
@@ -547,15 +452,6 @@
         if (isNaN(num) || num === null) return '0';
         return num.toLocaleString('vi-VN', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
     }
-
-    function getRankCellHtml(rank, total) {
-        let icon = '';
-        if (rank === 1) icon = '🥇 ';
-        else if (rank === 2) icon = '🥈 ';
-        else if (rank === 3) icon = '🥉 ';
-        else if (total > 3 && rank >= total - 2) icon = '🔴 ';
-        return `<td class="rank-cell"><span class="rank-icon">${icon}</span>${rank}</td>`;
-    }
     
     function getInitials(name) {
         if (!name) return '';
@@ -565,16 +461,15 @@
         return '';
     }
 
-    function getHeatmapStyle(percent) {
-        if (percent >= 100) return 'style="background-color: rgba(6, 215, 160, 0.1); color: #026C52; font-weight: bold;"';
-        if (percent >= 80) return 'style="background-color: rgba(255, 209, 103, 0.15); color: #8C6A19; font-weight: bold;"';
-        if (percent > 0) return 'style="background-color: rgba(240, 71, 112, 0.08); color: #A42643; font-weight: bold;"';
-        return 'style="color: #5A7A84;"';
+    function abbreviateName(name) {
+        if (!name) return '';
+        const parts = name.trim().split(' ').filter(p => p);
+        if (parts.length <= 1) return name;
+        const lastName = parts.pop();
+        const initials = parts.map(p => p.charAt(0).toUpperCase()).join('.');
+        return `${initials}.${lastName}`;
     }
-    
-    function getIndustryGroupColor(categoryName) {
-        return 'var(--contest-header-bg)';
-    }
+
 
     function getContestTimeframe(header) {
         const today = new Date();
@@ -620,36 +515,6 @@
         }
         return defaultTimeframe;
     }
-
-    function getContestCellHtml(percent) {
-        let barColor = 'transparent';
-        let textColor = 'var(--text-muted)';
-        
-        if (percent > 100) {
-            barColor = 'var(--success-color)';
-            textColor = '#026C52';
-        } else if (percent >= 50) {
-            barColor = 'var(--warning-color)';
-            textColor = '#8C6A19';
-        } else if (percent > 0) {
-            barColor = 'var(--danger-color)';
-            textColor = '#A42643';
-        }
-
-        if (percent === 0) {
-            return `<td class="data-cell" style="color: ${textColor};">
-                        <span class="cell-content">0.0%</span>
-                    </td>`;
-        }
-
-        const barWidth = Math.min(percent, 100); 
-
-        return `<td class="data-cell" style="color: ${textColor};">
-                    <div class="data-bar" style="width: ${barWidth}%; background-color: ${barColor};"></div>
-                    <span class="cell-content">${percent.toFixed(1)}%</span>
-                </td>`;
-    }
-
 
     // --- TƯƠNG TÁC UI & XỬ LÝ SỰ KIỆN ---
     function toggleAllocationInputs() {
@@ -705,10 +570,10 @@
     function captureAndDownload(element, filename) {
         const commentsCard = document.getElementById('comments-card');
         const originalDisplay = commentsCard.style.display;
-        commentsCard.style.display = 'none';
+        if(commentsCard) commentsCard.style.display = 'none';
 
         const reportTitleEl = document.getElementById('reportTitle');
-        reportTitleEl.style.display = 'block'; 
+        if(reportTitleEl) reportTitleEl.style.display = 'block'; 
         
         html2canvas(element, { 
             useCORS: true, 
@@ -723,11 +588,49 @@
             showToast("Lỗi khi chụp ảnh màn hình.");
             console.error(err);
         }).finally(() => {
-            reportTitleEl.style.display = 'none'; 
-            commentsCard.style.display = originalDisplay;
+            if(reportTitleEl) reportTitleEl.style.display = 'none'; 
+            if(commentsCard) commentsCard.style.display = originalDisplay;
         });
     }
-    
+
+    function captureFullTable() {
+        const container = document.getElementById('comprehensiveLeaderboardContainer');
+        const cardElement = container.closest('.card');
+        
+        // Store original styles
+        const originalContainerStyle = {
+            maxHeight: container.style.maxHeight,
+            overflowX: container.style.overflowX,
+        };
+
+        // Temporarily modify styles for capture
+        container.style.maxHeight = 'none';
+        container.style.overflowX = 'visible';
+        
+        showToast('Đang chụp ảnh toàn bảng...');
+
+        // Use a short timeout to allow the browser to re-render the layout
+        setTimeout(() => {
+            html2canvas(cardElement, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: getComputedStyle(document.body).getPropertyValue('--bg-main'),
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'BangTongHop_Full.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }).catch(err => {
+                showToast("Lỗi khi chụp ảnh màn hình.");
+                console.error(err);
+            }).finally(() => {
+                // Restore original styles
+                container.style.maxHeight = originalContainerStyle.maxHeight;
+                container.style.overflowX = originalContainerStyle.overflowX;
+            });
+        }, 250); // 250ms delay for DOM to update
+    }
+
     function captureAllIndividualCards() {
         const cards = document.querySelectorAll('#allCardsContainer .perf-card');
         if (cards.length === 0) return showToast("Không có thẻ KPI nào để chụp.");
@@ -753,89 +656,7 @@
         }
         window.getSelection().removeAllRanges();
     }
-
-    function showEmployeeKpiPopup(employeeId, event) {
-        event.preventDefault(); 
-        const employeeData = finalData.find(emp => emp.id === employeeId);
-        if (employeeData) {
-            let tableHtml = `
-                <div class="card" style="margin:0; box-shadow: none; border: none;">
-                    <h3 style="margin-top:0; color: var(--primary-color);">Chi tiết Thi đua: ${employeeData.name}</h3>
-                    <div class="table-container" style="margin-top:15px;">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Hạng</th>
-                                    <th>Số ngành HT (DK)</th>`;
-            sortedContestHeadersGlobal.forEach((h, index) => {
-                tableHtml += `<th>${index + 1}. ${h}</th>`;
-            });
-            tableHtml += `      </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    ${getRankCellHtml(employeeData.rank, finalData.length)}
-                                    <td>${employeeData.projectedCompletedContests}/${Object.keys(employeeData.contestTargets).length}</td>`;
-            sortedContestHeadersGlobal.forEach(h => {
-                const item = employeeData.contestCompletion[h] || { projectedPercent: 0 };
-                const style = getHeatmapStyle(item.projectedPercent);
-                tableHtml += `<td ${style}>${item.projectedPercent.toFixed(1)}%</td>`;
-            });
-            tableHtml += `      </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>`;
-            document.getElementById('modal-body').innerHTML = tableHtml;
-            modal.style.display = 'block';
-        }
-    }
     
-    function showContestGroupPopup(contestName, event) {
-        event.preventDefault();
-        const decodedContestName = decodeURIComponent(contestName);
-        
-        const sortedByContest = [...finalData].sort((a, b) => {
-            const perfA = a.contestCompletion[decodedContestName]?.projectedPercent || 0;
-            const perfB = b.contestCompletion[decodedContestName]?.projectedPercent || 0;
-            return perfB - perfA;
-        });
-
-        let tableHtml = `
-            <div class="card" style="margin:0; box-shadow: none; border: none;">
-                <h3 style="margin-top:0; color: var(--primary-color);">Xếp hạng Ngành hàng: ${decodedContestName}</h3>
-                <div class="table-container" style="margin-top:15px;">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Hạng</th>
-                                <th>Nhân viên</th>
-                                <th>Lũy kế</th>
-                                <th>Target</th>
-                                <th>% HT</th>
-                                <th>% HT Dự kiến</th>
-                            </tr>
-                        </thead>
-                        <tbody>`;
-        
-        sortedByContest.forEach((employee, index) => {
-            const item = employee.contestCompletion[decodedContestName] || { actual: 0, target: 0, percent: 0, projectedPercent: 0 };
-            tableHtml += `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td style="text-align:left;">${employee.name}</td>
-                    <td>${formatNumberFull(item.actual, 2)}</td>
-                    <td>${formatNumberFull(item.target, 0)}</td>
-                    <td style="font-weight:bold;">${item.percent.toFixed(0)}%</td>
-                    <td ${getHeatmapStyle(item.projectedPercent)}>${item.projectedPercent.toFixed(1)}%</td>
-                </tr>`;
-        });
-
-        tableHtml += `</tbody></table></div></div>`;
-        document.getElementById('modal-body').innerHTML = tableHtml;
-        modal.style.display = 'block';
-    }
-
     // --- XỬ LÝ DỮ LIỆU ---
     function processData() {
         try {
@@ -968,24 +789,18 @@
             finalData.sort((a,b) => b.totalScore - a.totalScore);
             finalData.forEach((employee, index) => { employee.rank = index + 1; });
             
-            const sortedContestHeaders = [...contestHeaders].sort((a, b) => {
-                const statA = contestStoreStats[a] || { actual: 0, target: 0 };
-                const statB = contestStoreStats[b] || { actual: 0, target: 0 };
-                const projA = statA.target > 0 ? (statA.actual / getContestTimeframe(a).passedDays * getContestTimeframe(a).totalDays) / statA.target * 100 : 0;
-                const projB = statB.target > 0 ? (statB.actual / getContestTimeframe(b).passedDays * getContestTimeframe(b).totalDays) / statB.target * 100 : 0;
-                return projB - projA;
-            });
-            
-            sortedContestHeadersGlobal = sortedContestHeaders;
-            
             const contestProjectedTotals = {};
-            sortedContestHeaders.forEach(header => {
+            contestHeaders.forEach(header => {
                 const stat = contestStoreStats[header];
                 const timeframe = getContestTimeframe(header);
                 contestProjectedTotals[header] = stat && stat.target > 0 ? (stat.actual / timeframe.passedDays * timeframe.totalDays) / stat.target * 100 : 0;
             });
+            
+            sortedContestHeadersGlobal = [...contestHeaders].sort((a, b) => {
+                return (contestProjectedTotals[b] || 0) - (contestProjectedTotals[a] || 0);
+            });
 
-            renderUI(finalData, sortedContestHeaders, contestProjectedTotals, currentMonthTimeframe);
+            renderUI(finalData, sortedContestHeadersGlobal, currentMonthTimeframe, contestProjectedTotals);
             
             Object.keys(inputs).forEach(key => {
                 const el = document.getElementById({data7: 'dataInput7', data6: 'dataInput6', data2: 'dataInput2', storeTarget: 'storeTargetInput', isAllInOne: 'allInOneCheckbox', totalStaff: 'totalEmployeeCountInput', group1Count: 'group1CountInput', group2Count: 'group2CountInput', slider1Ratio: 'slider1', slider2Ratio: 'slider2'}[key]);
@@ -999,7 +814,7 @@
     }
 
     // --- HIỂN THỊ GIAO DIỆN ---
-    function renderUI(data, headers, projectedTotals, timeframe) {
+    function renderUI(data, headers, timeframe, projectedTotals) {
         document.getElementById('data-input-card').style.display = 'none';
         document.getElementById('report-header').style.display = 'flex';
         document.getElementById('results-wrapper').style.display = 'block';
@@ -1011,105 +826,177 @@
         document.getElementById('month-progress-container').innerHTML = `
             <div class="progress-bar-wrapper" style="margin-top:0;">
                 <div class="progress-bar-label"><span>Tiến độ Tháng</span><span>${(timeframe.passedDays / timeframe.totalDays * 100).toFixed(1)}%</span></div>
-                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${(timeframe.passedDays / timeframe.totalDays * 100)}%;"></div></div>
-                <div class="progress-bar-sub-label">Đã qua ${timeframe.passedDays}/${timeframe.totalDays} ngày</div>
+                <div class="progress-bar-bg" style="height:12px;"><div class="progress-bar-fill" style="width: ${(timeframe.passedDays / timeframe.totalDays * 100)}%;"></div></div>
             </div>`;
         document.getElementById('month-progress-container').style.display = 'block';
 
-        renderRevenueTable(data);
-        renderContestSummaryTables(data, headers, projectedTotals);
+        renderComprehensiveDashboard(data, headers, projectedTotals);
         renderAllEmployeeCards(data);
         renderCommentsBox(data);
     }
+    
+    function renderComprehensiveDashboard(data, headers, projectedTotals) {
+        const container = document.getElementById('comprehensiveLeaderboardContainer');
+        let tableHtml = `
+            <table class="comprehensive-table">
+                <thead>
+                    <tr>
+                        <th>Hạng</th>
+                        <th>Nhân viên</th>
+                        <th>Điểm</th>
+                        <th>Số ngành HT (DK)</th>
+                        <th>Tiến độ DT</th>`;
+        headers.forEach((h, index) => {
+            const projectedTotal = projectedTotals[h] || 0;
+            tableHtml += `<th class="contest-header-cell">
+                            <a href="#" class="clickable-header" onclick="showContestDetailsPopup('${encodeURIComponent(h)}', event)">${index + 1}. ${h}</a>
+                            <div style="color: ${projectedTotal >= 100 ? 'var(--success-color)' : 'var(--danger-color)'};">${projectedTotal.toFixed(1)}%</div>
+                        </th>`;
+        });
+        tableHtml += `</tr></thead><tbody>`;
 
-    function renderRevenueTable(data) {
-        let tableHtml = '<table class="data-table"><thead><tr><th>Hạng</th><th>Nhân viên</th><th>Điểm</th><th>Số ngành HT (DK)</th><th>Tiến độ Doanh thu</th><th>Target Tháng</th><th>Còn lại</th><th>% HT Dự kiến</th></tr></thead><tbody>';
         const total = data.length;
-        data.forEach((e) => {
-             const remaining = e.revenueTarget - e.actual_DTQD;
-             const remainingCell = remaining <= 0 ? `<td style="color: var(--success-color); font-weight: bold;">✅ Hoàn thành</td>` : `<td>${formatNumberFull(remaining, 0)}</td>`;
-             const revenueCompletionCapped = Math.min(100, e.revenueCompletion);
-             const revenueCellHtml = `<td>
-                ${formatNumberFull(e.actual_DTQD, 0)}
-                <div class="table-progress-container">
-                    <div class="table-progress-bar-bg">
-                        <div class="table-progress-bar-fill ${e.revenueCompletion >= 100 ? 'success' : ''}" style="width: ${revenueCompletionCapped}%;"></div>
+        data.forEach(e => {
+            let rankIcon = '';
+            if (e.rank === 1) rankIcon = '🥇';
+            else if (e.rank === 2) rankIcon = '🥈';
+            else if (e.rank === 3) rankIcon = '🥉';
+            else if (total > 3 && e.rank >= total - 2) rankIcon = '🔴';
+            const rankDisplay = rankIcon ? `<span class="rank-icon">${rankIcon}</span>` : e.rank;
+
+            const revenueCompletionCapped = Math.min(100, e.revenueCompletion);
+            
+            tableHtml += `<tr>
+                <td class="rank-cell">${rankDisplay}</td>
+                <td><a href="#" class="clickable-name" onclick="showEmployeeDetailsPopup('${e.id}', event)">${abbreviateName(e.name)}</a></td>
+                <td style="font-weight: 700;">${e.totalScore.toFixed(1)}</td>
+                <td style="font-weight: 700;">${e.projectedCompletedContests}/${Object.keys(e.contestTargets).length}</td>
+                <td>
+                    <div class="progress-bar-wrapper">
+                         <div class="progress-bar-label">
+                            <span>${e.revenueCompletion.toFixed(1)}%</span>
+                            <span>${formatNumberFull(e.actual_DTQD, 0)} / ${formatNumberFull(e.revenueTarget, 0)}</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill ${e.revenueCompletion >= 100 ? 'success' : ''}" style="width: ${revenueCompletionCapped}%;"></div>
+                        </div>
                     </div>
-                    <span class="table-progress-label-outside">${e.revenueCompletion.toFixed(1)}%</span>
-                </div>
-             </td>`;
-             tableHtml += `<tr>
-                ${getRankCellHtml(e.rank, total)}
-                <td><a href="#" class="employee-name-link" onclick="showEmployeeKpiPopup('${e.id}', event)">${e.name}</a></td>
-                <td style="font-weight:bold; font-size: 1.1em;">${e.totalScore.toFixed(1)}</td>
-                <td style="font-weight:bold;">${e.projectedCompletedContests}/${Object.keys(e.contestTargets).length}</td>
-                ${revenueCellHtml}
-                <td>${formatNumberFull(e.revenueTarget, 0)}</td>
-                ${remainingCell}
-                <td style="font-weight: bold; font-size: 1.1em; color: ${e.projectedRevenueCompletion >= 100 ? 'var(--success-color)' : 'var(--danger-color)'}">${e.projectedRevenueCompletion.toFixed(1)}%</td>
-             </tr>`;
-        });
-        document.getElementById('revenueTableContainer').innerHTML = tableHtml + '</tbody></table>';
-    }
+                </td>`;
 
-    function renderContestSummaryTables(data, headers, projectedTotals) {
-        const container = document.getElementById('contestSummaryContainer');
-        container.innerHTML = '';
-        const totalHeaders = headers.length;
-        if (totalHeaders === 0) return;
-
-        const midPoint = Math.ceil(totalHeaders / 2);
-        const headerChunks = [
-            headers.slice(0, midPoint),
-            headers.slice(midPoint)
-        ].filter(chunk => chunk.length > 0);
-
-        headerChunks.forEach((headerChunk, tableIndex) => {
-            const startIndex = (tableIndex === 0) ? 0 : midPoint;
-            const tableNum = tableIndex + 1;
-            
-            let tableHtml = `<div class="contest-group">
-                <h3>Bảng Thi đua ${tableNum} (Nhóm ${startIndex + 1} - ${startIndex + headerChunk.length})</h3>
-                <table class="data-table"><thead><tr>
-                <th>Hạng</th>
-                <th>Nhân viên</th>
-                <th>Số ngành HT (DK)</th>`;
-            
-            headerChunk.forEach((h, index) => {
-                const projectedPercent = projectedTotals[h] || 0;
-                const percentColor = projectedPercent >= 100 ? 'var(--success-color)' : 'var(--danger-color)';
-                const encodedContestName = encodeURIComponent(h);
+            headers.forEach(h => {
+                const item = e.contestCompletion[h] || { projectedPercent: 0 };
+                let heatmapClass = 'heatmap-red';
+                if (item.projectedPercent >= 100) heatmapClass = 'heatmap-green';
+                else if (item.projectedPercent >= 50) heatmapClass = 'heatmap-orange';
                 
-                tableHtml += `<th style="background-color: ${getIndustryGroupColor(h)};">
-                    <div class="th-flex-wrapper">
-                        <a href="#" class="employee-name-link" onclick="showContestGroupPopup('${encodedContestName}', event)">
-                            <span class="header-main-text">${startIndex + index + 1}. ${h}</span>
-                        </a>
-                        <div class="header-sub-text" style="color: ${percentColor};">${projectedPercent.toFixed(1)}%</div>
-                    </div>
-                </th>`; 
-            });
-            tableHtml += '</tr></thead><tbody>';
-
-            const total = data.length;
-            data.forEach(e => {
-                tableHtml += `<tr>
-                    ${getRankCellHtml(e.rank, total)}
-                    <td><a href="#" class="employee-name-link" onclick="showEmployeeKpiPopup('${e.id}', event)">${e.name}</a></td>
-                    <td>${e.projectedCompletedContests}/${Object.keys(e.contestTargets).length}</td>`;
-
-                headerChunk.forEach(h => {
-                    const item = e.contestCompletion[h] || { projectedPercent: 0 };
-                    tableHtml += getContestCellHtml(item.projectedPercent);
-                });
-                tableHtml += '</tr>';
+                tableHtml += `<td class="heatmap-cell ${heatmapClass}">${item.projectedPercent.toFixed(1)}%</td>`;
             });
 
-            tableHtml += '</tbody></table></div>';
-            container.innerHTML += tableHtml;
+            tableHtml += `</tr>`;
         });
+        
+        container.innerHTML = tableHtml + '</tbody></table>';
     }
     
+    function showEmployeeDetailsPopup(employeeId, event) {
+        event.preventDefault(); 
+        const employeeData = finalData.find(emp => emp.id === employeeId);
+        if (employeeData) {
+            const contestData = Object.entries(employeeData.contestCompletion)
+                                    .sort(([, a], [, b]) => b.projectedPercent - a.projectedPercent);
+
+            let tableHtml = `
+                <div class="card" style="margin:0; box-shadow: none; border: none;">
+                    <h3 style="margin-top:0; color: var(--primary-color);">Chi tiết Thi đua: ${employeeData.name}</h3>
+                    <div class="table-container" style="margin-top:15px; max-height: 60vh;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Ngành hàng</th>
+                                    <th>Lũy kế</th>
+                                    <th>Target</th>
+                                    <th>% HT</th>
+                                    <th>% HT Dự kiến</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+            
+            contestData.forEach(([name, data]) => {
+                const globalIndex = sortedContestHeadersGlobal.findIndex(h => h === name);
+                let heatmapClass = 'heatmap-red';
+                if (data.projectedPercent >= 100) heatmapClass = 'heatmap-green';
+                else if (data.projectedPercent >= 50) heatmapClass = 'heatmap-orange';
+
+                tableHtml += `
+                    <tr>
+                        <td style="font-weight:bold;">${globalIndex + 1}</td>
+                        <td>${name}</td>
+                        <td>${formatNumberFull(data.actual, 2)}</td>
+                        <td>${formatNumberFull(data.target, 0)}</td>
+                        <td style="font-weight:bold;">${data.percent.toFixed(0)}%</td>
+                        <td class="heatmap-cell ${heatmapClass}">${data.projectedPercent.toFixed(1)}%</td>
+                    </tr>`;
+            });
+            
+            tableHtml += `      </tbody>
+                        </table>
+                    </div>
+                </div>`;
+            document.getElementById('modal-body').innerHTML = tableHtml;
+            modal.style.display = 'block';
+        }
+    }
+    
+    function showContestDetailsPopup(contestName, event) {
+        event.preventDefault();
+        const decodedContestName = decodeURIComponent(contestName);
+        
+        const sortedByContest = [...finalData].sort((a, b) => {
+            const perfA = a.contestCompletion[decodedContestName]?.projectedPercent || 0;
+            const perfB = b.contestCompletion[decodedContestName]?.projectedPercent || 0;
+            return perfB - perfA;
+        });
+
+        let tableHtml = `
+            <div class="card" style="margin:0; box-shadow: none; border: none;">
+                <h3 style="margin-top:0; color: var(--primary-color);">Xếp hạng Ngành hàng: ${decodedContestName}</h3>
+                <div class="table-container" style="margin-top:15px;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Hạng</th>
+                                <th>Nhân viên</th>
+                                <th>Lũy kế</th>
+                                <th>Target</th>
+                                <th>% HT</th>
+                                <th>% HT Dự kiến</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+        
+        sortedByContest.forEach((employee, index) => {
+            const item = employee.contestCompletion[decodedContestName] || { actual: 0, target: 0, percent: 0, projectedPercent: 0 };
+             let heatmapClass = 'heatmap-red';
+            if (item.projectedPercent >= 100) heatmapClass = 'heatmap-green';
+            else if (item.projectedPercent >= 50) heatmapClass = 'heatmap-orange';
+            
+            tableHtml += `
+                <tr>
+                    <td class="rank-cell">${index + 1}</td>
+                    <td>${employee.name}</td>
+                    <td>${formatNumberFull(item.actual, 2)}</td>
+                    <td>${formatNumberFull(item.target, 0)}</td>
+                    <td style="font-weight:bold;">${item.percent.toFixed(0)}%</td>
+                    <td class="heatmap-cell ${heatmapClass}">${item.projectedPercent.toFixed(1)}%</td>
+                </tr>`;
+        });
+
+        tableHtml += `</tbody></table></div></div>`;
+        document.getElementById('modal-body').innerHTML = tableHtml;
+        modal.style.display = 'block';
+    }
+
     function renderAllEmployeeCards(data) {
         document.getElementById('allCardsContainer').innerHTML = data.map(employee => getEmployeeCardHtml(employee, data.length)).join('');
     }
@@ -1228,4 +1115,3 @@
 </script>
 </body>
 </html>
-
