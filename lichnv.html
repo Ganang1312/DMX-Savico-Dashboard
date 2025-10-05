@@ -181,8 +181,13 @@
 
             <!-- BẢNG 5: NHẬN XÉT NGÀY -->
             <section id="daily-summary-section" class="section-card hidden">
-                <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
-                    <h2 class="text-xl font-bold text-gray-800 border-l-4 pl-3" style="border-color: var(--info-color);">5. Nhận xét ngày</h2>
+                <div class="flex justify-between items-center mb-4 flex-wrap gap-4">
+                    <div class="flex items-center gap-4">
+                         <h2 class="text-xl font-bold text-gray-800 border-l-4 pl-3" style="border-color: var(--info-color);">5. Nhận xét ngày</h2>
+                         <div id="day-selector-container">
+                            <!-- Dropdown will be dynamically inserted here -->
+                         </div>
+                    </div>
                     <div class="flex items-center gap-2">
                         <button id="export-weekly-review-btn" class="text-sm py-2 px-4 styled-button" style="background-color: var(--success-color);">📊 Xuất Excel Tuần</button>
                         <button data-target="daily-summary-section" class="screenshot-btn text-sm py-2 px-4 styled-button" style="background-color: var(--secondary-accent);">📸 Chụp ảnh</button>
@@ -217,6 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const importAllDataInput = document.getElementById('import-all-data-input');
     const exportTaskCsvBtn = document.getElementById('export-task-csv-btn');
     const clearTasksBtn = document.getElementById('clear-tasks-btn');
+    const daySelectorContainer = document.getElementById('day-selector-container');
 
 
     const sections = [
@@ -269,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderAllFromState(false);
                 sections.forEach(s => s.classList.remove('hidden'));
                 document.querySelectorAll('.screenshot-btn').forEach(b => b.classList.remove('hidden'));
-                showToast("Đã tải lại phiên làm việc từ bộ nhớ đệm.", true);
+                showToast("Đã tải lại phiên làm việc trước.", true);
             } catch (error) {
                 console.error("Lỗi khi tải dữ liệu từ LocalStorage:", error);
                 localStorage.removeItem(LOCAL_STORAGE_KEY);
@@ -278,28 +284,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function initializeData() {
-        try {
-            // 1. Cố gắng tải từ file JSON trước. Thêm timestamp để tránh cache.
-            const response = await fetch(`dmx_schedule_backup.json?v=${new Date().getTime()}`);
-            if (!response.ok) throw new Error('File dmx_schedule_backup.json không tìm thấy, thử tải từ bộ nhớ máy.');
-
-            const fileState = await response.json();
-            if (fileState && fileState.employees && fileState.dateHeaders) {
-                scheduleState = fileState;
-                savedTaskCountsHistory = [];
-                undoHistoryBtn.disabled = true;
-                renderAllFromState(true); // Hiển thị và lưu vào localStorage
-                sections.forEach(s => s.classList.remove('hidden'));
-                document.querySelectorAll('.screenshot-btn').forEach(b => b.classList.remove('hidden'));
-                showToast("Đã tải dữ liệu từ file dmx_schedule_backup.json!", true);
-            } else {
-                throw new Error("Tệp JSON không hợp lệ.");
-            }
-        } catch (error) {
-            // 2. Nếu tải file thất bại, chuyển sang tải từ localStorage.
-            console.log(error.message);
-            loadStateFromLocalStorage();
-        }
+        // We prioritize loading from LocalStorage first now
+        loadStateFromLocalStorage();
     }
 
 
@@ -434,18 +420,44 @@ document.addEventListener('DOMContentLoaded', () => {
         state.employees.sort((a, b) => b.kpi.erp - a.kpi.erp || b.kpi.gh1 - a.kpi.gh1);
     }
 
+    function setupDaySelector() {
+        if (!scheduleState || !scheduleState.dateHeaders) {
+            daySelectorContainer.innerHTML = '';
+            return;
+        }
+
+        const optionsHtml = scheduleState.dateHeaders.map(day =>
+            `<option value="${day.name}">${day.name}</option>`
+        ).join('');
+
+        daySelectorContainer.innerHTML = `
+            <select id="day-selector" class="p-2 border border-gray-300 rounded-md bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                ${optionsHtml}
+            </select>
+        `;
+
+        document.getElementById('day-selector').addEventListener('change', (e) => {
+            selectAndFocusDay(e.target.value);
+        });
+    }
+    
     function renderAllFromState(shouldSave = true) {
         if (!scheduleState) return;
         recalculateKpi(scheduleState);
         renderCombinedTable(scheduleState);
         renderTaskSummaryTable();
-        
+        setupDaySelector(); 
+
+        // Automatically select and display the summary for the current day.
+        // If the current day is not in the schedule, it defaults to the first day.
         const currentDayKey = getCurrentDayKey();
-        const activeDayHeader = document.querySelector('.day-header.active');
-        const currentDayExists = scheduleState.dateHeaders.some(header => header.name === currentDayKey);
-        let dayToRender = currentDayExists ? currentDayKey : (activeDayHeader ? activeDayHeader.dataset.daykey : scheduleState.dateHeaders[0]?.name);
+        const currentDayExistsInSchedule = scheduleState.dateHeaders.some(header => header.name === currentDayKey);
+        const dayToDisplay = currentDayExistsInSchedule ? currentDayKey : scheduleState.dateHeaders[0]?.name;
         
-        if(dayToRender) renderDailySummary(dayToRender);
+        if (dayToDisplay) {
+            selectAndFocusDay(dayToDisplay);
+        }
+
         if (shouldSave) saveStateToLocalStorage();
     }
     
@@ -642,54 +654,119 @@ document.addEventListener('DOMContentLoaded', () => {
         const { employees, singleCellTaskMap, CA_SANG, CA_CHIEU, headerLine2, staticHeaderCount, dateHeaders } = scheduleState;
         
         const dayInfo = dateHeaders.find(d => d.name === dayKey);
-        if (!dayInfo) return { totalWorkers: 0, workersSang: new Set(), workersChieu: new Set(), workersOff: new Set(employees.map(e => e.ten)) };
+        const activeEmployees = employees.filter(e => e.isActive);
 
-        const workersSang = new Set(), workersChieu = new Set(), workersOff = new Set(employees.map(e => e.ten));
-        let totalWorkers = 0;
+        if (!dayInfo) {
+             return { 
+                totalWorkers: 0, 
+                workersSang: new Set(), 
+                workersChieu: new Set(), 
+                workersOff: new Set(activeEmployees.map(e => e.ten)) 
+            };
+        }
 
         const dayStartIndex = dateHeaders.slice(0, dateHeaders.indexOf(dayInfo)).reduce((acc, d) => acc + d.span, 0);
+        const dayShifts = headerLine2.slice(staticHeaderCount + dayStartIndex, staticHeaderCount + dayStartIndex + dayInfo.span);
+        
+        const availableShiftsSang = dayShifts.filter(s => CA_SANG.includes(s));
+        const availableShiftsChieu = dayShifts.filter(s => CA_CHIEU.includes(s));
 
-        employees.forEach(emp => {
-            if (!emp.isActive) {
-                workersOff.delete(emp.ten); // Remove inactive from off list if they weren't there
-                return;
-            }
-            let worksSang = false, worksChieu = false;
-            let taskSang = new Set(), taskChieu = new Set();
+        const workersSang = new Set(), workersChieu = new Set();
+        const workersOff = new Set(activeEmployees.map(e => e.ten));
+        let totalWorkers = 0;
+
+        activeEmployees.forEach(emp => {
+            let hasAnyShift = false;
             
+            // Analyze Morning Shifts
+            const workedShiftsSang = [];
+            const tasksSang = new Set();
             for(let i=0; i<dayInfo.span; i++) {
                 const shiftIndex = dayStartIndex + i;
                 const shiftName = headerLine2[staticHeaderCount + shiftIndex];
-                if(String(emp.shifts[shiftIndex] || '').trim()){
+                if (CA_SANG.includes(shiftName) && String(emp.shifts[shiftIndex] || '').trim()) {
+                    workedShiftsSang.push(shiftName);
                     const task = singleCellTaskMap[emp.ten]?.[dayKey]?.[shiftName];
-                    if(CA_SANG.includes(shiftName)) {
-                        worksSang = true;
-                        if(task) taskSang.add(task);
-                    }
-                    if(CA_CHIEU.includes(shiftName)) {
-                        worksChieu = true;
-                        if(task) taskChieu.add(task);
-                    }
+                    if(task) tasksSang.add(task);
                 }
             }
-            const formatWorker = (emp, tasks) => `${emp.ten}${tasks.size > 0 ? ` (${[...tasks].join(', ')})` : ''}`;
-            if(worksSang) workersSang.add(formatWorker(emp, taskSang));
-            if(worksChieu) workersChieu.add(formatWorker(emp, taskChieu));
-            if (worksSang || worksChieu) {
-                totalWorkers++;
+
+            // Analyze Afternoon Shifts
+            const workedShiftsChieu = [];
+            const tasksChieu = new Set();
+            for(let i=0; i<dayInfo.span; i++) {
+                const shiftIndex = dayStartIndex + i;
+                const shiftName = headerLine2[staticHeaderCount + shiftIndex];
+                if (CA_CHIEU.includes(shiftName) && String(emp.shifts[shiftIndex] || '').trim()) {
+                    workedShiftsChieu.push(shiftName);
+                    const task = singleCellTaskMap[emp.ten]?.[dayKey]?.[shiftName];
+                    if(task) tasksChieu.add(task);
+                }
+            }
+
+            // Helper to format the final string for the summary
+            const formatWorkerString = (empName, tasks, offShifts) => {
+                let details = [];
+                if (tasks.size > 0) details.push([...tasks].join(', '));
+                if (offShifts.length > 0) details.push(`OFF ${offShifts.map(s => s.replace('Ca ', 'ca')).join(', ')}`);
+                return `${empName}${details.length > 0 ? ` (${details.join('; ')})` : ''}`;
+            };
+
+            // Process and add to morning list if applicable
+            if (workedShiftsSang.length > 0) {
+                hasAnyShift = true;
+                const offShiftsSang = availableShiftsSang.filter(s => !workedShiftsSang.includes(s));
+                workersSang.add(formatWorkerString(emp.ten, tasksSang, offShiftsSang));
+            }
+
+            // Process and add to afternoon list if applicable
+            if (workedShiftsChieu.length > 0) {
+                hasAnyShift = true;
+                const offShiftsChieu = availableShiftsChieu.filter(s => !workedShiftsChieu.includes(s));
+                workersChieu.add(formatWorkerString(emp.ten, tasksChieu, offShiftsChieu));
+            }
+
+            // Update total worker counts and off list
+            if (hasAnyShift) {
                 workersOff.delete(emp.ten);
             }
         });
         
+        totalWorkers = activeEmployees.length - workersOff.size;
+
         return { totalWorkers, workersSang, workersChieu, workersOff };
     }
 
-    function renderDailySummary(dayKey) {
+    function selectAndFocusDay(dayKey) {
+        if (!scheduleState || !dayKey) return;
+
+        // 1. Highlight the correct header
+        document.querySelectorAll('.day-header.active').forEach(h => h.classList.remove('active'));
+        const headerElement = document.querySelector(`.day-header[data-daykey="${dayKey}"]`);
+        if(headerElement) {
+            headerElement.classList.add('active');
+        }
+
+        // 2. Update the day selector dropdown's value
+        const daySelector = document.getElementById('day-selector');
+        if (daySelector) {
+            daySelector.value = dayKey;
+        }
+        
+        // 3. Render the summary content for that day
+        renderDailySummaryContent(dayKey);
+        
+        // 4. Scroll the main table to that day's column, giving a moment for rendering
+        if (headerElement) {
+            setTimeout(() => {
+                headerElement.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }, 100);
+        }
+    }
+
+    function renderDailySummaryContent(dayKey) {
         if (!scheduleState) return;
         
-        document.querySelectorAll('.day-header.active').forEach(h => h.classList.remove('active'));
-        document.querySelector(`.day-header[data-daykey="${dayKey}"]`)?.classList.add('active');
-
         const { totalWorkers, workersSang, workersChieu, workersOff } = getDailySummaryData(dayKey);
 
         let html = `<div class="summary-card-3d">
@@ -704,7 +781,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dailySummaryContainer.innerHTML = html;
     }
     
-    // --- EVENT HANDLERS --- //
+    // --- EVENT HANDLERS & LOGIC HELPERS (FIXED) --- //
 
     function handleUpdateEmployeeProperty(e) {
         const select = e.target;
@@ -721,6 +798,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderAllFromState();
     }
     
+    // Function to update a single cell's state, used primarily by CSV import
     function updateStateForCell(emp, shiftIndex, value) {
         const { dateHeaders, staticHeaderCount, headerLine2 } = scheduleState;
         let dayName = '', shiftName = '', cumulativeSpan = 0;
@@ -737,7 +815,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!scheduleState.singleCellTaskMap[emp.ten]) scheduleState.singleCellTaskMap[emp.ten] = {};
         if (!scheduleState.singleCellTaskMap[emp.ten][dayName]) scheduleState.singleCellTaskMap[emp.ten][dayName] = {};
         
-        // Clear any previous task in this specific shift slot
         delete scheduleState.singleCellTaskMap[emp.ten][dayName][shiftName];
 
         if (['GH1', 'GH2', 'ERP'].includes(value)) {
@@ -747,6 +824,59 @@ document.addEventListener('DOMContentLoaded', () => {
         emp.shifts[shiftIndex] = (value === 'off') ? '' : '1';
     }
 
+    // New helper to get the representative task for an entire period (Sang/Chieu)
+    function getTaskForPeriod(employee, dayKey, periodName) {
+        const { dateHeaders, headerLine2, staticHeaderCount, CA_SANG, CA_CHIEU } = scheduleState;
+        const periodShifts = periodName === 'Sang' ? CA_SANG : CA_CHIEU;
+        const dayInfo = dateHeaders.find(d => d.name === dayKey);
+        if (!dayInfo || !scheduleState.singleCellTaskMap[employee.ten]?.[dayKey]) return null;
+
+        const dayStartIndex = dateHeaders.slice(0, dateHeaders.indexOf(dayInfo)).reduce((acc, d) => acc + d.span, 0);
+
+        for (let i = 0; i < dayInfo.span; i++) {
+            const shiftIndex = dayStartIndex + i;
+            const shiftName = headerLine2[staticHeaderCount + shiftIndex];
+            if (periodShifts.includes(shiftName)) {
+                const task = scheduleState.singleCellTaskMap[employee.ten][dayKey][shiftName];
+                if (task) return task; // Return the first task found in the period
+            }
+        }
+        return null;
+    }
+
+    // New helper to apply a state ('off', 'work', 'GH1', etc.) to an entire period
+    function updatePeriodState(employee, dayKey, periodName, state) {
+        const { dateHeaders, headerLine2, staticHeaderCount, CA_SANG, CA_CHIEU } = scheduleState;
+        const periodShifts = periodName === 'Sang' ? CA_SANG : CA_CHIEU;
+        const dayInfo = dateHeaders.find(d => d.name === dayKey);
+        if (!dayInfo) return;
+
+        const dayStartIndex = dateHeaders.slice(0, dateHeaders.indexOf(dayInfo)).reduce((acc, d) => acc + d.span, 0);
+
+        for (let i = 0; i < dayInfo.span; i++) {
+            const shiftIndex = dayStartIndex + i;
+            const shiftName = headerLine2[staticHeaderCount + shiftIndex];
+
+            if (periodShifts.includes(shiftName)) {
+                // Update work status in shifts array
+                employee.shifts[shiftIndex] = (state === 'off') ? '' : '1';
+                
+                // Clear any old task in this specific slot
+                if (scheduleState.singleCellTaskMap[employee.ten]?.[dayKey]) {
+                    delete scheduleState.singleCellTaskMap[employee.ten][dayKey][shiftName];
+                }
+
+                // Set new task if applicable for the whole period
+                if (['GH1', 'GH2', 'ERP'].includes(state)) {
+                    if (!scheduleState.singleCellTaskMap[employee.ten]) scheduleState.singleCellTaskMap[employee.ten] = {};
+                    if (!scheduleState.singleCellTaskMap[employee.ten][dayKey]) scheduleState.singleCellTaskMap[employee.ten][dayKey] = {};
+                    scheduleState.singleCellTaskMap[employee.ten][dayKey][shiftName] = state;
+                }
+            }
+        }
+    }
+
+    // FIXED: Handles clicks on the main schedule to cycle through tasks for the whole period
     function handleCellClick(e) {
         const cell = e.target.closest('.editable-cell');
         if (!cell) return;
@@ -762,91 +892,96 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Get current state directly from the data model, not the DOM
-        const shiftValue = employee.shifts[shiftIndex];
-        
-        const { dateHeaders, staticHeaderCount, headerLine2 } = scheduleState;
-        let dayName = '', shiftName = '', cumulativeSpan = 0;
-        for(const day of dateHeaders) {
+        const { dateHeaders, staticHeaderCount, headerLine2, CA_SANG, CA_CHIEU } = scheduleState;
+        let dayName = '', shiftName = '', periodName = '', cumulativeSpan = 0;
+
+        for (const day of dateHeaders) {
             if (shiftIndex < cumulativeSpan + day.span) {
                 dayName = day.name;
                 shiftName = headerLine2[staticHeaderCount + shiftIndex];
+                if (CA_SANG.includes(shiftName)) periodName = 'Sang';
+                else if (CA_CHIEU.includes(shiftName)) periodName = 'Chieu';
                 break;
             }
             cumulativeSpan += day.span;
         }
-        
-        const currentTask = scheduleState.singleCellTaskMap[employee.ten]?.[dayName]?.[shiftName];
-        let currentState = 'off';
-        if (String(shiftValue || '').trim()) {
-            currentState = currentTask || 'work';
-        }
-        
+
+        // Only allow editing for defined periods (Sang/Chieu)
+        if (!dayName || !periodName) return;
+
+        // Determine current state of the whole period
+        const isWorkingInPeriod = employee.shifts.some((s, i) => {
+            let idxDayName = '', idxShiftName = '', idxPeriodName = '', cSpan = 0;
+            for (const d of dateHeaders) {
+                 if (i < cSpan + d.span) {
+                     idxDayName = d.name;
+                     idxShiftName = headerLine2[staticHeaderCount + i];
+                     if (CA_SANG.includes(idxShiftName)) idxPeriodName = 'Sang';
+                     else if (CA_CHIEU.includes(idxShiftName)) idxPeriodName = 'Chieu';
+                     break;
+                 }
+                 cSpan += d.span;
+            }
+            return idxDayName === dayName && idxPeriodName === periodName && String(s || '').trim();
+        });
+
+        const currentTask = getTaskForPeriod(employee, dayName, periodName);
+        let currentState = isWorkingInPeriod ? (currentTask || 'work') : 'off';
+
+        // Cycle to the next valid state
         const baseCycle = ['off', 'work', 'GH1', 'GH2', 'ERP'];
         const currentIndex = baseCycle.indexOf(currentState);
         
-        // Find the next valid state based on gender
-        let nextState = 'off'; // Default fallback
+        let nextState = 'off';
         for (let i = 1; i <= baseCycle.length; i++) {
             const potentialState = baseCycle[(currentIndex + i) % baseCycle.length];
-            
             if (potentialState === 'ERP' && employee.gender !== 'nu') continue;
             if ((potentialState === 'GH1' || potentialState === 'GH2') && employee.gender !== 'nam') continue;
-
             nextState = potentialState;
-            break; 
+            break;
         }
-        
-        updateStateForCell(employee, shiftIndex, nextState);
+
+        // Apply the new state to the entire period
+        updatePeriodState(employee, dayName, periodName, nextState);
         renderAllFromState();
     }
 
-
+    // FIXED: Handles the auxiliary dropdowns to assign tasks for the whole period
     function handleAuxEdit(e) {
         const select = e.target;
         const dayKey = select.dataset.daykey, periodName = select.dataset.period;
         const task = select.dataset.task, newWorkerName = select.value;
-        const { employees, dateHeaders, headerLine2, staticHeaderCount, CA_SANG, CA_CHIEU } = scheduleState;
-        const periodShifts = periodName === 'Sang' ? CA_SANG : CA_CHIEU;
-        
-        // Clear previous assignment for this task/period/day
-        Object.values(employees).forEach(emp => {
-            if(scheduleState.singleCellTaskMap[emp.ten]?.[dayKey]) {
-                Object.entries(scheduleState.singleCellTaskMap[emp.ten][dayKey]).forEach(([shift, assignedTask]) => {
-                     if(assignedTask === task && periodShifts.includes(shift)) {
-                         const shiftIndexInHeader = headerLine2.findIndex((s, i) => i >= staticHeaderCount && s === shift);
-                         if (shiftIndexInHeader !== -1) {
-                            const actualShiftIndex = shiftIndexInHeader - staticHeaderCount;
-                            
-                            let cumulativeSpan = 0;
-                            let dayBelongs = false;
-                            for(const day of dateHeaders) {
-                                if (actualShiftIndex < cumulativeSpan + day.span) {
-                                    if(day.name === dayKey) dayBelongs = true;
-                                    break;
-                                }
-                                cumulativeSpan += day.span;
-                            }
-                            if(dayBelongs) updateStateForCell(emp, actualShiftIndex, 'work');
-                         }
-                     }
-                });
-            }
-        });
+        const { employees } = scheduleState;
+
+        // Find and clear previous assignment for this task/period/day
+        const previousWorker = employees.find(emp => getTaskForPeriod(emp, dayKey, periodName) === task);
+        if (previousWorker) {
+            updatePeriodState(previousWorker, dayKey, periodName, 'work');
+        }
 
         // Assign to new worker
-        if(newWorkerName) {
+        if (newWorkerName) {
             const newWorker = employees.find(e => e.ten === newWorkerName);
-            if (!newWorker) return;
+            if (newWorker) {
+                // Check if the new worker has a shift during this period before assigning
+                const isEligible = scheduleState.dateHeaders.some(day => {
+                    if (day.name !== dayKey) return false;
+                    const periodShifts = periodName === 'Sang' ? scheduleState.CA_SANG : scheduleState.CA_CHIEU;
+                    const dayStartIndex = scheduleState.dateHeaders.slice(0, scheduleState.dateHeaders.indexOf(day)).reduce((acc, d) => acc + d.span, 0);
+                    for (let i = 0; i < day.span; i++) {
+                        const shiftIndex = dayStartIndex + i;
+                        const shiftName = scheduleState.headerLine2[scheduleState.staticHeaderCount + shiftIndex];
+                        if (periodShifts.includes(shiftName) && String(newWorker.shifts[shiftIndex] || '').trim()) {
+                            return true; // Is eligible
+                        }
+                    }
+                    return false;
+                });
 
-            const dayInfo = dateHeaders.find(d => d.name === dayKey);
-            const dayStartIndex = dateHeaders.slice(0, dateHeaders.indexOf(dayInfo)).reduce((acc, d) => acc + d.span, 0);
-            
-            for (let i = 0; i < dayInfo.span; i++) {
-                const currentShiftIndex = dayStartIndex + i;
-                const currentShiftName = headerLine2[staticHeaderCount + currentShiftIndex];
-                if (periodShifts.includes(currentShiftName)) {
-                    updateStateForCell(newWorker, currentShiftIndex, task);
+                if (isEligible) {
+                    updatePeriodState(newWorker, dayKey, periodName, task);
+                } else {
+                    showToast(`${newWorkerName} không có lịch làm việc vào ca này.`, false);
                 }
             }
         }
@@ -1077,10 +1212,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     mainScheduleContainer.addEventListener('click', (e) => {
-        if (e.target.closest('.day-header')) {
-            renderDailySummary(e.target.closest('.day-header').dataset.daykey);
-        }
-        if (e.target.closest('.editable-cell')) {
+        const dayHeader = e.target.closest('.day-header');
+        if (dayHeader) {
+            selectAndFocusDay(dayHeader.dataset.daykey);
+        } else if (e.target.closest('.editable-cell')) {
             handleCellClick(e);
         }
     });
@@ -1376,4 +1511,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
-
