@@ -483,6 +483,7 @@
             passedDays = prevMonthDate.getDate();
         } else {
             totalDays = new Date(currentYear, today.getMonth() + 1, 0).getDate();
+            // [FIX REVERTED] Reverted to original logic as requested by user.
             passedDays = today.getDate() - 1;
         }
         
@@ -718,15 +719,20 @@
                 const nameIndex2 = headers2.findIndex(h => h.includes('Ngành hàng'));
                 const dtqdIndex2 = headers2.findIndex(h => h === 'DTQĐ');
                 const targetIndex2 = headers2.findIndex(h => h === 'Target');
-                if (nameIndex2 !== -1 && dtqdIndex2 !== -1 && targetIndex2 !== -1) {
+                // [FIX] Find the projected completion column from the source data
+                const projectedIndex2 = headers2.findIndex(h => h.includes('% HT Dự Kiến'));
+
+                if (nameIndex2 !== -1 && dtqdIndex2 !== -1 && targetIndex2 !== -1 && projectedIndex2 !== -1) {
                     lines2.forEach(row => {
                         const cells = row.split('\t');
                         const categoryName = (cells[nameIndex2] || '').trim();
                         if (categoryName && categoryName.toLowerCase() !== 'tổng' && !categoryName.toLowerCase().includes('ngành hàng')) {
                             const target = parseFloat(cells[targetIndex2].replace(/,/g, '')) || 0;
                             const actual = parseFloat(cells[dtqdIndex2].replace(/,/g, '')) || 0;
+                            // [FIX] Read the projected percentage directly from the table
+                            const projected = parseFloat(String(cells[projectedIndex2]).replace(/%/g, '')) || 0;
                             contestTargetsStore[categoryName] = target;
-                            contestStoreStats[categoryName] = { actual, target };
+                            contestStoreStats[categoryName] = { actual, target, projectedPercentFromSource: projected };
                         }
                     });
                 }
@@ -789,11 +795,11 @@
             finalData.sort((a,b) => b.totalScore - a.totalScore);
             finalData.forEach((employee, index) => { employee.rank = index + 1; });
             
+            // [FIX] Use the projected values read directly from Table 2
             const contestProjectedTotals = {};
             contestHeaders.forEach(header => {
                 const stat = contestStoreStats[header];
-                const timeframe = getContestTimeframe(header);
-                contestProjectedTotals[header] = stat && stat.target > 0 ? (stat.actual / timeframe.passedDays * timeframe.totalDays) / stat.target * 100 : 0;
+                contestProjectedTotals[header] = stat ? stat.projectedPercentFromSource : 0;
             });
             
             sortedContestHeadersGlobal = [...contestHeaders].sort((a, b) => {
