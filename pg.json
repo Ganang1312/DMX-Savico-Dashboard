@@ -1,5 +1,15 @@
 {
-  "meta": {},
+  "meta": {
+    "dates": [
+      "20/10",
+      "21/10",
+      "22/10",
+      "23/10",
+      "24/10",
+      "25/10",
+      "26/10"
+    ]
+  },
   "pgs": [
     {
       "stt": 1,
@@ -8,14 +18,14 @@
       "ten": "YẾN",
       "sdt": "362282223",
       "gt": "Nữ",
-      "veSinh": "Thứ 3",
+      "veSinh": "Thứ 2",
       "lich": [
+        "SÁNG",
+        "SÁNG",
         "OFF",
-        "SÁNG",
-        "SÁNG",
-        "SÁNG",
         "CHIỀU",
         "CHIỀU",
+        "SÁNG",
         "SÁNG"
       ],
       "note": "",
@@ -31,9 +41,9 @@
       "veSinh": "Thứ 6",
       "lich": [
         "OFF",
+        "OFF",
         "CHIỀU",
-        "HỌP",
-        "CHIỀU",
+        "SÁNG",
         "SÁNG",
         "CHIỀU",
         "CHIỀU"
@@ -50,8 +60,8 @@
       "gt": "Nam",
       "veSinh": "Thứ 4",
       "lich": [
-        "HỌP",
         "OFF",
+        "HỌP",
         "SÁNG",
         "SÁNG",
         "SÁNG",
@@ -68,15 +78,15 @@
       "ten": "ĐỨC",
       "sdt": "393461656",
       "gt": "Nam",
-      "veSinh": "Thứ 2",
+      "veSinh": "",
       "lich": [
-        "CHIỀU",
         "ST KHÁC",
         "CHIỀU",
-        "ST KHÁC",
         "CHIỀU",
+        "ST KHÁC",
         "OFF",
-        "ST KHÁC"
+        "ST KHÁC",
+        "CHIỀU"
       ],
       "note": "",
       "diaChi": "17 Đào Nguyên B, Trâu Quỳ, GL"
@@ -88,15 +98,15 @@
       "ten": "THÚY",
       "sdt": "0862321997",
       "gt": "Nữ",
-      "veSinh": "Thứ 7",
+      "veSinh": "Chủ Nhật",
       "lich": [
         "ST KHÁC",
         "HỌP",
+        "OFF",
+        "ST KHÁC",
+        "ST KHÁC",
         "CHIỀU",
-        "CHIỀU",
-        "CHIỀU",
-        "SÁNG",
-        "ST KHÁC"
+        "SÁNG"
       ],
       "note": "",
       "diaChi": "564 Nguyễn Văn Cừ, LB"
@@ -108,15 +118,15 @@
       "ten": "VÂN",
       "sdt": "973756696",
       "gt": "Nữ",
-      "veSinh": "Thứ 5",
+      "veSinh": "Thứ 4",
       "lich": [
-        "HỌP",
         "OFF",
+        "HỌP",
+        "SÁNG",
         "CHIỀU",
         "SÁNG",
         "SÁNG",
-        "CHIỀU",
-        "SÁNG"
+        "CHIỀU"
       ],
       "note": "",
       "diaChi": "Khu ĐT Việt Hưng, Giang Biên ,Long Biên"
@@ -128,13 +138,13 @@
       "ten": "BẢO",
       "sdt": "352242281",
       "gt": "Nam",
-      "veSinh": "Thứ 3",
+      "veSinh": "",
       "lich": [
         "ST KHÁC",
-        "CHIỀU",
         "ST KHÁC",
+        "OFF",
         "CHIỀU",
-        "ST KHÁC",
+        "CHIỀU",
         "CHIỀU",
         "ST KHÁC"
       ],
@@ -151,9 +161,9 @@
       "veSinh": "Thứ 2",
       "lich": [
         "SÁNG",
-        "OFF",
-        "SÁNG",
         "ST KHÁC",
+        "SÁNG",
+        "OFF",
         "SÁNG",
         "SÁNG",
         "CHIỀU"
@@ -168,14 +178,14 @@
       "ten": "TRANG",
       "sdt": "0967841092",
       "gt": "Nữ",
-      "veSinh": "Thứ 6",
+      "veSinh": "Thứ 7",
       "lich": [
+        "ST KHÁC",
         "CHIỀU",
+        "ST KHÁC",
         "OFF",
         "ST KHÁC",
-        "ST KHÁC",
         "SÁNG",
-        "ST KHÁC",
         "SÁNG"
       ],
       "note": "",
@@ -188,15 +198,15 @@
       "ten": "LIÊN",
       "sdt": "387563276",
       "gt": "Nữ",
-      "veSinh": "Thứ 4",
+      "veSinh": "Thứ 5",
       "lich": [
         "OFF",
         "ST KHÁC",
-        "SÁNG",
+        "HỌP",
         "SÁNG",
         "CHIỀU",
-        "SÁNG",
-        "ST KHÁC"
+        "CHIỀU",
+        "SÁNG"
       ],
       "note": "",
       "diaChi": "Đức Giang, Long Biên."
@@ -210,9 +220,9 @@
       "gt": "Nam",
       "veSinh": "Chủ Nhật",
       "lich": [
-        "OFF",
-        "HỌP",
         "CHIỀU",
+        "HỌP",
+        "OFF",
         "CHIỀU",
         "CHIỀU",
         "CHIỀU",
@@ -233,10 +243,10 @@
         "HỌP",
         "SÁNG",
         "SÁNG",
-        "CHIỀU",
-        "SÁNG",
         "OFF",
-        "CHIỀU"
+        "SÁNG",
+        "SÁNG",
+        "SÁNG"
       ],
       "note": "",
       "diaChi": "55 ngõ 32 An Dương"
@@ -248,15 +258,15 @@
       "ten": "TUẤN",
       "sdt": "0987093298",
       "gt": "Nam",
-      "veSinh": "Thứ 7",
+      "veSinh": "Thứ 6",
       "lich": [
-        "OFF",
         "HỌP",
+        "OFF",
+        "OFF",
         "CHIỀU",
         "SÁNG",
         "SÁNG",
-        "SÁNG",
-        "OFF"
+        "SÁNG"
       ],
       "note": "",
       "diaChi": "Ngõ 2 Xuân Đỉnh"
@@ -268,14 +278,14 @@
       "ten": "LINH",
       "sdt": "326343998",
       "gt": "Nữ",
-      "veSinh": "Thứ 2",
+      "veSinh": "Thứ 5",
       "lich": [
+        "OFF",
+        "CHIỀU",
+        "CHIỀU",
         "SÁNG",
         "OFF",
-        "HỌP",
         "CHIỀU",
-        "CHIỀU",
-        "SÁNG",
         "CHIỀU"
       ],
       "note": "",
@@ -288,11 +298,11 @@
       "ten": "NHUNG",
       "sdt": "974528882",
       "gt": "Nữ",
-      "veSinh": "Thứ 5",
+      "veSinh": "Thứ 3",
       "lich": [
         "HỌP",
-        "OFF",
         "SÁNG",
+        "OFF",
         "SÁNG",
         "CHIỀU",
         "CHIỀU",
