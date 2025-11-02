@@ -1,13 +1,13 @@
 {
   "meta": {
     "dates": [
-      "27/10",
-      "28/10",
-      "29/10",
-      "30/10",
-      "31/10",
-      "01/11",
-      "02/11"
+      "03/11",
+      "04/11",
+      "05/11",
+      "06/11",
+      "07/11",
+      "08/11",
+      "09/11"
     ]
   },
   "pgs": [
@@ -18,17 +18,17 @@
       "ten": "YẾN",
       "sdt": "362282223",
       "gt": "Nữ",
-      "veSinh": "Thứ 7",
+      "veSinh": "Thứ 3",
       "lich": [
         "CHIỀU",
         "SÁNG",
         "OFF",
         "SÁNG",
-        "OFF",
+        "CHIỀU",
         "SÁNG",
-        "CHIỀU"
+        "SÁNG"
       ],
-      "note": "T6: tranning sản phẩm",
+      "note": "",
       "diaChi": "44 Lạc Long Quân, Tây Hồ"
     },
     {
@@ -38,15 +38,15 @@
       "ten": "THẢO",
       "sdt": "0338096094",
       "gt": "Nữ",
-      "veSinh": "Thứ 2",
+      "veSinh": "Thứ 6",
       "lich": [
-        "SÁNG",
-        "CHIỀU",
-        "SÁNG",
+        "OFF",
+        "OFF",
         "OFF",
         "CHIỀU",
+        "SÁNG",
         "CHIỀU",
-        "SÁNG"
+        "CHIỀU"
       ],
       "note": "",
       "diaChi": "Vĩnh Hưng, Hoàng Mai"
@@ -66,9 +66,9 @@
         "SÁNG",
         "SÁNG",
         "SÁNG",
-        "SÁNG"
+        "OFF"
       ],
-      "note": "",
+      "note": "Xin nghỉ phép tháng do bận việc gđ",
       "diaChi": "390 Nguyễn Văn Cừ , LB"
     },
     {
@@ -78,18 +78,18 @@
       "ten": "ĐỨC",
       "sdt": "393461656",
       "gt": "Nam",
-      "veSinh": "Thứ 5",
+      "veSinh": "Thứ 3",
       "lich": [
         "ST KHÁC",
-        "ST KHÁC",
         "CHIỀU",
         "CHIỀU",
         "ST KHÁC",
+        "CHIỀU",
         "ST KHÁC",
-        "CHIỀU"
+        "ST KHÁC"
       ],
       "note": "",
-      "diaChi": "17 Nguyên Đào B, Trâu Quỳ, Gl"
+      "diaChi": "17 Nguyên Đào B, Trâu Quỳ, GL"
     },
     {
       "stt": 5,
@@ -98,15 +98,15 @@
       "ten": "THÚY",
       "sdt": "0862321997",
       "gt": "Nữ",
-      "veSinh": "Thứ 5",
+      "veSinh": "Chủ Nhật",
       "lich": [
+        "ST KHÁC",
+        "HỌP",
         "OFF",
-        "CHIỀU",
-        "CHIỀU",
-        "SÁNG",
         "ST KHÁC",
         "ST KHÁC",
-        "ST KHÁC"
+        "CHIỀU",
+        "SÁNG"
       ],
       "note": "",
       "diaChi": "564 Nguyễn Văn Cừ , LB"
@@ -118,18 +118,18 @@
       "ten": "VÂN",
       "sdt": "973756696",
       "gt": "Nữ",
-      "veSinh": "Thứ 3",
+      "veSinh": "Thứ 5",
       "lich": [
         "HỌP",
-        "SÁNG",
         "OFF",
-        "SÁNG",
         "CHIỀU",
-        "OFF",
-        "SÁNG"
+        "SÁNG",
+        "SÁNG",
+        "SÁNG",
+        "CHIỀU"
       ],
-      "note": "T7: do bận việc gia đình",
-      "diaChi": "Khu ĐT Việt Hưng, Giang Biên"
+      "note": "",
+      "diaChi": "Khu ĐT Việt Hưng, Giang Biên, LB"
     },
     {
       "stt": 7,
@@ -140,8 +140,8 @@
       "gt": "Nam",
       "veSinh": "Thứ 4",
       "lich": [
-        "ST KHÁC",
         "OFF",
+        "ST KHÁC",
         "CHIỀU",
         "CHIỀU",
         "ST KHÁC",
@@ -158,13 +158,13 @@
       "ten": "HẰNG",
       "sdt": "0392946783",
       "gt": "Nữ",
-      "veSinh": "Thứ 4",
+      "veSinh": "Thứ 7",
       "lich": [
         "ST KHÁC",
-        "SÁNG",
+        "ST KHÁC",
         "SÁNG",
         "OFF",
-        "ST KHÁC",
+        "SÁNG",
         "SÁNG",
         "CHIỀU"
       ],
@@ -181,10 +181,10 @@
       "veSinh": "Chủ Nhật",
       "lich": [
         "ST KHÁC",
-        "SÁNG",
         "OFF",
-        "SÁNG",
+        "HỌP",
         "ST KHÁC",
+        "CHIỀU",
         "ST KHÁC",
         "SÁNG"
       ],
@@ -198,15 +198,15 @@
       "ten": "LIÊN",
       "sdt": "387563276",
       "gt": "Nữ",
-      "veSinh": "Thứ 6",
+      "veSinh": "Thứ 4",
       "lich": [
-        "OFF",
         "HỌP",
+        "OFF",
+        "SÁNG",
+        "CHIỀU",
         "ST KHÁC",
         "CHIỀU",
-        "SÁNG",
-        "SÁNG",
-        "CHIỀU"
+        "SÁNG"
       ],
       "note": "",
       "diaChi": "Đức Giang, LB"
@@ -221,10 +221,10 @@
       "veSinh": "Chủ Nhật",
       "lich": [
         "OFF",
+        "HỌP",
         "CHIỀU",
         "CHIỀU",
         "CHIỀU",
-        "SÁNG",
         "CHIỀU",
         "SÁNG"
       ],
@@ -234,36 +234,56 @@
     {
       "stt": 12,
       "nganhHang": "ĐIỆN LẠNH",
-      "hang": "ELECTROLUX",
-      "ten": "TÚ",
-      "sdt": "919352985",
+      "hang": "BOSCH",
+      "ten": "HUY",
+      "sdt": "368256560",
       "gt": "Nam",
-      "veSinh": "Thứ 3",
+      "veSinh": "Thứ 7",
       "lich": [
-        "HỌP",
-        "SÁNG",
+        "ST KHÁC",
+        "ST KHÁC",
+        "ST KHÁC",
         "OFF",
-        "CHIỀU",
         "CHIỀU",
         "SÁNG",
         "SÁNG"
       ],
       "note": "",
-      "diaChi": "55 Ngõ 32 An Dương"
+      "diaChi": "Ngọc Thụy, LB"
     },
     {
       "stt": 13,
+      "nganhHang": "ĐIỆN LẠNH",
+      "hang": "ELECTROLUX",
+      "ten": "TÚ",
+      "sdt": "919352985",
+      "gt": "Nam",
+      "veSinh": "Thứ 2",
+      "lich": [
+        "SÁNG",
+        "SÁNG",
+        "OFF",
+        "CHIỀU",
+        "SÁNG",
+        "OFF",
+        "CHIỀU"
+      ],
+      "note": "T2 xin phép chưa cắt ca đi họp ạ , t7 off khám nvqs",
+      "diaChi": "55 Ngõ 32 An Dương"
+    },
+    {
+      "stt": 14,
       "nganhHang": "ĐIỆN LẠNH",
       "hang": "PANASONIC",
       "ten": "TUẤN",
       "sdt": "0987093298",
       "gt": "Nam",
-      "veSinh": "Thứ 6",
+      "veSinh": "Thứ 5",
       "lich": [
         "HỌP",
         "OFF",
         "OFF",
-        "CHIỀU",
+        "SÁNG",
         "SÁNG",
         "SÁNG",
         "CHIỀU"
@@ -272,40 +292,40 @@
       "diaChi": "Ngõ 2 Xuân Đỉnh"
     },
     {
-      "stt": 14,
+      "stt": 15,
       "nganhHang": "ĐIỆN LẠNH",
       "hang": "HITACHI",
       "ten": "LINH",
       "sdt": "326343998",
       "gt": "Nữ",
-      "veSinh": "Thứ 2",
+      "veSinh": "Thứ 6",
       "lich": [
-        "SÁNG",
-        "CHIỀU",
         "OFF",
+        "CHIỀU",
         "HỌP",
         "CHIỀU",
+        "SÁNG",
         "CHIỀU",
-        "SÁNG"
+        "CHIỀU"
       ],
       "note": "",
       "diaChi": "17 Tổ 8 Thượng Thanh, LB"
     },
     {
-      "stt": 15,
+      "stt": 16,
       "nganhHang": "ĐIỆN LẠNH",
       "hang": "SAMSUNG",
       "ten": "NHUNG",
       "sdt": "974528882",
       "gt": "Nữ",
-      "veSinh": "Thứ 5",
+      "veSinh": "Thứ 3",
       "lich": [
         "HỌP",
+        "SÁNG",
         "OFF",
         "SÁNG",
-        "SÁNG",
-        "SÁNG",
         "CHIỀU",
+        "SÁNG",
         "CHIỀU"
       ],
       "note": "",
