@@ -1,13 +1,13 @@
 {
   "meta": {
     "dates": [
-      "10/11",
-      "11/11",
-      "12/11",
-      "13/11",
-      "14/11",
-      "15/11",
-      "16/11"
+      "17/11",
+      "18/11",
+      "19/11",
+      "20/11",
+      "21/11",
+      "22/11",
+      "23/11"
     ]
   },
   "pgs": [
@@ -23,10 +23,10 @@
         "CHIỀU",
         "SÁNG",
         "OFF",
-        "OFF",
-        "CHIỀU",
         "SÁNG",
-        "SÁNG"
+        "SÁNG",
+        "SÁNG",
+        "CHIỀU"
       ],
       "note": "",
       "diaChi": "44 Lạc Long Quân, Tây Hồ"
@@ -38,17 +38,17 @@
       "ten": "THẢO",
       "sdt": "0338096094",
       "gt": "Nữ",
-      "veSinh": "Thứ 2",
+      "veSinh": "",
       "lich": [
-        "SÁNG",
         "OFF",
-        "HỌP",
-        "CHIỀU",
-        "SÁNG",
-        "CHIỀU",
-        "CHIỀU"
+        "OFF",
+        "OFF",
+        "OFF",
+        "OFF",
+        "OFF",
+        "OFF"
       ],
-      "note": "",
+      "note": "Nghỉ ốm",
       "diaChi": "Vĩnh Hưng, Hoàng Mai"
     },
     {
@@ -78,15 +78,15 @@
       "ten": "ĐỨC",
       "sdt": "393461656",
       "gt": "Nam",
-      "veSinh": "Thứ 4",
+      "veSinh": "Thứ 5",
       "lich": [
         "ST KHÁC",
         "ST KHÁC",
-        "CHIỀU",
-        "CHIỀU",
         "OFF",
-        "ST KHÁC",
-        "CHIỀU"
+        "CHIỀU",
+        "CHIỀU",
+        "CHIỀU",
+        "ST KHÁC"
       ],
       "note": "",
       "diaChi": "17 Nguyên Đào B, Trâu Quỳ, GL"
@@ -101,11 +101,11 @@
       "veSinh": "Chủ Nhật",
       "lich": [
         "ST KHÁC",
-        "HỌP",
+        "ST KHÁC",
+        "ST KHÁC",
         "OFF",
         "ST KHÁC",
-        "ST KHÁC",
-        "CHIỀU",
+        "SÁNG",
         "SÁNG"
       ],
       "note": "",
@@ -120,12 +120,12 @@
       "gt": "Nữ",
       "veSinh": "Thứ 4",
       "lich": [
+        "CHIỀU",
         "OFF",
+        "SÁNG",
         "HỌP",
-        "SÁNG",
         "CHIỀU",
         "SÁNG",
-        "CHIỀU",
         "SÁNG"
       ],
       "note": "",
@@ -138,15 +138,15 @@
       "ten": "BẢO",
       "sdt": "352242281",
       "gt": "Nam",
-      "veSinh": "Thứ 5",
+      "veSinh": "Thứ 7",
       "lich": [
+        "ST KHÁC",
+        "ST KHÁC",
         "OFF",
         "ST KHÁC",
-        "ST KHÁC",
         "CHIỀU",
         "CHIỀU",
-        "CHIỀU",
-        "ST KHÁC"
+        "CHIỀU"
       ],
       "note": "",
       "diaChi": "Chương Dương Độ, Hoàn Kiếm"
@@ -178,14 +178,14 @@
       "ten": "TRANG",
       "sdt": "0967841092",
       "gt": "Nữ",
-      "veSinh": "Thứ 5",
+      "veSinh": "Thứ 2",
       "lich": [
+        "SÁNG",
         "ST KHÁC",
         "ST KHÁC",
         "OFF",
-        "SÁNG",
-        "CHIỀU",
         "ST KHÁC",
+        "CHIỀU",
         "SÁNG"
       ],
       "note": "",
@@ -200,15 +200,15 @@
       "gt": "Nữ",
       "veSinh": "Thứ 7",
       "lich": [
-        "ST KHÁC",
+        "HỌP",
+        "OFF",
+        "OFF",
         "OFF",
         "ST KHÁC",
-        "SÁNG",
         "CHIỀU",
-        "SÁNG",
         "CHIỀU"
       ],
-      "note": "",
+      "note": "Thứ 3,4,5 em xin nghỉ Kick Off tham gia Team Buiding cùng công ty ạ",
       "diaChi": "Đức Giang, LB"
     },
     {
@@ -218,13 +218,13 @@
       "ten": "TÚ",
       "sdt": "383209079",
       "gt": "Nam",
-      "veSinh": "Thứ 5",
+      "veSinh": "Chủ Nhật",
       "lich": [
-        "CHIỀU",
-        "CHIỀU",
-        "HỌP",
-        "SÁNG",
         "OFF",
+        "HỌP",
+        "CHIỀU",
+        "CHIỀU",
+        "CHIỀU",
         "CHIỀU",
         "SÁNG"
       ],
@@ -238,14 +238,14 @@
       "ten": "HUY",
       "sdt": "368256560",
       "gt": "Nam",
-      "veSinh": "Thứ 7",
+      "veSinh": "Thứ 6",
       "lich": [
         "ST KHÁC",
         "ST KHÁC",
         "ST KHÁC",
         "OFF",
-        "CHIỀU",
         "SÁNG",
+        "CHIỀU",
         "SÁNG"
       ],
       "note": "",
@@ -258,15 +258,15 @@
       "ten": "TÚ",
       "sdt": "919352985",
       "gt": "Nam",
-      "veSinh": "Chủ Nhật",
+      "veSinh": "Thứ 5",
       "lich": [
         "HỌP",
+        "CHIỀU",
         "OFF",
-        "CHIỀU",
-        "CHIỀU",
         "SÁNG",
         "CHIỀU",
-        "SÁNG"
+        "SÁNG",
+        "CHIỀU"
       ],
       "note": "",
       "diaChi": "55 Ngõ 32 An Dương"
@@ -278,17 +278,17 @@
       "ten": "TUẤN",
       "sdt": "0987093298",
       "gt": "Nam",
-      "veSinh": "Thứ 6",
+      "veSinh": "Thứ 3",
       "lich": [
         "HỌP",
+        "SÁNG",
+        "SÁNG",
         "OFF",
-        "OFF",
         "SÁNG",
         "SÁNG",
-        "SÁNG",
-        "CHIỀU"
+        "OFF"
       ],
-      "note": "",
+      "note": "Em xin phép nghỉ CN nhà làm giỗ bố",
       "diaChi": "Ngõ 2 Xuân Đỉnh"
     },
     {
@@ -298,17 +298,17 @@
       "ten": "LINH",
       "sdt": "326343998",
       "gt": "Nữ",
-      "veSinh": "Thứ 2",
+      "veSinh": "Thứ 6",
       "lich": [
+        "OFF",
+        "CHIỀU",
+        "CHIỀU",
+        "CHIỀU",
         "SÁNG",
-        "OFF",
-        "OFF",
-        "OFF",
         "CHIỀU",
-        "CHIỀU",
-        "CHIỀU"
+        "OFF"
       ],
-      "note": "Thứ 3 đi khám sức khoẻ",
+      "note": "Gia đình ở quê nhà e làm lễ e xp off để về quê ạ",
       "diaChi": "17 Tổ 8 Thượng Thanh, LB"
     },
     {
@@ -318,13 +318,13 @@
       "ten": "NHUNG",
       "sdt": "974528882",
       "gt": "Nữ",
-      "veSinh": "Thứ 3",
+      "veSinh": "Thứ 5",
       "lich": [
         "HỌP",
         "SÁNG",
         "OFF",
-        "CHIỀU",
         "SÁNG",
+        "CHIỀU",
         "SÁNG",
         "CHIỀU"
       ],
