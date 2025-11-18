@@ -25,6 +25,12 @@
             /* Ánh xạ các biến cũ sang biến mới để tương thích */
             --primary-color: var(--primary-accent);
             --card-bg: #FFFFFF;
+            
+            /* STRAM Colors */
+            --d1-color: #F04770;
+            --d2-color: #F78C6A;
+            --d3-color: #FFD167;
+            --d4-color: #06D7A0;
         }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; padding: 20px; background-color: var(--bg-main); color: var(--text-primary); }
         .container { max-width: 100%; padding: 15px; box-sizing: border-box; }
@@ -90,7 +96,7 @@
         #copyCommentsBtn { background-color: var(--primary-accent); }
         
         .slider-group { margin-top: 15px; }
-        .slider-container { display: flex; align-items: center; gap: 15px; }
+        .slider-container { display: flex; align: center; gap: 15px; }
         input[type="range"] { flex-grow: 1; accent-color: var(--primary-color); }
         .slider-value { font-weight: bold; font-size: 16px; min-width: 50px; text-align: right; }
 
@@ -108,10 +114,10 @@
         .section-header { display: flex; justify-content: space-between; align-items: center; }
         
         /* --- GIAO DIỆN BẢNG TỔNG HỢP MỚI --- */
-        .comprehensive-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .comprehensive-table { width: 100%; border-collapse: collapse; font-size: 11px; } /* Giảm font-size từ 12px */
         .comprehensive-table th, .comprehensive-table td {
             border: 1px solid var(--border-main);
-            padding: 10px 8px;
+            padding: 6px 3px; /* Giảm padding từ 8px 5px */
             text-align: center;
             vertical-align: middle;
         }
@@ -122,15 +128,22 @@
             top: 0;
             z-index: 1;
         }
-        .comprehensive-table th:first-child, .comprehensive-table td:first-child,
-        .comprehensive-table th:nth-child(2), .comprehensive-table td:nth-child(2) {
+        /* Sticky columns for first 2 cols */
+        .comprehensive-table th:first-child, .comprehensive-table td:first-child {
             position: sticky;
             left: 0;
             background-color: #fff;
             z-index: 2;
+            width: 40px; /* Giảm từ 50px */
+            min-width: 40px; /* Giảm từ 50px */
         }
          .comprehensive-table th:nth-child(2), .comprehensive-table td:nth-child(2) {
-            left: 50px; /* Bằng độ rộng của cột đầu tiên */
+            position: sticky;
+            left: 40px; /* Cập nhật left = width cột 1 */
+            background-color: #fff;
+            z-index: 2;
+            min-width: 100px; /* Giảm từ 120px */
+            width: 100px; /* Giảm từ 120px */
         }
         
         .comprehensive-table td:nth-child(2) { text-align: left; font-weight: 600; }
@@ -143,31 +156,55 @@
         .clickable-name:hover, .clickable-header:hover { text-decoration: underline; }
 
 
-        .rank-cell { font-weight: 700; font-size: 1.2em; width: 50px;}
+        .rank-cell { font-weight: 700; font-size: 1.0em; } /* Giảm font-size từ 1.1em */
         .rank-icon { font-size: 1.5em; }
 
         .heatmap-cell {
-            font-weight: 700;
+            /* font-weight: 600; Bỏ đi, chuyển vào badge */
             color: var(--text-primary);
+            font-size: 11px; /* Đảm bảo font-size nhất quán */
+            /* Đã xóa các màu nền heatmap-green/orange/red */
         }
-        .heatmap-green { background-color: rgba(6, 215, 160, 0.2); }
-        .heatmap-orange { background-color: rgba(255, 209, 103, 0.3); }
-        .heatmap-red { background-color: rgba(240, 71, 112, 0.15); }
         
-        .progress-bar-wrapper { min-width: 150px; }
-        .progress-bar-label { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-bottom: 4px; font-weight: 500; color: var(--text-muted);}
+        /* [MỚI] CSS cho kiểu hiển thị % dạng badge */
+        .percent-badge {
+            display: inline-block;
+            padding: 3px 8px; /* Padding bên trong badge */
+            border-radius: 15px; /* Bo tròn giống D3 */
+            font-weight: 700;
+            font-size: 1.0em; /* Kích thước chữ tương đối 11px của ô */
+            border: 2px solid;
+            min-width: 45px; /* Đảm bảo độ rộng tối thiểu */
+            text-align: center;
+        }
+        .badge-green {
+            background-color: rgba(6, 215, 160, 0.1); /* Nền xanh lá mờ */
+            border-color: var(--success-color);
+            color: var(--success-color);
+        }
+        .badge-red {
+            background-color: rgba(240, 71, 112, 0.1); /* Nền đỏ mờ */
+            border-color: var(--danger-color);
+            color: var(--danger-color);
+        }
+        /* [KẾT THÚC] */
+        
+        .progress-bar-wrapper { min-width: 110px; } /* Giảm min-width từ 130px */
+        .progress-bar-label { display: flex; justify-content: space-between; align-items: center; font-size: 10px; margin-bottom: 4px; font-weight: 500; color: var(--text-muted);} /* Giảm font-size từ 12px */
         .progress-bar-bg { background-color: #e9ecef; border-radius: 50px; height: 8px; overflow: hidden;}
         .progress-bar-fill { background-color: var(--primary-color); height: 100%; border-radius: 50px; transition: width 0.5s ease-in-out; }
         .progress-bar-fill.success { background-color: var(--success-color); }
 
         .contest-header-cell {
-            max-width: 100px;
+            max-width: 70px; /* Giảm max-width từ 90px */
+            min-width: 60px; /* Giảm min-width từ 80px */
             white-space: normal;
-            font-size: 12px;
+            font-size: 10px; /* Giảm font-size từ 11px */
             vertical-align: top;
+            padding: 6px 3px; /* Đồng bộ padding */
         }
         .contest-header-cell > div {
-             margin-top: 5px; font-size: 1.1em; font-weight: 700;
+             margin-top: 5px; font-size: 1.0em; font-weight: 700; /* Giảm font-size từ 1.1em */
         }
 
         /* Modal Styles */
@@ -197,7 +234,7 @@
         }
 
 
-        /* --- Giao diện Thẻ KPI --- */
+        /* --- GIAO DIỆN Thẻ KPI --- */
         #allCardsContainer { 
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -277,6 +314,188 @@
             background-color: #f8f9fa;
         }
 
+        /* --- [MỚI] Thu nhỏ font chữ tên ngành hàng trong thẻ KPI --- */
+        .contest-table tbody td:nth-child(2) {
+            font-size: 10px; /* Cập nhật từ 8px lên 10px */
+            font-weight: normal; 
+            text-align: left; /* Chuyển style từ inline JS ra đây */
+        }
+        /* --- [KẾT THÚC] --- */
+
+        /* --- STRAM STYLES --- */
+        .stram-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .stram-table th, .stram-table td {
+            border: 1px solid var(--border-main);
+            padding: 10px 8px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .stram-table thead th {
+            background-color: #F9FAFB;
+            font-weight: 600;
+        }
+        .stram-table td:nth-child(2) {
+            text-align: left;
+            font-weight: 600;
+        }
+        .d-level-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 1.1em;
+            border: 2px solid;
+        }
+        .d1 { background-color: rgba(240, 71, 112, 0.1); border-color: var(--d1-color); color: var(--d1-color); }
+        .d2 { background-color: rgba(247, 140, 106, 0.1); border-color: var(--d2-color); color: var(--d2-color); }
+        .d3 { background-color: rgba(255, 209, 103, 0.1); border-color: var(--d3-color); color: var(--d3-color); }
+        .d4 { background-color: rgba(6, 215, 160, 0.1); border-color: var(--d4-color); color: var(--d4-color); }
+        
+        .s-level-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-weight: 700;
+            color: #fff;
+            font-size: 1.1em;
+        }
+        .s1 { background-color: var(--d1-color); }
+        .s2 { background-color: var(--d2-color); }
+        .s3 { background-color: var(--d3-color); color: var(--text-primary); }
+        .s4 { background-color: var(--d4-color); color: var(--text-primary); }
+        
+        .btn-stram-detail {
+            background-color: var(--primary-accent);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-stram-detail:hover {
+            filter: brightness(90%);
+        }
+
+        /* STRAM Modal */
+        #stram-modal .modal-content {
+            max-width: 1200px;
+        }
+        .stram-modal-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 25px;
+        }
+        .stram-leader-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border-main);
+        }
+        .stram-leader-card h3 {
+            margin-top: 0;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-main);
+            padding-bottom: 10px;
+        }
+        .stram-leader-card h4 {
+            color: var(--primary-accent);
+            margin-bottom: 8px;
+        }
+        .stram-leader-card ul {
+            padding-left: 20px;
+            margin-top: 0;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        .stram-tabs {
+            display: flex;
+            gap: 5px;
+            border-bottom: 2px solid var(--border-main);
+            margin-bottom: 20px;
+        }
+        .stram-tab-btn {
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+        .stram-tab-btn.active {
+            background: white;
+            color: var(--primary-accent);
+            border: 2px solid var(--border-main);
+            border-bottom: 2px solid white;
+        }
+        .stram-tab-content {
+            display: none;
+            background: white;
+            padding: 20px;
+            border-radius: 0 10px 10px 10px;
+            border: 1px solid var(--border-main);
+            border-top: none;
+        }
+        .stram-tab-content.active {
+            display: block;
+        }
+        .stram-task-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        .stram-task-table th, .stram-task-table td {
+            border: 1px solid var(--border-main);
+            padding: 10px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .stram-task-table th { background-color: #F9FAFB; }
+        .stram-task-table td:nth-child(1) { text-align: left; font-weight: 500;}
+
+        /* STRAM Table Progress Bar */
+        .stram-progress-bar-bg {
+            background-color: #e9ecef;
+            border-radius: 50px;
+            height: 6px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        .stram-progress-bar-fill {
+            height: 100%;
+            border-radius: 50px;
+            transition: width 0.5s ease-in-out;
+        }
+        .stram-progress-bar-fill.success { background-color: var(--success-color); }
+        .stram-progress-bar-fill.danger { background-color: var(--danger-color); }
+        
+        /* STRAM Modal Task Details */
+        .stram-task-details {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed var(--border-main);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px 10px;
+        }
+        .stram-task-details > div {
+            display: flex;
+            justify-content: space-between;
+        }
+        .stram-task-details .label { font-weight: 500; color: var(--text-primary); }
+        .stram-task-details .value { font-weight: 700; }
+        .stram-task-details .value.green { color: var(--success-color); }
+        .stram-task-details .value.red { color: var(--danger-color); }
+
+
     </style>
 </head>
 <body onload="initDashboard()">
@@ -349,11 +568,22 @@
                 <div id="results-wrapper" style="display: none;">
                     <div class="card">
                         <div class="section-header">
-                            <h2 style="color:var(--primary-color); margin-bottom: 0; border: none;"> Bảng Xếp Hạng Tổng Hợp</h2>
+                            <h2 style="color:var(--primary-accent); margin-bottom: 0; border: none;"> Bảng Xếp Hạng Tổng Hợp</h2>
                             <button id="captureComprehensiveBtn" class="btn btn-small">Chụp Toàn Bảng</button>
                         </div>
-                        <div id="comprehensiveLeaderboardContainer" class="table-container" style="margin-top:15px; max-height: 70vh;"></div>
+                        <div id="comprehensiveLeaderboardContainer" class="table-container" style="margin-top:15px; max-height: 70vh; overflow-x: auto;"></div>
                     </div>
+                    
+                    <!-- NEW STRAM CARD -->
+                    <div class="card" id="stram-analysis-card">
+                        <div class="section-header">
+                            <h2 style="color:var(--primary-accent); margin-bottom: 0; border: none;">🔥 Chuẩn đoán STRAM & Phong cách Lãnh đạo</h2>
+                        </div>
+                        <!-- *** CHỈNH SỬA ***: Đã xóa max-height: 70vh để hiển thị toàn bộ bảng -->
+                        <div id="stramAnalysisContainer" class="table-container" style="margin-top:15px;"></div>
+                    </div>
+                    <!-- END NEW STRAM CARD -->
+
                 </div>
             </div>
             
@@ -387,20 +617,26 @@
     
     <div id="kpi-modal" class="modal">
         <div class="modal-content">
-            <span class="modal-close-btn">&times;</span>
+            <span class="modal-close-btn" data-modal-id="kpi-modal">&times;</span>
             <div id="modal-body"></div>
         </div>
     </div>
+    
+    <!-- NEW STRAM MODAL -->
+    <div id="stram-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close-btn" data-modal-id="stram-modal">&times;</span>
+            <h2 id="stram-modal-title" style="margin-top:0; color: var(--primary-accent);"></h2>
+            <div id="stram-modal-body"></div>
+        </div>
+    </div>
+    <!-- END NEW STRAM MODAL -->
+
 
 <script>
     // Global data store
     var finalData = [];
     var sortedContestHeadersGlobal = [];
-    const modal = document.getElementById('kpi-modal');
-
-
-    // Register Chart.js plugins
-    Chart.register(ChartDataLabels);
     
     // --- KHỞI TẠO ---
     function initDashboard() {
@@ -434,8 +670,18 @@
         document.getElementById('captureAllCardsBtn').addEventListener('click', () => captureAndDownload(document.getElementById('kpi-cards-section'), 'TatCa_KPI_NhanVien.png'));
         document.getElementById('copyCommentsBtn').addEventListener('click', copyComments);
         
-        document.querySelector('.modal-close-btn').onclick = () => { modal.style.display = "none"; };
-        window.onclick = (event) => { if (event.target == modal) { modal.style.display = "none"; } };
+        // Modal close buttons
+        document.querySelectorAll('.modal-close-btn').forEach(btn => {
+            btn.onclick = () => {
+                document.getElementById(btn.dataset.modalId).style.display = "none";
+            };
+        });
+        
+        window.onclick = (event) => {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = "none";
+            }
+        };
 
         toggleAllocationInputs(); 
     }
@@ -594,43 +840,68 @@
         });
     }
 
+    // --- *** HÀM ĐÃ CẬP NHẬT *** ---
+    // Chụp toàn bộ bảng, bao gồm cả phần cuộn ngang và dọc
     function captureFullTable() {
         const container = document.getElementById('comprehensiveLeaderboardContainer');
         const cardElement = container.closest('.card');
         
-        // Store original styles
-        const originalContainerStyle = {
-            maxHeight: container.style.maxHeight,
-            overflowX: container.style.overflowX,
+        // 1. Lưu lại style gốc để khôi phục sau khi chụp
+        const originalStyles = {
+            containerOverflowX: container.style.overflowX,
+            containerMaxHeight: container.style.maxHeight,
+            cardWidth: cardElement.style.width,
+            cardMaxWidth: cardElement.style.maxWidth,
+            bodyOverflow: document.body.style.overflow // Ngăn cuộn trang khi đang xử lý
         };
 
-        // Temporarily modify styles for capture
+        // 2. Mở rộng toàn bộ để hiển thị hết nội dung
+        // Ẩn thanh cuộn của container để ảnh chụp đẹp hơn
+        container.style.overflowX = 'visible'; 
         container.style.maxHeight = 'none';
-        container.style.overflowX = 'visible';
         
-        showToast('Đang chụp ảnh toàn bảng...');
+        // Ép thẻ Card mở rộng theo nội dung bảng (để chụp được phần cuộn ngang)
+        cardElement.style.width = 'fit-content';
+        cardElement.style.maxWidth = 'none';
+        
+        // Tạm thời khóa cuộn trang chính để tránh rung lắc
+        document.body.style.overflow = 'hidden';
 
-        // Use a short timeout to allow the browser to re-render the layout
+        showToast('Đang xử lý ảnh toàn bảng (bao gồm phần bị che)...');
+
+        // Chờ trình duyệt render lại giao diện đã mở rộng
         setTimeout(() => {
             html2canvas(cardElement, {
-                scale: 2,
+                scale: 2, // Tăng độ nét
                 useCORS: true,
                 backgroundColor: getComputedStyle(document.body).getPropertyValue('--bg-main'),
+                // Quan trọng: Thiết lập kích thước canvas bằng kích thước thật của nội dung đã mở rộng
+                width: cardElement.scrollWidth + 20, // Cộng thêm chút lề an toàn
+                height: cardElement.scrollHeight,
+                windowWidth: cardElement.scrollWidth + 50, // Giả lập màn hình lớn để không bị cắt
+                x: 0,
+                y: 0
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = 'BangTongHop_Full.png';
                 link.href = canvas.toDataURL('image/png');
                 link.click();
+                showToast("Đã chụp ảnh thành công!");
             }).catch(err => {
                 showToast("Lỗi khi chụp ảnh màn hình.");
                 console.error(err);
             }).finally(() => {
-                // Restore original styles
-                container.style.maxHeight = originalContainerStyle.maxHeight;
-                container.style.overflowX = originalContainerStyle.overflowX;
+                // 3. Khôi phục lại hiện trạng ban đầu
+                container.style.overflowX = originalStyles.containerOverflowX;
+                container.style.maxHeight = originalStyles.containerMaxHeight;
+                cardElement.style.width = originalStyles.cardWidth;
+                cardElement.style.maxWidth = originalStyles.cardMaxWidth;
+                document.body.style.overflow = originalStyles.bodyOverflow;
             });
-        }, 250); // 250ms delay for DOM to update
+        }, 500); // Tăng thời gian chờ lên 500ms để đảm bảo render xong style mới
     }
+    // --- *** KẾT THÚC HÀM CẬP NHẬT *** ---
+
 
     function captureAllIndividualCards() {
         const cards = document.querySelectorAll('#allCardsContainer .perf-card');
@@ -837,6 +1108,7 @@
         document.getElementById('month-progress-container').style.display = 'block';
 
         renderComprehensiveDashboard(data, headers, projectedTotals);
+        renderStramAnalysis(data); // <-- NEW FUNCTION CALL
         renderAllEmployeeCards(data);
         renderCommentsBox(data);
     }
@@ -891,11 +1163,21 @@
 
             headers.forEach(h => {
                 const item = e.contestCompletion[h] || { projectedPercent: 0 };
-                let heatmapClass = 'heatmap-red';
-                if (item.projectedPercent >= 100) heatmapClass = 'heatmap-green';
-                else if (item.projectedPercent >= 50) heatmapClass = 'heatmap-orange';
                 
-                tableHtml += `<td class="heatmap-cell ${heatmapClass}">${item.projectedPercent.toFixed(1)}%</td>`;
+                // [THAY ĐỔI] Logic chọn class badge Xanh/Đỏ
+                let badgeClass = '';
+                if (item.projectedPercent >= 100) {
+                    badgeClass = 'badge-green';
+                } else {
+                    badgeClass = 'badge-red';
+                }
+                
+                // [THAY ĐỔI] Thêm <span> với class badge mới, xóa class heatmap khỏi <td>
+                tableHtml += `<td class="heatmap-cell">
+                                <span class="percent-badge ${badgeClass}">
+                                    ${item.projectedPercent.toFixed(1)}%
+                                </span>
+                              </td>`;
             });
 
             tableHtml += `</tr>`;
@@ -950,7 +1232,7 @@
                     </div>
                 </div>`;
             document.getElementById('modal-body').innerHTML = tableHtml;
-            modal.style.display = 'block';
+            document.getElementById('kpi-modal').style.display = 'block';
         }
     }
     
@@ -1000,7 +1282,7 @@
 
         tableHtml += `</tbody></table></div></div>`;
         document.getElementById('modal-body').innerHTML = tableHtml;
-        modal.style.display = 'block';
+        document.getElementById('kpi-modal').style.display = 'block';
     }
 
     function renderAllEmployeeCards(data) {
@@ -1088,7 +1370,7 @@
                                     const remainingCell = remaining <= 0 ? `<td class="icon-cell">✅</td>` : `<td>${formatNumberFull(remaining, 2)}</td>`;
                                     return `<tr>
                                         <td>${index + 1}</td>
-                                        <td style="text-align:left;"><strong>${category}</strong></td>
+                                        <td>${category}</td>
                                         ${targetTodayCell}
                                         <td>${formatNumberFull(data.target, 0)}</td>
                                         <td>${formatNumberFull(data.actual, 2)}</td>
@@ -1118,6 +1400,391 @@
         document.getElementById('comments-textarea').value = comments;
         document.getElementById('comments-section').style.display = 'block';
     }
+    
+    // --- STRAM FUNCTIONS ---
+    
+    /**
+     * Xác định Cấp độ Phát triển (D) và Phong cách Lãnh đạo (S) tổng thể
+     * dựa trên Năng lực (Doanh thu) và Cam kết (Thi đua).
+     */
+    function getOverallDevelopmentLevel(revenuePercent, contestPercent) {
+        // Năng lực: Doanh thu dự kiến
+        // Cam kết: % hoàn thành nhóm thi đua dự kiến
+        const highNangLuc = revenuePercent >= 95;
+        const highCamKet = contestPercent >= 80;
+
+        if (highNangLuc && highCamKet) {
+            return {
+                dLevel: 'D4', sLevel: 'S4',
+                description: 'Năng lực cao, Cam kết cao. (Người tự lực, đạt thành tựu)',
+                nangLuc: `Cao (${revenuePercent.toFixed(1)}%)`,
+                camKet: `Cao (${contestPercent.toFixed(1)}%)`,
+                revenuePercent: revenuePercent,
+                overallProjectedContestCompletion: contestPercent
+            };
+        } else if (highNangLuc && !highCamKet) {
+            return {
+                dLevel: 'D3', sLevel: 'S3',
+                description: 'Năng lực cao, Cam kết thay đổi. (Có khả năng, nhưng thận trọng)',
+                nangLuc: `Cao (${revenuePercent.toFixed(1)}%)`,
+                camKet: `Thấp (${contestPercent.toFixed(1)}%)`,
+                revenuePercent: revenuePercent,
+                overallProjectedContestCompletion: contestPercent
+            };
+        } else if (!highNangLuc && highCamKet) {
+            return {
+                dLevel: 'D1', sLevel: 'S1',
+                description: 'Năng lực thấp, Cam kết cao. (Người mới, nhiệt tình)',
+                nangLuc: `Thấp (${revenuePercent.toFixed(1)}%)`,
+                camKet: `Cao (${contestPercent.toFixed(1)}%)`,
+                revenuePercent: revenuePercent,
+                overallProjectedContestCompletion: contestPercent
+            };
+        } else { // !highNangLuc && !highCamKet
+            return {
+                dLevel: 'D2', sLevel: 'S2',
+                description: 'Năng lực thấp, Cam kết thấp. (Người học, vỡ mộng)',
+                nangLuc: `Thấp (${revenuePercent.toFixed(1)}%)`,
+                camKet: `Thấp (${contestPercent.toFixed(1)}%)`,
+                revenuePercent: revenuePercent,
+                overallProjectedContestCompletion: contestPercent
+            };
+        }
+    }
+
+    /**
+     * Xác định Cấp độ Phát triển (D) cho một NHIỆM VỤ CỤ THỂ (Doanh thu hoặc 1 nhóm thi đua).
+     */
+    function getTaskDevelopmentLevel(projectedPercent) {
+        if (projectedPercent >= 100) {
+            return { dLevel: 'D4', sLevel: 'S4', description: 'Tự lực đạt thành tựu. (Năng lực cao, Cam kết cao)' };
+        } else if (projectedPercent >= 80) {
+            return { dLevel: 'D3', sLevel: 'S3', description: 'Có khả năng nhưng thận trọng. (Năng lực cao, Cam kết thay đổi)' };
+        } else if (projectedPercent >= 50) {
+            return { dLevel: 'D1', sLevel: 'S1', description: 'Nhiệt tình, cần chỉ dẫn. (Năng lực thấp, Cam kết cao)' };
+        } else {
+            return { dLevel: 'D2', sLevel: 'S2', description: 'Vỡ mộng, cần huấn luyện. (Năng lực thấp, Cam kết thấp)' };
+        }
+    }
+    
+    /**
+     * Lấy thông tin chi tiết về Phong cách Lãnh đạo (S)
+     */
+    function getLeadershipStyleInfo(sLevel) {
+        switch (sLevel) {
+            case 'S1':
+                return {
+                    title: 'S1: Chỉ đạo (Hành vi chỉ đạo cao, hỗ trợ thấp)',
+                    chuDich: 'Giúp nhân viên phát triển năng lực.',
+                    bangCach: [
+                        'Ghi nhận các kỹ năng có thể chuyển giao/học cam kết.',
+                        'Đưa ra chỉ đạo về công việc, cách làm và thời điểm hoàn thành.',
+                        'Kiểm tra thường xuyên.'
+                    ]
+                };
+            case 'S2':
+                return {
+                    title: 'S2: Huấn luyện (Hành vi chỉ đạo cao, hỗ trợ cao)',
+                    chuDich: 'Xốc tinh thần và chỉ dạy lại.',
+                    bangCach: [
+                        'Quan tâm đến họ và khích lệ họ.',
+                        'Giải thích vì sao.',
+                        'Chỉ đạo và hướng dẫn lại.',
+                        'Cho họ cùng tham gia giải quyết vấn đề.'
+                    ]
+                };
+            case 'S3':
+                return {
+                    title: 'S3: Hỗ trợ (Hành vi chỉ đạo thấp, hỗ trợ cao)',
+                    chuDich: 'Xây dựng sự tự tin vào năng lực.',
+                    bangCach: [
+                        'Nói D3 đưa ý kiến về công việc được giao và cách làm.',
+                        'Lắng nghe và khích lệ.',
+                        'Hướng dẫn giải quyết vấn đề bằng cách đặt câu hỏi mở.'
+                    ]
+                };
+            case 'S4':
+                return {
+                    title: 'S4: Giao phó (Hành vi chỉ đạo thấp, hỗ trợ thấp)',
+                    chuDich: 'Trân trọng sự đóng góp.',
+                    bangCach: [
+                        'Ghi nhận họ có chuyên môn.',
+                        'Ủng hộ sự tự quyết.',
+                        'Khuyến khích họ đổi mới và học hỏi liên tục.'
+                    ]
+                };
+            default:
+                return { title: '', chuDich: '', bangCach: [] };
+        }
+    }
+    
+    /**
+     * Hiển thị bảng chuẩn đoán STRAM tổng thể
+     */
+    function renderStramAnalysis(data) {
+        const container = document.getElementById('stramAnalysisContainer');
+        let tableHtml = `
+            <table class="stram-table">
+                <thead>
+                    <tr>
+                        <th>Hạng</th>
+                        <th>Nhân viên</th>
+                        <th>Năng lực (DT DK)</th>
+                        <th>Cam kết (TĐ DK)</th>
+                        <th>Cấp độ (Tổng thể)</th>
+                        <th>Phong cách QL</th>
+                        <th>Chi tiết</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+        
+        data.forEach(e => {
+            const stram = getOverallDevelopmentLevel(e.projectedRevenueCompletion, e.overallProjectedContestCompletion);
+            
+            const nangLucPercent = stram.revenuePercent;
+            const nangLucHigh = nangLucPercent >= 95;
+            const nangLucCell = `<div style="text-align: center; min-width: 100px;">
+                                    <span style="color: ${nangLucHigh ? 'var(--success-color)' : 'var(--danger-color)'}; font-weight: 700; font-size: 1.1em;">
+                                        ${nangLucPercent.toFixed(1)}%
+                                    </span>
+                                    <div class="stram-progress-bar-bg">
+                                        <div class="stram-progress-bar-fill ${nangLucHigh ? 'success' : 'danger'}" style="width: ${Math.min(100, nangLucPercent)}%;"></div>
+                                    </div>
+                               </div>`;
+                               
+            const camKetPercent = stram.overallProjectedContestCompletion; // Use the raw contest percent for the bar
+            const camKetHigh = camKetPercent >= 80;
+            const camKetCell = `<div style="text-align: center; min-width: 100px;">
+                                    <span style="color: ${camKetHigh ? 'var(--success-color)' : 'var(--danger-color)'}; font-weight: 700; font-size: 1.1em;">
+                                        ${camKetPercent.toFixed(1)}%
+                                    </span>
+                                    <div class="stram-progress-bar-bg">
+                                        <div class="stram-progress-bar-fill ${camKetHigh ? 'success' : 'danger'}" style="width: ${Math.min(100, camKetPercent)}%;"></div>
+                                    </div>
+                               </div>`;
+            
+            tableHtml += `
+                <tr>
+                    <td class="rank-cell">${e.rank}</td>
+                    <td>${abbreviateName(e.name)}</td>
+                    <td>${nangLucCell}</td>
+                    <td>${camKetCell}</td>
+                    <td><span class="d-level-badge ${stram.dLevel.toLowerCase()}">${stram.dLevel}</span></td>
+                    <td><span class="s-level-badge ${stram.sLevel.toLowerCase()}">${stram.sLevel}</span></td>
+                    <td>
+                        <button class="btn-stram-detail" onclick="showStramDetailsPopup('${e.id}')">
+                            Xem chi tiết
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        container.innerHTML = tableHtml + '</tbody></table>';
+    }
+
+    /**
+     * Hiển thị modal chi tiết chuẩn đoán STRAM cho 1 nhân viên
+     */
+    function showStramDetailsPopup(employeeId) {
+        const employeeData = finalData.find(emp => emp.id === employeeId);
+        if (!employeeData) return;
+
+        const modal = document.getElementById('stram-modal');
+        const modalTitle = document.getElementById('stram-modal-title');
+        const modalBody = document.getElementById('stram-modal-body');
+        
+        modalTitle.textContent = `Phân tích STRAM: ${employeeData.name}`;
+        
+        // 1. Phân tích tổng thể
+        const overall = getOverallDevelopmentLevel(employeeData.projectedRevenueCompletion, employeeData.overallProjectedContestCompletion);
+        const leaderStyle = getLeadershipStyleInfo(overall.sLevel);
+        
+        // 2. Phân tích nhiệm vụ Doanh thu
+        const revenueTask = getTaskDevelopmentLevel(employeeData.projectedRevenueCompletion);
+        
+        // 3. Phân tích từng nhiệm vụ Thi đua
+        const contestTasks = Object.entries(employeeData.contestCompletion)
+            .map(([name, data]) => {
+                return {
+                    name,
+                    rawData: data, // Giữ lại toàn bộ dữ liệu
+                    analysis: getTaskDevelopmentLevel(data.projectedPercent)
+                };
+            })
+            .sort((a, b) => b.rawData.projectedPercent - a.rawData.projectedPercent); // Sắp xếp từ cao đến thấp
+        
+        let contestTaskHtml = contestTasks.map((task, index) => {
+            const leaderAction = getLeadershipStyleInfo(task.analysis.sLevel);
+            const data = task.rawData; // Get the raw data
+            const contestTimeframe = getContestTimeframe(task.name);
+            const remainingDays = contestTimeframe.totalDays - contestTimeframe.passedDays + 1;
+            const todayTarget = (data.target - data.actual > 0 && remainingDays > 0) ? (data.target - data.actual) / remainingDays : 0;
+            const targetTodayCell = data.projectedPercent >= 100 ? `<span class="value green">🏆</span>` : `<span class="value">${formatNumberFull(todayTarget, 2)}</span>`;
+            const remaining = data.target - data.actual;
+            const remainingCell = remaining <= 0 ? `<span class="value green">✅</span>` : `<span class="value">${formatNumberFull(remaining, 2)}</span>`;
+            
+            const projectedPercentClass = data.projectedPercent >= 100 ? 'green' : (data.projectedPercent >= 80 ? 'green' : (data.projectedPercent >= 50 ? 'red' : 'red'));
+            
+            return `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td style="text-align: left; vertical-align: top;">
+                        <strong style="font-size: 1.1em; color: var(--text-primary);">${task.name}</strong>
+                        <div class="stram-task-details">
+                            <div><span class="label">M.tiêu Ngày:</span> ${targetTodayCell}</div>
+                            <div><span class="label">Target:</span> <span class="value">${formatNumberFull(data.target, 0)}</span></div>
+                            <div><span class="label">Lũy kế:</span> <span class="value">${formatNumberFull(data.actual, 2)}</span></div>
+                            <div><span class="label">Còn lại:</span> ${remainingCell}</div>
+                            <div><span class="label">% HT:</span> <span class="value">${data.percent.toFixed(0)}%</span></div>
+                            <div><span class="label">% HT DK:</span> <span class="value ${projectedPercentClass}">${data.projectedPercent.toFixed(1)}%</span></div>
+                        </div>
+                    </td>
+                    <td><span class="d-level-badge ${task.analysis.dLevel.toLowerCase()}">${task.analysis.dLevel}</span></td>
+                    <td><span class="s-level-badge ${task.analysis.sLevel.toLowerCase()}">${task.analysis.sLevel}</span></td>
+                    <td style="text-align: left; font-size: 13px; vertical-align: top;">
+                        <strong>${leaderAction.chuDich}</strong>
+                        <ul>${leaderAction.bangCach.map(li => `<li>${li}</li>`).join('')}</ul>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+        
+        // Tính toán chi tiết cho Doanh thu
+        const revenueActual = employeeData.actual_DTQD || 0;
+        const revenueTarget = employeeData.revenueTarget || 0;
+        const revenueRemaining = revenueTarget - revenueActual;
+        const timeframe = getContestTimeframe('');
+        const revenueTodayTarget = (revenueRemaining > 0) ? revenueRemaining / (timeframe.totalDays - timeframe.passedDays + 1) : 0;
+        const revenueTodayCell = employeeData.projectedRevenueCompletion >= 100 ? `<span class="value green">🏆</span>` : `<span class="value">${formatNumberFull(revenueTodayTarget, 0)}</span>`;
+        const revenueRemainingCell = revenueRemaining <= 0 ? `<span class="value green">✅</span>` : `<span class="value">${formatNumberFull(revenueRemaining, 0)}</span>`;
+        const projectedPercentClass = employeeData.projectedRevenueCompletion >= 100 ? 'green' : (employeeData.projectedRevenueCompletion >= 80 ? 'green' : (employeeData.projectedRevenueCompletion >= 50 ? 'red' : 'red'));
+
+        let revenueTaskHtml = `
+            <tr>
+                <td style="text-align: left; vertical-align: top;">
+                    <strong style="font-size: 1.1em; color: var(--text-primary);">Doanh thu Cá nhân</strong>
+                    <div class="stram-task-details">
+                        <div><span class="label">M.tiêu Ngày:</span> ${revenueTodayCell}</div>
+                        <div><span class="label">Target:</span> <span class="value">${formatNumberFull(revenueTarget, 0)}</span></div>
+                        <div><span class="label">Lũy kế:</span> <span class="value">${formatNumberFull(revenueActual, 0)}</span></div>
+                        <div><span class="label">Còn lại:</span> ${revenueRemainingCell}</div>
+                        <div><span class="label">% HT:</span> <span class="value">${employeeData.revenueCompletion.toFixed(0)}%</span></div>
+                        <div><span class="label">% HT DK:</span> <span class="value ${projectedPercentClass}">${employeeData.projectedRevenueCompletion.toFixed(1)}%</span></div>
+                    </div>
+                </td>
+                <td><span class="d-level-badge ${revenueTask.dLevel.toLowerCase()}">${revenueTask.dLevel}</span></td>
+                <td><span classs="s-level-badge ${revenueTask.sLevel.toLowerCase()}">${revenueTask.sLevel}</span></td>
+                <td style="text-align: left; font-size: 13px; vertical-align: top;">
+                    <strong>${getLeadershipStyleInfo(revenueTask.sLevel).chuDich}</strong>
+                    <ul>${getLeadershipStyleInfo(revenueTask.sLevel).bangCach.map(li => `<li>${li}</li>`).join('')}</ul>
+                </td>
+            </tr>
+        `;
+
+        modalBody.innerHTML = `
+            <style>
+                /* Make modal wider for new columns */
+                #stram-modal .modal-content {
+                    max-width: 1200px; /* Reduced width as columns are merged */
+                }
+                .stram-task-table { table-layout: fixed; width: 100%; }
+                .stram-task-table th, .stram-task-table td { word-wrap: break-word; font-size: 12px; padding: 12px 8px; }
+                
+                /* --- Tab Thi Đua --- */
+                /* STT */ #tab-contest .stram-task-table th:nth-child(1), #tab-contest .stram-task-table td:nth-child(1) { width: 5%; }
+                /* Nhiệm vụ */ #tab-contest .stram-task-table th:nth-child(2), #tab-contest .stram-task-table td:nth-child(2) { width: 35%; text-align: left; }
+                /* Cấp độ */ #tab-contest .stram-task-table th:nth-child(3), #tab-contest .stram-task-table td:nth-child(3) { width: 8%; }
+                /* Phong cách */ #tab-contest .stram-task-table th:nth-child(4), #tab-contest .stram-task-table td:nth-child(4) { width: 8%; }
+                /* Gợi ý */ #tab-contest .stram-task-table th:nth-child(5), #tab-contest .stram-task-table td:nth-child(5) { width: 44%; text-align: left; }
+                
+                /* --- Tab Doanh Thu --- */
+                #tab-revenue .stram-task-table th:nth-child(1), #tab-revenue .stram-task-table td:nth-child(1) { width: 35%; text-align: left; }
+                #tab-revenue .stram-task-table th:nth-child(2), #tab-revenue .stram-task-table td:nth-child(2) { width: 8%; }
+                #tab-revenue .stram-task-table th:nth-child(3), #tab-revenue .stram-task-table td:nth-child(3) { width: 8%; }
+                #tab-revenue .stram-task-table th:nth-child(4), #tab-revenue .stram-task-table td:nth-child(4) { width: 49%; text-align: left; }
+            </style>
+            <div class="stram-modal-grid">
+                <!-- CỘT BÊN TRÁI: TỔNG QUAN & GỢI Ý CHUNG -->
+                <div class="stram-leader-card">
+                    <h3>Chuẩn đoán Tổng thể</h3>
+                    <p style="font-size: 1.1em; text-align: center;">
+                        <span class="d-level-badge ${overall.dLevel.toLowerCase()}">${overall.dLevel}</span>
+                        <span style="font-size: 1.5em; margin: 0 10px;">➔</span>
+                        <span class="s-level-badge ${overall.sLevel.toLowerCase()}">${overall.sLevel}</span>
+                    </p>
+                    <p style="font-size: 14px; text-align: center; color: var(--text-muted); margin-top: 5px;"><i>"${overall.description}"</i></p>
+                    
+                    <hr style="border: none; border-top: 1px solid var(--border-main); margin: 15px 0;">
+                    
+                    <h3>Gợi ý Phong cách Lãnh đạo Chung</h3>
+                    <h4>${leaderStyle.title}</h4>
+                    
+                    <h4>Chủ đích:</h4>
+                    <p style="font-size: 14px; color: var(--text-muted);">${leaderStyle.chuDich}</p>
+                    
+                    <h4>Bằng cách:</h4>
+                    <ul>
+                        ${leaderStyle.bangCach.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <!-- CỘT BÊN PHẢI: CHI TIẾT NHIỆM VỤ -->
+                <div>
+                    <div class="stram-tabs">
+                        <button class="stram-tab-btn active" data-tab="tab-contest">Thi đua (${contestTasks.length})</button>
+                        <button class="stram-tab-btn" data-tab="tab-revenue">Doanh thu</button>
+                    </div>
+                    
+                    <div id="tab-contest" class="stram-tab-content active" style="max-height: 60vh; overflow-y: auto;">
+                        <table class="stram-task-table">
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Nhiệm vụ (Ngành hàng) & Chi tiết</th>
+                                    <th>Cấp độ (D)</th>
+                                    <th>Phong cách (S)</th>
+                                    <th>Gợi ý Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>${contestTaskHtml}</tbody>
+                        </table>
+                    </div>
+                    
+                    <div id="tab-revenue" class="stram-tab-content">
+                         <table class="stram-task-table">
+                            <thead>
+                                <tr>
+                                    <th>Nhiệm vụ & Chi tiết</th>
+                                    <th>Cấp độ (D)</th>
+                                    <th>Phong cách (S)</th>
+                                    <th>Gợi ý Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>${revenueTaskHtml}</tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Add tab switching logic
+        modalBody.querySelectorAll('.stram-tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active from all
+                modalBody.querySelectorAll('.stram-tab-btn').forEach(b => b.classList.remove('active'));
+                modalBody.querySelectorAll('.stram-tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active to clicked
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.add('active');
+            });
+        });
+
+        modal.style.display = 'block';
+    }
+
+
 </script>
 </body>
 </html>
