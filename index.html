@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Quản lý - Điện Máy Xanh Savico</title>
+    <style>
+        :root {
+            --dmx-blue: #0088ff;
+            --dmx-green: #28a745;
+            --dmx-orange: #fd7e14;
+            --bg-color: #f0f2f5;
+            --border-color: #dee2e6;
+            --text-dark: #333;
+            --text-light: #fff;
+        }
+
+        /* --- Cài đặt tổng thể --- */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Header của trang chủ --- */
+        .main-header {
+            background: linear-gradient(90deg, var(--dmx-blue) 0%, var(--dmx-green) 100%);
+            color: var(--text-light);
+            padding: 15px 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .main-header .store-icon {
+            width: 40px;
+            height: 40px;
+            fill: var(--text-light); /* Màu của icon */
+        }
+
+        .main-header h1 {
+            margin: 0;
+            font-size: 1.8em;
+            font-weight: 600;
+        }
+
+        /* --- Thanh Tabs điều hướng --- */
+        .tab-bar {
+            background-color: #fff;
+            padding: 0 20px;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap; /* Cho phép tab xuống dòng trên màn hình nhỏ */
+        }
+
+        .tab-button {
+            padding: 15px 25px;
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #555;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-button:hover {
+            color: var(--dmx-blue);
+        }
+
+        .tab-button.active {
+            color: var(--dmx-blue);
+            border-bottom-color: var(--dmx-blue);
+        }
+
+        /* --- Vùng chứa nội dung --- */
+        .content-area {
+            flex-grow: 1; /* Quan trọng: giúp vùng này lấp đầy không gian còn lại */
+            overflow: hidden; /* Ẩn thanh cuộn của body */
+            position: relative;
+        }
+
+        .tab-content {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .tab-content.active {
+            display: block; /* Chỉ hiện tab đang được chọn */
+        }
+
+        /* --- iFrame để hiển thị file html con --- */
+        .content-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        /* --- Placeholder cho tab chưa có nội dung --- */
+        .placeholder-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            flex-direction: column;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .placeholder-text {
+            font-size: 1.5em;
+            color: #777;
+            max-width: 600px;
+        }
+        .placeholder-text code {
+            background-color: #e9ecef;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: #d63384;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <svg class="store-icon" viewBox="0 0 24 24">
+            <path d="M12,3L2,12V21H22V12L12,3M19,19H17V12H7V19H5V10.19L12,5.69L19,10.19V19M12,14A2,2 0 0,1 14,16A2,2 0 0,1 12,18A2,2 0 0,1 10,16A2,2 0 0,1 12,14Z" />
+        </svg>
+        <h1>Dashboard Quản lý - ĐMX Savico</h1>
+    </header>
+
+    <div class="tab-bar">
+        <button class="tab-button active" onclick="openTab(event, 'Rtst')">📊Realtime</button>
+		<button class="tab-button" onclick="openTab(event, 'Lkst')">🧑‍💻 BI Lũy Kế</button>
+        <button class="tab-button" onclick="openTab(event, 'biNhanVien')">🧑‍💻 BI Nhân viên</button>
+        <button class="tab-button" onclick="openTab(event, 'baoCaoYCX')">📈 Báo cáo YCX</button>
+		<button class="tab-button" onclick="openTab(event, 'lichpg')">🗓️ Lịch làm việc PG</button>
+		<button class="tab-button" onclick="openTab(event, 'lichnv')">🗓️ Lịch làm việc NV</button>    
+    </div>
+
+    <main class="content-area">
+        <div id="Rtst" class="tab-content active">
+            <iframe class="content-iframe" src="./RT.html"></iframe>
+        </div>
+		<div id="Lkst" class="tab-content">
+            <iframe class="content-iframe" src="./Lkst.html"></iframe>
+        </div>
+
+        <div id="biNhanVien" class="tab-content">
+            <iframe class="content-iframe" src="./NV.html"></iframe>
+        </div>
+        
+		<div id="baoCaoYCX" class="tab-content">
+            <iframe class="content-iframe" src="./YCX.html"></iframe>
+        </div>
+		<div id="lichpg" class="tab-content">
+            <iframe class="content-iframe" src="./pg.html"></iframe>
+        </div>
+	</div>
+		<div id="lichnv" class="tab-content">
+            <iframe class="content-iframe" src="./lichnv.html"></iframe>
+        </div>    
+    </main>
+
+    <script>
+        function openTab(evt, tabName) {
+            let i, tabContents, tabButtons;
+
+            tabContents = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+
+            tabButtons = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove("active");
+            }
+
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
+<script>
+  async function loadData() {
+    const res = await fetch('https://raw.githubusercontent.com/Ganang1312/DMX-Savico-Dashboard/main/data.json');
+    const data = await res.json();
+
+    document.getElementById('textarea_kinh_doanh').value = data.kinh_doanh;
+    document.getElementById('textarea_thi_dua').value = data.thi_dua;
+
+    const tableNam = document.getElementById('table_nam_body');
+    tableNam.innerHTML = '';
+    data.du_lieu_nam.forEach(row => {
+      tableNam.innerHTML += `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td></tr>`;
+    });
+
+    const tableNgay = document.getElementById('table_ngay_body');
+    tableNgay.innerHTML = '';
+    data.so_sanh_ngay.forEach(row => {
+      tableNgay.innerHTML += `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td></tr>`;
+    });
+  }
+  loadData();
+</script>
+
+
+</body>
+</html>
+
+
