@@ -69,7 +69,8 @@
             /* Màu đen tuyệt đối */
             * { color: black !important; border-color: black !important; }
             .bg-black { background-color: black !important; color: white !important; }
-            .text-white { color: white !important; } 
+            /* Sửa lại text-white khi in đè lên nền trắng -> thành đen */
+            .text-white { color: black !important; } 
 
             /* PHÓNG ĐẠI CỠ CHỮ (Gấp ~1.5 - 2 lần cũ) */
             /* Tiêu đề nhỏ (Mục tiêu tháng, Lũy kế...) */
@@ -186,9 +187,9 @@
 
             return (
                 <div className="bg-white rounded-lg shadow-xl overflow-hidden border-2 border-dashed border-black flex flex-col break-inside-avoid print-no-shadow print:shadow-none">
-                    <div className="bg-black text-white p-2 px-3 flex justify-between items-center print:bg-black print:text-white print:py-1">
+                    <div className="bg-white text-black border-b border-black p-2 px-3 flex justify-between items-center print:bg-white print:text-black print:py-1 print:border-b print:border-black">
                         <div className="flex items-center gap-2">
-                             <Icon name="BookOpen" size={16} className="text-white" />
+                             <Icon name="BookOpen" size={16} className="text-black" />
                             <span className="font-bold text-base">Các nhóm hàng quan tâm</span>
                         </div>
                     </div>
@@ -213,17 +214,17 @@
         });
 
         const GroupNameInput = memo(({ id, name, onNameChange, removeGroup, canRemove }) => (
-             <div className="bg-black text-white p-2 px-3 flex justify-between items-center print:bg-black print:text-white print:py-1 print:px-1">
+             <div className="bg-white text-black border-b border-black p-2 px-3 flex justify-between items-center print:bg-white print:text-black print:py-1 print:px-1 print:border-b print:border-black">
                 <input 
                     value={name}
                     onChange={(e) => onNameChange(id, e.target.value)}
-                    className="bg-transparent text-white font-bold text-base focus:outline-none w-3/4 placeholder-gray-400 print:text-white print:placeholder-gray-300 print:w-full"
+                    className="bg-transparent text-black font-bold text-base focus:outline-none w-3/4 placeholder-gray-500 print:text-black print:placeholder-transparent print:w-full"
                     placeholder="Tên nhóm..."
                 />
                 {canRemove && (
                     <button 
                         onClick={() => removeGroup(id)}
-                        className="text-gray-400 hover:text-white transition-colors no-print"
+                        className="text-gray-400 hover:text-red-500 transition-colors no-print"
                         title="Xóa"
                     >
                         <Icon name="Trash2" size={16} />
@@ -232,7 +233,7 @@
             </div>
         ));
 
-        const GroupCard = memo(({ group, handleGroupChange, handleDayChange, removeGroup, groupsLength, calculateWeeklyTotal }) => {
+        const GroupCard = memo(({ group, handleGroupChange, handleDayChange, handleTotalChange, removeGroup, groupsLength }) => {
             const onNameChange = useCallback((id, newName) => {
                 handleGroupChange(id, 'name', newName);
             }, [handleGroupChange]);
@@ -306,7 +307,13 @@
                         </div>
                         <div className="flex justify-between items-center pt-2 border-t border-black print:pt-0 print:border-t-2">
                             <span className="text-[10px] font-bold text-black uppercase">Tổng:</span>
-                            <span className="text-base font-bold text-black">{calculateWeeklyTotal(group.days)}</span>
+                            {/* ĐÃ THAY ĐỔI: Từ span sang input để có thể sửa được */}
+                            <input 
+                                value={group.weeklyTotal}
+                                onChange={(e) => handleTotalChange(group.id, e.target.value)}
+                                className="text-base font-bold text-black text-right bg-transparent focus:outline-none w-20"
+                                placeholder="0"
+                            />
                         </div>
                     </div>
                 </div>
@@ -332,15 +339,16 @@
 
             const defaultInterestContent = splitAndFormatGroups(predefinedInterestGroups);
 
+            // ĐÃ THAY ĐỔI: Thêm weeklyTotal: 0 vào dữ liệu khởi tạo
             const initialGroups = [
-                { id: 1, name: 'Camera', monthTarget: '', accumulated: '', weekTarget: '', dailyTarget: '', days: { t2: '', t3: '', t4: '', t5: '', t6: '', t7: '', cn: '' } },
-                { id: 2, name: 'Sim', monthTarget: '', accumulated: '', weekTarget: '', dailyTarget: '', days: { t2: '', t3: '', t4: '', t5: '', t6: '', t7: '', cn: '' } },
-                { id: 3, name: 'ICT / LT', monthTarget: '', accumulated: '', weekTarget: '', dailyTarget: '', days: { t2: '', t3: '', t4: '', t5: '', t6: '', t7: '', cn: '' } },
-                { id: 4, name: 'Gia dụng', monthTarget: '', accumulated: '', weekTarget: '', dailyTarget: '', days: { t2: '', t3: '', t4: '', t5: '', t6: '', t7: '', cn: '' } },
-                { id: 5, name: 'Bảo hiểm', monthTarget: '', accumulated: '', weekTarget: '', dailyTarget: '', days: { t2: '', t3: '', t4: '', t5: '', t6: '', t7: '', cn: '' } },
-                { id: 6, name: 'Samsung', monthTarget: '', accumulated: '', weekTarget: '', dailyTarget: '', days: { t2: '', t3: '', t4: '', t5: '', t6: '', t7: '', cn: '' } },
-                { id: 7, name: 'Phụ kiện', monthTarget: '', accumulated: '', weekTarget: '', dailyTarget: '', days: { t2: '', t3: '', t4: '', t5: '', t6: '', t7: '', cn: '' } },
-                { id: 8, name: 'Điện thoại', monthTarget: '', accumulated: '', weekTarget: '', dailyTarget: '', days: { t2: '', t3: '', t4: '', t5: '', t6: '', t7: '', cn: '' } },
+                { id: 1, name: 'Camera', monthTarget: '', accumulated: '', weekTarget: '', dailyTarget: '', weeklyTotal: 0, days: { t2: '', t3: '', t4: '', t5: '', t6: '', t7: '', cn: '' } },
+                { id: 2, name: 'Sim', monthTarget: '', accumulated: '', weekTarget: '', dailyTarget: '', weeklyTotal: 0, days: { t2: '', t3: '', t4: '', t5: '', t6: '', t7: '', cn: '' } },
+                { id: 3, name: 'ICT / LT', monthTarget: '', accumulated: '', weekTarget: '', dailyTarget: '', weeklyTotal: 0, days: { t2: '', t3: '', t4: '', t5: '', t6: '', t7: '', cn: '' } },
+                { id: 4, name: 'Gia dụng', monthTarget: '', accumulated: '', weekTarget: '', dailyTarget: '', weeklyTotal: 0, days: { t2: '', t3: '', t4: '', t5: '', t6: '', t7: '', cn: '' } },
+                { id: 5, name: 'Bảo hiểm', monthTarget: '', accumulated: '', weekTarget: '', dailyTarget: '', weeklyTotal: 0, days: { t2: '', t3: '', t4: '', t5: '', t6: '', t7: '', cn: '' } },
+                { id: 6, name: 'Samsung', monthTarget: '', accumulated: '', weekTarget: '', dailyTarget: '', weeklyTotal: 0, days: { t2: '', t3: '', t4: '', t5: '', t6: '', t7: '', cn: '' } },
+                { id: 7, name: 'Phụ kiện', monthTarget: '', accumulated: '', weekTarget: '', dailyTarget: '', weeklyTotal: 0, days: { t2: '', t3: '', t4: '', t5: '', t6: '', t7: '', cn: '' } },
+                { id: 8, name: 'Điện thoại', monthTarget: '', accumulated: '', weekTarget: '', dailyTarget: '', weeklyTotal: 0, days: { t2: '', t3: '', t4: '', t5: '', t6: '', t7: '', cn: '' } },
             ];
 
             const initialGeneralInfo = {
@@ -352,22 +360,34 @@
             const [groups, setGroups] = useState(initialGroups);
             const [interestContent, setInterestContent] = useState(defaultInterestContent);
 
-            const calculateWeeklyTotal = useCallback((days) => {
-                return Object.values(days).reduce((acc, curr) => {
-                    const val = parseFloat(curr);
-                    return acc + (isNaN(val) ? 0 : val);
-                }, 0);
-            }, []);
-
             const handleGroupChange = useCallback((id, field, value) => {
                 setGroups(prevGroups => prevGroups.map(group => 
                     group.id === id ? { ...group, [field]: value } : group
                 ));
             }, []);
 
+            // ĐÃ THAY ĐỔI: Cập nhật logic tự động tính tổng khi sửa ngày
             const handleDayChange = useCallback((id, day, value) => {
+                setGroups(prevGroups => prevGroups.map(group => {
+                    if (group.id !== id) return group;
+                    
+                    const newDays = { ...group.days, [day]: value };
+                    
+                    // Tính toán lại tổng tự động
+                    const total = Object.values(newDays).reduce((acc, curr) => {
+                        const val = parseFloat(curr);
+                        return acc + (isNaN(val) ? 0 : val);
+                    }, 0);
+
+                    // Cập nhật cả ngày và tổng mới
+                    return { ...group, days: newDays, weeklyTotal: total };
+                }));
+            }, []);
+
+            // ĐÃ THAY ĐỔI: Thêm hàm xử lý khi nhập tay vào ô Tổng
+            const handleTotalChange = useCallback((id, value) => {
                 setGroups(prevGroups => prevGroups.map(group => 
-                    group.id === id ? { ...group, days: { ...group.days, [day]: value } } : group
+                    group.id === id ? { ...group, weeklyTotal: value } : group
                 ));
             }, []);
 
@@ -387,6 +407,7 @@
                         id: newId,
                         name: 'Nhóm mới',
                         monthTarget: '', accumulated: '', weekTarget: '', dailyTarget: '',
+                        weeklyTotal: 0,
                         days: { t2: '', t3: '', t4: '', t5: '', t6: '', t7: '', cn: '' }
                     }];
                 });
@@ -395,13 +416,24 @@
             const clearAllData = useCallback(() => {
                 if (window.confirm('CẢNH BÁO: Bạn muốn xóa TRẮNG toàn bộ thông tin?')) {
                     setGeneralInfo({ ...initialGeneralInfo, signerTitle: 'DMX Savico' });
+                    
+                    // Xóa trắng tên nhóm hàng (name: '') và reset tổng về 0
                     setGroups(initialGroups.map(g => ({
                         ...g,
+                        name: '', 
                         monthTarget: '', accumulated: '', weekTarget: '', dailyTarget: '',
+                        weeklyTotal: 0,
                         days: { t2: '', t3: '', t4: '', t5: '', t6: '', t7: '', cn: '' }
                     })));
+                    
                     setManagerComment('');
-                    setInterestContent(defaultInterestContent);
+                    
+                    // Hỏi thêm về nhóm hàng quan tâm
+                    if (window.confirm('Bạn có muốn xóa trắng cả nội dung "Các nhóm hàng quan tâm" không?\n(OK = Xóa trắng, Cancel = Giữ danh sách mặc định)')) {
+                        setInterestContent({ col1: '', col2: '' });
+                    } else {
+                        setInterestContent(defaultInterestContent);
+                    }
                 }
             }, [initialGeneralInfo, initialGroups, defaultInterestContent]);
 
@@ -575,9 +607,9 @@
                                         group={item.data} 
                                         handleGroupChange={handleGroupChange}
                                         handleDayChange={handleDayChange}
+                                        handleTotalChange={handleTotalChange}
                                         removeGroup={removeGroup}
                                         groupsLength={groups.length}
-                                        calculateWeeklyTotal={calculateWeeklyTotal}
                                     />;
                                 } else if (item.type === 'interest') {
                                     return <InterestGroupCard key={item.id} interestColumns={interestContent} setInterestColumns={setInterestContent} />;
