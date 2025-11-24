@@ -19,7 +19,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <!-- Google Fonts: Noto Sans -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
         body { font-family: 'Noto Sans', sans-serif; }
@@ -32,37 +32,114 @@
             overflow: visible !important;
         }
 
-        /* --- TÙY CHỈNH IN ẤN NÂNG CAO --- */
+        /* --- TÙY CHỈNH IN ẤN SIÊU TO & SIÊU KHÍT --- */
         @media print {
             @page { 
                 size: A4 landscape;
-                margin: 5mm;
+                margin: 2mm; /* Lề giấy cực nhỏ */
             }
             body { 
                 -webkit-print-color-adjust: exact !important; 
                 print-color-adjust: exact !important; 
                 background-color: white !important;
-                zoom: 67%; 
+                zoom: 98%; /* Zoom tối đa */
             }
             .no-print { display: none !important; }
+            
+            /* Grid in ấn xít lại */
             .print-grid-fix {
                 display: grid !important;
                 grid-template-columns: repeat(3, minmax(0, 1fr)) !important; 
-                gap: 0.5rem !important;
+                gap: 2px !important; /* Khoảng cách giữa các khối gần như bằng 0 */
             }
-            .print-no-shadow { box-shadow: none !important; border: 1px solid #000 !important; }
+            
+            .print-no-shadow { box-shadow: none !important; border: 2px solid #000 !important; }
+            
+            /* Ép chiều cao textarea */
             .print-h-auto { 
-                min-height: 80px !important; 
+                min-height: 60px !important; /* Giảm chiều cao tối thiểu để tiết kiệm chỗ */
                 height: auto !important; 
                 white-space: pre-wrap !important; 
             }
             .break-inside-avoid { break-inside: avoid; page-break-inside: avoid; }
             .no-scroll-on-print { overflow: hidden !important; }
             
-            /* Ép màu chữ đen tuyệt đối khi in */
+            /* --- CẤU HÌNH PHÔNG CHỮ KHỔNG LỒ & BỐ CỤC CHẶT --- */
+            
+            /* Màu đen tuyệt đối */
             * { color: black !important; border-color: black !important; }
             .bg-black { background-color: black !important; color: white !important; }
-            .text-white { color: white !important; }
+            .text-white { color: white !important; } 
+
+            /* PHÓNG ĐẠI CỠ CHỮ (Gấp ~1.5 - 2 lần cũ) */
+            /* Tiêu đề nhỏ (Mục tiêu tháng, Lũy kế...) */
+            .text-\[8px\] { 
+                font-size: 14px !important; 
+                font-weight: 800 !important; /* Rất đậm */
+                line-height: 1 !important;
+                margin-bottom: 0 !important;
+                text-transform: uppercase;
+            }
+            /* Thứ ngày (T2, T3...) */
+            .text-\[9px\] { 
+                font-size: 16px !important; 
+                font-weight: 800 !important;
+            }
+            /* Nhãn (Tổng kết tuần...) */
+            .text-\[10px\] { 
+                font-size: 16px !important; 
+                font-weight: 800 !important;
+            }
+            
+            /* Số liệu nhập vào & Text thường */
+            .text-xs { 
+                font-size: 20px !important; 
+                font-weight: 700 !important; 
+            }
+            .text-sm { font-size: 18px !important; }
+            .text-base { font-size: 22px !important; font-weight: 900 !important; } /* Tổng kết to đùng */
+            .text-lg { font-size: 24px !important; }
+
+            /* Input nhập liệu: Siêu to, bỏ viền để tiết kiệm diện tích nhìn */
+            input { 
+                font-weight: 800 !important; 
+                font-size: 22px !important;
+                padding: 0 !important;
+                height: auto !important;
+                line-height: 1 !important;
+                border: none !important; /* Bỏ viền input con để nhìn thoáng hơn */
+                border-bottom: 1px dotted #999 !important; /* Chỉ giữ gạch chân mờ */
+                background: transparent !important;
+            }
+            
+            /* Textarea */
+            textarea {
+                font-size: 16px !important;
+                line-height: 1.2 !important;
+                padding: 2px !important;
+            }
+
+            /* --- CẮT GIẢM KHOẢNG TRỐNG (PADDING/MARGIN) --- */
+            /* Loại bỏ padding thừa trong các ô */
+            .p-2 { padding: 1px 2px !important; } 
+            .px-3 { padding-left: 4px !important; padding-right: 4px !important; }
+            .py-1 { padding-top: 0px !important; padding-bottom: 0px !important; }
+            .mb-4 { margin-bottom: 4px !important; }
+            .mb-2 { margin-bottom: 1px !important; }
+            .mt-4 { margin-top: 2px !important; }
+            
+            /* Căn chỉnh lại lưới con bên trong thẻ GroupCard */
+            .grid-cols-2 { gap: 0px !important; } /* Bỏ khoảng cách cột */
+            .flex-col { gap: 0px !important; } /* Bỏ khoảng cách dòng flex */
+            
+            /* Giảm độ dày đường kẻ phân cách để dành chỗ cho chữ */
+            .border-r { border-right-width: 1px !important; }
+            .h-px { height: 1px !important; margin: 1px 0 !important; } /* Đường kẻ ngang siêu mảnh, sát chữ */
+            
+            /* Ẩn các placeholder khi in để đỡ rối */
+            input::placeholder, textarea::placeholder {
+                color: transparent !important;
+            }
         }
     </style>
 </head>
@@ -96,7 +173,8 @@
         // --- COMPONENTS ---
 
         const InterestGroupCard = memo(({ interestColumns, setInterestColumns }) => {
-            const minHeightClass = "min-h-[220px] md:min-h-[200px] xl:min-h-[200px]"; 
+            // Giảm chiều cao tối thiểu khi in để tiết kiệm giấy
+            const minHeightClass = "min-h-[220px] md:min-h-[200px] xl:min-h-[200px] print:min-h-[150px]"; 
             
             const handleChangeCol1 = useCallback((e) => {
                 setInterestColumns(prev => ({ ...prev, col1: e.target.value }));
@@ -128,17 +206,18 @@
                             className={`w-full h-full p-2 bg-white rounded-lg border border-black focus:outline-none focus:border-black focus:ring-1 focus:ring-black text-black text-sm resize-none leading-relaxed overflow-hidden print:border-none print:p-0 print:text-xs print-h-auto data-capture-textarea`}
                         ></textarea>
                     </div>
-                    <div className="text-[10px] text-black p-1 pt-0 text-center font-medium">Nội dung không cuộn và được chia thành 2 cột riêng biệt.</div>
+                    {/* Ẩn dòng hướng dẫn khi in */}
+                    <div className="text-[10px] text-black p-1 pt-0 text-center font-medium print:hidden">Nội dung không cuộn và được chia thành 2 cột riêng biệt.</div>
                 </div>
             );
         });
 
         const GroupNameInput = memo(({ id, name, onNameChange, removeGroup, canRemove }) => (
-             <div className="bg-black text-white p-2 px-3 flex justify-between items-center print:bg-black print:text-white print:py-1">
+             <div className="bg-black text-white p-2 px-3 flex justify-between items-center print:bg-black print:text-white print:py-1 print:px-1">
                 <input 
                     value={name}
                     onChange={(e) => onNameChange(id, e.target.value)}
-                    className="bg-transparent text-white font-bold text-base focus:outline-none w-3/4 placeholder-gray-400 print:text-white print:placeholder-gray-300"
+                    className="bg-transparent text-white font-bold text-base focus:outline-none w-3/4 placeholder-gray-400 print:text-white print:placeholder-gray-300 print:w-full"
                     placeholder="Tên nhóm..."
                 />
                 {canRemove && (
@@ -168,8 +247,8 @@
                         canRemove={groupsLength > 8}
                     />
 
-                    <div className="p-2 bg-white grid grid-cols-2 gap-2 text-center border-b border-black print:py-1">
-                        <div className="flex flex-col border-r border-black pr-1">
+                    <div className="p-2 bg-white grid grid-cols-2 gap-2 text-center border-b border-black print:py-0 print:gap-0">
+                        <div className="flex flex-col border-r border-black pr-1 print:pr-0">
                             <span className="text-[8px] text-black uppercase font-bold">Mục tiêu Tháng</span>
                             <input 
                                 value={group.monthTarget}
@@ -178,7 +257,7 @@
                                 placeholder="..."
                             />
                         </div>
-                        <div className="flex flex-col pl-1">
+                        <div className="flex flex-col pl-1 print:pl-0">
                             <span className="text-[8px] text-black uppercase font-bold">Lũy kế</span>
                             <input 
                                 value={group.accumulated}
@@ -187,8 +266,8 @@
                                 placeholder="..."
                             />
                         </div>
-                        <div className="col-span-2 h-px bg-black my-0.5"></div>
-                        <div className="flex flex-col border-r border-black pr-1">
+                        <div className="col-span-2 h-px bg-black my-0.5 print:my-0"></div>
+                        <div className="flex flex-col border-r border-black pr-1 print:pr-0">
                             <span className="text-[8px] text-black uppercase font-bold">Mục tiêu Tuần</span>
                             <input 
                                 value={group.weekTarget}
@@ -197,7 +276,7 @@
                                 placeholder="..."
                             />
                         </div>
-                        <div className="flex flex-col pl-1">
+                        <div className="flex flex-col pl-1 print:pl-0">
                             <span className="text-[8px] text-black uppercase font-bold">Mục tiêu Ngày</span>
                             <input 
                                 value={group.dailyTarget}
@@ -208,25 +287,25 @@
                         </div>
                     </div>
 
-                    <div className="p-2 flex-grow print:py-1">
-                        <div className="grid grid-cols-7 gap-1 mb-1">
+                    <div className="p-2 flex-grow print:py-0">
+                        <div className="grid grid-cols-7 gap-1 mb-1 print:mb-0 print:gap-0">
                             {['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'].map(d => (
                                 <div key={d} className="text-center text-[9px] font-bold text-black">{d}</div>
                             ))}
                         </div>
-                        <div className="grid grid-cols-7 gap-1 mb-2">
+                        <div className="grid grid-cols-7 gap-1 mb-2 print:gap-0 print:mb-0">
                             {Object.keys(group.days).map((day) => (
                                 <input
                                     key={day}
                                     type="number"
                                     value={group.days[day]}
                                     onChange={(e) => handleDayChange(group.id, day, e.target.value)}
-                                    className="w-full text-center border border-gray-400 rounded py-0.5 text-xs font-medium text-black focus:border-black focus:outline-none"
+                                    className="w-full text-center border border-gray-400 rounded py-0.5 text-xs font-medium text-black focus:border-black focus:outline-none print:border-none print:border-b print:border-dotted print:rounded-none"
                                 />
                             ))}
                         </div>
-                        <div className="flex justify-between items-center pt-2 border-t border-black print:pt-1">
-                            <span className="text-[10px] font-bold text-black uppercase">Tổng kết tuần:</span>
+                        <div className="flex justify-between items-center pt-2 border-t border-black print:pt-0 print:border-t-2">
+                            <span className="text-[10px] font-bold text-black uppercase">Tổng:</span>
                             <span className="text-base font-bold text-black">{calculateWeeklyTotal(group.days)}</span>
                         </div>
                     </div>
@@ -328,7 +407,7 @@
 
             const handlePrint = () => window.print();
 
-            // --- HÀM CHỤP ẢNH ĐÃ ĐƯỢC TỐI ƯU ---
+            // --- HÀM CHỤP ẢNH ---
             const captureAndProcess = async (callback) => {
                 const element = document.getElementById('dashboard-content-to-capture');
                 if (!element) return;
@@ -446,29 +525,29 @@
 
                     <div id="dashboard-content-to-capture">
                         {/* Header Info */}
-                        <div className="bg-white rounded-xl shadow-md p-4 mb-4 border-t-4 border-black break-inside-avoid print:mb-2 print:p-2 print-compact-mb print-no-shadow">
+                        <div className="bg-white rounded-xl shadow-md p-4 mb-4 border-t-4 border-black break-inside-avoid print:mb-2 print:p-2 print-compact-mb print-no-shadow print:border-2">
                             <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4 print:mb-2 print:gap-2">
                                 <div className="flex items-center gap-3 w-full md:w-auto">
                                     <div className="bg-gray-200 p-3 rounded-full no-print">
                                         <Icon name="User" className="text-black" size={24} />
                                     </div>
                                     <div className="text-left w-full">
-                                        <label className="block text-[10px] text-black uppercase font-bold tracking-wider">Nhân viên</label>
-                                        <input value={generalInfo.userName} onChange={(e) => setGeneralInfo({...generalInfo, userName: e.target.value})} className="text-lg font-bold text-black border-b border-dashed border-gray-400 focus:outline-none focus:border-black bg-transparent w-full placeholder-gray-400" placeholder="Nhập tên..." />
+                                        <label className="block text-[10px] text-black uppercase font-bold tracking-wider print:text-lg">Nhân viên</label>
+                                        <input value={generalInfo.userName} onChange={(e) => setGeneralInfo({...generalInfo, userName: e.target.value})} className="text-lg font-bold text-black border-b border-dashed border-gray-400 focus:outline-none focus:border-black bg-transparent w-full placeholder-gray-400 print:text-xl" placeholder="Nhập tên..." />
                                     </div>
                                 </div>
                                 <div className="flex gap-4 w-full md:w-auto justify-between md:justify-end">
                                     <div>
-                                        <label className="block text-[10px] text-black uppercase font-bold">Mã NV</label>
-                                        <input value={generalInfo.userCode} onChange={(e) => setGeneralInfo({...generalInfo, userCode: e.target.value})} className="font-semibold w-24 border-b border-dashed border-gray-400 focus:outline-none text-center bg-transparent" placeholder="..." />
+                                        <label className="block text-[10px] text-black uppercase font-bold print:text-lg">Mã NV</label>
+                                        <input value={generalInfo.userCode} onChange={(e) => setGeneralInfo({...generalInfo, userCode: e.target.value})} className="font-semibold w-24 border-b border-dashed border-gray-400 focus:outline-none text-center bg-transparent print:text-xl" placeholder="..." />
                                     </div>
                                     <div>
-                                        <label className="block text-[10px] text-black uppercase font-bold">Tuần</label>
-                                        <input value={generalInfo.week} onChange={(e) => setGeneralInfo({...generalInfo, week: e.target.value})} className="font-semibold w-16 border-b border-dashed border-gray-400 focus:outline-none text-center bg-transparent" placeholder="..." />
+                                        <label className="block text-[10px] text-black uppercase font-bold print:text-lg">Tuần</label>
+                                        <input value={generalInfo.week} onChange={(e) => setGeneralInfo({...generalInfo, week: e.target.value})} className="font-semibold w-16 border-b border-dashed border-gray-400 focus:outline-none text-center bg-transparent print:text-xl" placeholder="..." />
                                     </div>
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-white rounded-lg p-3 border border-black print:border-black print:p-0 print:gap-2">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-white rounded-lg p-3 border border-black print:border-black print:p-0 print:gap-1">
                                 {[
                                     { label: 'Target (Mục tiêu)', val: generalInfo.mainTarget, setVal: v => setGeneralInfo({...generalInfo, mainTarget: v}) },
                                     { label: 'Lũy kế hiện tại', val: generalInfo.accumulated, setVal: v => setGeneralInfo({...generalInfo, accumulated: v}) },
@@ -488,7 +567,7 @@
                         </div>
 
                         {/* Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-4 print-grid-fix print:mb-2 print:gap-2">
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-4 print-grid-fix print:mb-2 print:gap-1">
                             {allItemsToRender.map((item) => {
                                 if (item.type === 'group') {
                                     return <GroupCard 
@@ -514,7 +593,7 @@
                         </div>
 
                         {/* Comments */}
-                        <div className="bg-white rounded-xl shadow-md border-l-8 border-black overflow-hidden break-inside-avoid print-no-shadow print:border-black">
+                        <div className="bg-white rounded-xl shadow-md border-l-8 border-black overflow-hidden break-inside-avoid print-no-shadow print:border-2">
                             <div className="p-4 print:p-2">
                                 <div className="flex items-center gap-2 mb-2 print:mb-1"><Icon name="MessageSquare" className="text-black" size={20} /><h3 className="text-base font-bold text-black uppercase">Nhận xét của Quản lý</h3></div>
                                 <div className="relative">
